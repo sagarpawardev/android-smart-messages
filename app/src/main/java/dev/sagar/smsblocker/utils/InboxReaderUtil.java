@@ -20,6 +20,8 @@ public class InboxReaderUtil {
 
     private Context context;
     private InboxReaderUtil reader = null;
+    public final int SORT_DESC = 0;
+    public final int SORT_ASC = 1;
 
     public InboxReaderUtil(Context context) {
         this.context = context;
@@ -74,7 +76,7 @@ public class InboxReaderUtil {
     }
 
     //Returns All SMS From/To contactNo
-    public ArrayList<SMS> getAllSMSFromTo(String contactNo){
+    public ArrayList<SMS> getAllSMSFromTo(String contactNo, int sortingOrder){
         Uri uriSMSURI = Uri.parse("content://sms/");
         String[] projection = {Telephony.Sms._ID,
                 Telephony.Sms.ADDRESS,
@@ -85,7 +87,12 @@ public class InboxReaderUtil {
 
         String selection = "address = ?";
         String[] selectionArgs = {contactNo};
-        String mSortOrder = "date DESC";
+        String mSortOrder;
+        switch (sortingOrder) {
+            case SORT_DESC: mSortOrder = "date DESC"; break;
+            case SORT_ASC: mSortOrder = "date ASC"; break;
+            default: mSortOrder="";
+        }
 
         Cursor c = context.getContentResolver()
                 .query(uriSMSURI, projection, selection, selectionArgs, mSortOrder);
@@ -123,6 +130,10 @@ public class InboxReaderUtil {
         }
 
         return smses;
+    }
+
+    public ArrayList<SMS> getAllSMSFromTo(String contactNo){
+        return getAllSMSFromTo(contactNo, SORT_DESC);
     }
 
 
