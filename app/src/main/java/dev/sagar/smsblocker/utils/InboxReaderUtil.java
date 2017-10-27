@@ -20,8 +20,8 @@ public class InboxReaderUtil {
 
     private Context context;
     private InboxReaderUtil reader = null;
-    public final int SORT_DESC = 0;
-    public final int SORT_ASC = 1;
+    public static final int SORT_DESC = 0;
+    public static final int SORT_ASC = 1;
 
     public InboxReaderUtil(Context context) {
         this.context = context;
