@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.utils;
+package dev.sagar.smsblocker.tech.utils;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import dev.sagar.smsblocker.beans.SMS;
+import dev.sagar.smsblocker.tech.beans.SMS;
 
 /**
  * Created by sagarpawar on 15/10/17.

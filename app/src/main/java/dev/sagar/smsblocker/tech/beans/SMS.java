@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.beans;
+package dev.sagar.smsblocker.tech.beans;
 
 import android.os.Parcel;
 import android.os.Parcelable;

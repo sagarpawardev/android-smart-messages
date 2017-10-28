@@ -1,12 +1,9 @@
-package dev.sagar.smsblocker.utils;
+package dev.sagar.smsblocker.tech.utils;
 
 
 import android.content.Context;
 import android.telephony.SmsManager;
 import android.util.Log;
-
-
-import dev.sagar.smsblocker.beans.SimOperator;
 
 /**
  * Created by sagarpawar on 22/10/17.

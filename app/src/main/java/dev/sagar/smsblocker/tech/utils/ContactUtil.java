@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.utils;
+package dev.sagar.smsblocker.tech.utils;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import dev.sagar.smsblocker.beans.Contact;
+import dev.sagar.smsblocker.tech.beans.Contact;
 
 /**
  * Created by sagarpawar on 15/10/17.

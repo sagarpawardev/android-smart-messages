@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.beans;
+package dev.sagar.smsblocker.tech.beans;
 
 /**
  * Created by sagarpawar on 22/10/17.

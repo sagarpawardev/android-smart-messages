@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.adapters;
+package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 import dev.sagar.smsblocker.R;
-import dev.sagar.smsblocker.beans.SMS;
-import dev.sagar.smsblocker.utils.ContactUtil;
+import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.ContactUtil;
 
 /**
  * Created by sagarpawar on 15/10/17.

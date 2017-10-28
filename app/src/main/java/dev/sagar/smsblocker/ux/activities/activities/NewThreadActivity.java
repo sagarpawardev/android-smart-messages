@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.activities;
+package dev.sagar.smsblocker.ux.activities.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,9 +16,9 @@ import android.widget.EditText;
 import java.util.ArrayList;
 
 import dev.sagar.smsblocker.R;
-import dev.sagar.smsblocker.adapters.RVNewThreadAdapter_Contacts;
-import dev.sagar.smsblocker.beans.Contact;
-import dev.sagar.smsblocker.utils.ContactUtil;
+import dev.sagar.smsblocker.ux.adapters.RVNewThreadAdapter_Contacts;
+import dev.sagar.smsblocker.tech.beans.Contact;
+import dev.sagar.smsblocker.tech.utils.ContactUtil;
 
 public class NewThreadActivity extends AppCompatActivity implements RVNewThreadAdapter_Contacts.Callback{
     //View

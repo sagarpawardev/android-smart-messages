@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.activities;
+package dev.sagar.smsblocker.ux.activities.activities;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -16,12 +16,12 @@ import java.util.ArrayList;
 
 import dev.sagar.smsblocker.Constants;
 import dev.sagar.smsblocker.R;
-import dev.sagar.smsblocker.adapters.RVThreadAdapter;
-import dev.sagar.smsblocker.beans.SMS;
-import dev.sagar.smsblocker.utils.ContactUtil;
-import dev.sagar.smsblocker.utils.InboxReaderUtil;
-import dev.sagar.smsblocker.utils.PermissionUtil;
-import dev.sagar.smsblocker.utils.SMSUtil;
+import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
+import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.ContactUtil;
+import dev.sagar.smsblocker.tech.utils.InboxReaderUtil;
+import dev.sagar.smsblocker.tech.utils.PermissionUtil;
+import dev.sagar.smsblocker.tech.utils.SMSUtil;
 
 public class ThreadActivity extends AppCompatActivity implements RVThreadAdapter.Callback {
 

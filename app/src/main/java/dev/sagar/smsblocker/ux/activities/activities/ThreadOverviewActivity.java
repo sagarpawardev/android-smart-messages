@@ -1,10 +1,9 @@
-package dev.sagar.smsblocker.activities;
+package dev.sagar.smsblocker.ux.activities.activities;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,10 +19,10 @@ import java.util.Map;
 
 import dev.sagar.smsblocker.Constants;
 import dev.sagar.smsblocker.R;
-import dev.sagar.smsblocker.adapters.RVThreadOverviewAdapter;
-import dev.sagar.smsblocker.beans.SMS;
-import dev.sagar.smsblocker.utils.InboxReaderUtil;
-import dev.sagar.smsblocker.utils.PermissionUtil;
+import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
+import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.InboxReaderUtil;
+import dev.sagar.smsblocker.tech.utils.PermissionUtil;
 
 public class ThreadOverviewActivity extends AppCompatActivity implements RVThreadOverviewAdapter.Callback{
 

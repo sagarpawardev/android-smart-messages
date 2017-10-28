@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.adapters;
+package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import dev.sagar.smsblocker.R;
-import dev.sagar.smsblocker.beans.SMS;
+import dev.sagar.smsblocker.tech.beans.SMS;
 
 /**
  * Created by sagarpawar on 15/10/17.

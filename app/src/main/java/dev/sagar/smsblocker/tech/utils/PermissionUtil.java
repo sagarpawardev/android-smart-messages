@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.utils;
+package dev.sagar.smsblocker.tech.utils;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
