@@ -29,9 +29,10 @@ public class ContactUtil {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = contentResolver.query(uri, new String[]{ ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
         if (cursor == null) {
+            Log.e(TAG, METHOD_NAME + "==>Some Query Cursor is null");
             return null;
         }
-        String contactName = null;
+        String contactName = phoneNumber;
         if(cursor.moveToFirst()) {
             contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
         }
@@ -40,7 +41,7 @@ public class ContactUtil {
             cursor.close();
         }
 
-        Log.e(TAG, "==>Returning from "+METHOD_NAME);
+        Log.e(TAG, "==>Returning Contact Name:"+ contactName +" from"+METHOD_NAME);
         return contactName;
     }
 
