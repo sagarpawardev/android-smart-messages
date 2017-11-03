@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.ux.activities.activities;
+package dev.sagar.smsblocker.ux.activities;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -21,7 +21,7 @@ import dev.sagar.smsblocker.Constants;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
-import dev.sagar.smsblocker.tech.utils.InboxReaderUtil;
+import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtil;
 
 public class ThreadOverviewActivity extends AppCompatActivity implements RVThreadOverviewAdapter.Callback{
@@ -31,7 +31,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     FloatingActionButton fab;
 
     //Internal
-    InboxReaderUtil reader = null;
+    InboxUtil reader = null;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
 
     private void init(){
@@ -59,8 +59,8 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
 
     private void showInbox(){
 
-        if(reader==null) reader = new InboxReaderUtil(this);
-        Map<String, ArrayList<SMS>> smsMap = reader.getMsgs();
+        if(reader==null) reader = new InboxUtil(this);
+        Map<String, SMS> smsMap = reader.getMsgs();
         if(smsMap.size() == 0) {
             Toast.makeText(this, "You have not recieved any SMS Yet!!", Toast.LENGTH_SHORT).show();
             return;

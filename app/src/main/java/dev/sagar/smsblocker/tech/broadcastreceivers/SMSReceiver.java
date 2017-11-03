@@ -9,15 +9,12 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
-import android.util.Log;
-
-import java.util.ArrayList;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.ContactUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
-import dev.sagar.smsblocker.ux.activities.activities.ThreadActivity;
+import dev.sagar.smsblocker.ux.activities.ThreadActivity;
 
 public class SMSReceiver extends BroadcastReceiver {
 

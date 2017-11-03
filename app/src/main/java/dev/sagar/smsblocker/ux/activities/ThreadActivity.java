@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.ux.activities.activities;
+package dev.sagar.smsblocker.ux.activities;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -19,7 +19,7 @@ import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.ContactUtil;
-import dev.sagar.smsblocker.tech.utils.InboxReaderUtil;
+import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtil;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
 
@@ -36,7 +36,7 @@ public class ThreadActivity extends AppCompatActivity implements RVThreadAdapter
     //Internal
     private ArrayList<SMS> smses;
     private String threadId;
-    private InboxReaderUtil readerUtil = null;
+    private InboxUtil readerUtil = null;
     private SMSUtil smsUtil;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
 
@@ -85,7 +85,7 @@ public class ThreadActivity extends AppCompatActivity implements RVThreadAdapter
         btnSend = (Button) findViewById(R.id.btn_send);
         etMsg = (EditText) findViewById(R.id.et_msg);
 
-        if(readerUtil == null) readerUtil = new InboxReaderUtil(this);
+        if(readerUtil == null) readerUtil = new InboxUtil(this);
         smsUtil = new SMSUtil(this);
     }
 

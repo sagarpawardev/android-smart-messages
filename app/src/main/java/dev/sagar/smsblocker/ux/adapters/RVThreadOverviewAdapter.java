@@ -22,11 +22,11 @@ import dev.sagar.smsblocker.tech.utils.ContactUtil;
 
 public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOverviewAdapter.SMSViewHolder> implements View.OnClickListener{
     private Context context;
-    private Map<String, ArrayList<SMS>> smsMap;
+    private Map<String, SMS> smsMap;
     private Callback callback;
     private List<String> threads;
 
-    public RVThreadOverviewAdapter(Context context, Map<String, ArrayList<SMS>> smsMap, Callback callback) {
+    public RVThreadOverviewAdapter(Context context, Map<String, SMS> smsMap, Callback callback) {
         this.context = context;
         this.smsMap = smsMap;
         this.callback = callback;
@@ -48,7 +48,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
     public void onBindViewHolder(SMSViewHolder holder, int position) {
 
         String thread = threads.get(position);
-        SMS sms = smsMap.get(thread).get(0);
+        SMS sms = smsMap.get(thread);
         String fromNumber = sms.getFrom();
         String fromName = ContactUtil.getContactName(context, fromNumber);
 

@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.ux.activities.activities;
+package dev.sagar.smsblocker.ux.activities;
 
 import android.content.Intent;
 import android.os.Bundle;

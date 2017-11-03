@@ -16,23 +16,37 @@ import dev.sagar.smsblocker.tech.beans.SMS;
  * Created by sagarpawar on 15/10/17.
  */
 
-public class InboxReaderUtil {
+public class InboxUtil {
 
+    //Log Initiate
+    LogUtil log = new LogUtil( this.getClass().getName() );
+
+    //Internal References
     private Context context;
-    private InboxReaderUtil reader = null;
+    private InboxUtil reader = null;
     public static final int SORT_DESC = 0;
     public static final int SORT_ASC = 1;
 
-    public InboxReaderUtil(Context context) {
+    public InboxUtil(Context context) {
         this.context = context;
     }
 
     //Returns Map of Threads
-    public Map<String, ArrayList<SMS>> getMsgs(){
-        Uri uriSMSURI = Uri.parse("content://sms/inbox");
-        Cursor c = context.getContentResolver().query(uriSMSURI, null, null, null,null);
+    public Map<String, SMS> getMsgs(){
+        Uri uriSMSURI = Uri.parse("content://sms/");
+        String[] projection = {Telephony.Sms._ID,
+                Telephony.Sms.ADDRESS,
+                Telephony.Sms.BODY,
+                Telephony.Sms.READ,
+                Telephony.Sms.DATE,
+                Telephony.Sms.TYPE};
+        String selection = "";
+        String[] selectionArgs = {};
+        String sortOrder = Telephony.Sms.DATE +" desc";
 
-        LinkedHashMap<String, ArrayList<SMS>> smsMap = new LinkedHashMap<>();
+        Cursor c = context.getContentResolver()
+                .query(uriSMSURI, projection, selection, selectionArgs, sortOrder);
+        LinkedHashMap<String, SMS> smsMap = new LinkedHashMap<>();
 
         Log.e("My TAG", "Reading Msg... ");
         try {
@@ -45,23 +59,17 @@ public class InboxReaderUtil {
                 long time = c.getLong(c.getColumnIndexOrThrow("date"));
                 long type = c.getLong(c.getColumnIndexOrThrow("type"));
 
-                SMS sms = new SMS();
-                sms.setId(id);
-                sms.setFrom(from);
-                sms.setBody(body);
-                sms.setRead(readState);
-                sms.setDateTime(time);
-                sms.setType(type);
+                if(!smsMap.containsKey(from)) {
+                    SMS sms = new SMS();
+                    sms.setId(id);
+                    sms.setFrom(from);
+                    sms.setBody(body);
+                    sms.setRead(readState);
+                    sms.setDateTime(time);
+                    sms.setType(type);
 
-                ArrayList<SMS> smses;
-                if(smsMap.containsKey(from))
-                    smses = smsMap.get(from);
-                else {
-                    smses = new ArrayList<>();
-                    smsMap.put(from, smses);
+                    smsMap.put(from, sms);
                 }
-
-                smses.add(sms);
 
             }
         }

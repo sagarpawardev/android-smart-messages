@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="dev.sagar.smsblocker.ux.activities.activities.ThreadActivity"
+    tools:context="dev.sagar.smsblocker.ux.activities.ThreadActivity"
     tools:showIn="@layout/activity_thread">
 
     <LinearLayout
