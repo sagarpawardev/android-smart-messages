@@ -29,4 +29,5 @@ dependencies {
     compile 'com.android.support:design:26.+'
     compile 'com.google.code.gson:gson:2.8.2'
     testCompile 'junit:junit:4.12'
+    implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
 }

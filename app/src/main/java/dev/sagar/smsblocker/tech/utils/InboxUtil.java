@@ -1,5 +1,6 @@
 package dev.sagar.smsblocker.tech.utils;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -149,4 +150,21 @@ public class InboxUtil {
     }
 
 
+    public int setStatusRead(String fromNumber){
+        final String methodName = "setStatusRead()";
+        log.debug(methodName, "Just Entered..");
+
+        Uri uriSMSURI = Uri.parse("content://sms/inbox");
+        String selection = "address = ?";
+        String[] selectionArgs = {fromNumber};
+        ContentValues values = new ContentValues();
+        values.put("read", true);
+
+        int updateCount = context
+                .getContentResolver()
+                .update(uriSMSURI, values, selection, selectionArgs);
+
+        log.debug(methodName, "Returning..");
+        return updateCount;
+    }
 }
