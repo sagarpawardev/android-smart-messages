@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import dev.sagar.smsblocker.Constants;
@@ -22,7 +21,7 @@ import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
-import dev.sagar.smsblocker.tech.utils.PermissionUtil;
+import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 
 public class ThreadOverviewActivity extends AppCompatActivity implements RVThreadOverviewAdapter.Callback{
 
@@ -33,6 +32,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     //Internal
     InboxUtil reader = null;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
+    private PermissionUtilSingleton permissionInstance = PermissionUtilSingleton.getInstance();
 
     private void init(){
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -49,7 +49,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     }
 
     private void process(){
-        boolean hasPermissions = PermissionUtil.hasPermissions(this, Constants.PERMISSIONS);
+        boolean hasPermissions = permissionInstance.hasPermissions(this, Constants.PERMISSIONS);
         if(!hasPermissions) {
             askPermissions();
             return;

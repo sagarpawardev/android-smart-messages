@@ -37,6 +37,7 @@
             android:label="@string/title_activity_new_thread"
             android:theme="@style/AppTheme.NoActionBar" />
 
+
         <receiver
             android:name=".tech.broadcastreceivers.SMSReceiver"
             android:enabled="true"
@@ -45,6 +46,12 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+        <!--<receiver android:name=".tech.broadcastreceivers.LocalSMSReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="smsblocker.event.LOCAL_SMS_RECEIVED"></action>
+            </intent-filter>
+        </receiver>-->
     </application>
 
 </manifest>

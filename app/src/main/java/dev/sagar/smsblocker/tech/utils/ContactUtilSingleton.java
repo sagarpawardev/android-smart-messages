@@ -15,21 +15,41 @@ import dev.sagar.smsblocker.tech.beans.Contact;
  * Created by sagarpawar on 15/10/17.
  */
 
-public class ContactUtil {
+public class ContactUtilSingleton {
+
+    //Log Initiate
+    private static LogUtil log = new LogUtil( "ContactUtilSingleton" );
+
     //Constants
-    private static final String TAG = "ContactUtil";
+    private static final String TAG = "ContactUtilSingleton";
+
+    //Java Core
+    private static ContactUtilSingleton instance = null;
+
+
+    private ContactUtilSingleton(){
+        this.instance = instance;
+    }
+
+
+    public static synchronized ContactUtilSingleton getInstance(){
+        if(instance == null)
+            instance = new ContactUtilSingleton();
+        return instance;
+    }
 
 
     //Convert Contact Number to Contact Name
     public static String getContactName(Context context, String phoneNumber) {
-        final String METHOD_NAME = "getContactName()";
-        Log.e(TAG, "==>Inside "+METHOD_NAME);
+
+        final String methodName = "getContactName()";
+        log.info(methodName, "Just Entered...");
 
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = contentResolver.query(uri, new String[]{ ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
         if (cursor == null) {
-            Log.e(TAG, METHOD_NAME + "==>Some Query Cursor is null");
+            log.error(methodName, "==> Nothing in Cursor for "+phoneNumber);
             return null;
         }
         String contactName = phoneNumber;
@@ -41,9 +61,10 @@ public class ContactUtil {
             cursor.close();
         }
 
-        Log.e(TAG, "==>Returning Contact Name:"+ contactName +" from"+METHOD_NAME);
+        log.info(methodName, "Returing...");
         return contactName;
     }
+
 
     //Get All Contacts
     public static ArrayList<Contact> getAllContacts(Context context){
@@ -92,6 +113,7 @@ public class ContactUtil {
         Log.e(TAG, "==>Returning from "+METHOD_NAME);
         return contacts;
     }
+
 
     //Search Contacts in Phone
     public static ArrayList<Contact> searchContacts(Context context, String searchStr){

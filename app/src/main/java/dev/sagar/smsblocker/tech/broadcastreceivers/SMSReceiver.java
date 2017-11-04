@@ -1,20 +1,21 @@
 package dev.sagar.smsblocker.tech.broadcastreceivers;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 
-import dev.sagar.smsblocker.R;
+import com.google.gson.Gson;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import dev.sagar.smsblocker.tech.beans.SMS;
-import dev.sagar.smsblocker.tech.utils.ContactUtil;
+import dev.sagar.smsblocker.tech.utils.BroadcastUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
-import dev.sagar.smsblocker.ux.activities.ThreadActivity;
+import dev.sagar.smsblocker.tech.utils.NotificationUtilSingleton;
 
 public class SMSReceiver extends BroadcastReceiver {
 
@@ -22,9 +23,20 @@ public class SMSReceiver extends BroadcastReceiver {
     LogUtil log = new LogUtil( this.getClass().getName() );
 
     //Internal References
-    final SmsManager sms = SmsManager.getDefault();
+    private final SmsManager sms = SmsManager.getDefault();
+    private final NotificationUtilSingleton notifUtil = NotificationUtilSingleton.getInstance();
+
+    //Java Android
+    private final Gson gson = new Gson();
+
+    //Java Core
+    private final BroadcastUtilSingleton broadcastUtil = BroadcastUtilSingleton.getInstance();
+
+    //Constants
     private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
     private static final String MSG_FORMAT = "3gpp";
+    public static final String LOCAL_SMS_RECEIVED = "smsblocker.event.LOCAL_SMS_RECEIVED";
+    public static final String KEY_SMS_RECEIVED = "key_sms_received";
 
 
     /**
@@ -50,47 +62,19 @@ public class SMSReceiver extends BroadcastReceiver {
                     sms.setFrom(msg.getOriginatingAddress());
 
                     log.info(methodName, "Received Message From: "+msg.getDisplayOriginatingAddress());
-                    createNotification(context, sms);
+
+                    broadcastLocalSMS(context, sms);
+                    notifUtil.createSMSNotification(context, sms);
                 }
             }
         }
     }
 
-    /**
-     * This Method Creates a Notification
-     * @param context
-     * @param sms
-     */
-    public void createNotification(Context context, SMS sms){
-        final int NOTIFICATION_ID = 123;
 
-        String from = sms.getFrom();
-        String fromName = ContactUtil.getContactName(context, from);
-        String text = sms.getBody();
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(fromName)
-                        .setContentText(text);
-
-        Intent resultIntent = new Intent(context, ThreadActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(ThreadActivity.KEY_THREAD_ID, from);
-        resultIntent.putExtras(bundle);
-        PendingIntent resultPendingIntent =
-                PendingIntent.getActivity(
-                        context,
-                        0,
-                        resultIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-        mBuilder.setContentIntent(resultPendingIntent)
-        .setAutoCancel(true);
-
-        NotificationManager mNotifyMgr =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
-
+    private void broadcastLocalSMS(Context context, SMS sms){
+        Bundle basket = new Bundle();
+        String jsonSMS = gson.toJson(sms);
+        basket.putString(KEY_SMS_RECEIVED, jsonSMS);
+        broadcastUtil.broadcast(context, LOCAL_SMS_RECEIVED, basket);
     }
 }

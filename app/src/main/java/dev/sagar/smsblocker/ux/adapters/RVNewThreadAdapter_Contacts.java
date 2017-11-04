@@ -18,7 +18,10 @@ import dev.sagar.smsblocker.tech.beans.Contact;
 
 public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RVNewThreadAdapter_Contacts.ContactViewHolder> implements View.OnClickListener{
 
+    //Java Android
     private Context context;
+
+    //Java Core
     private ArrayList<Contact> contacts;
     private Callback callback;
 

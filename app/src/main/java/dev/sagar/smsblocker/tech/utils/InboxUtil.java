@@ -27,9 +27,11 @@ public class InboxUtil {
     public static final int SORT_DESC = 0;
     public static final int SORT_ASC = 1;
 
+
     public InboxUtil(Context context) {
         this.context = context;
     }
+
 
     //Returns Map of Threads
     public Map<String, SMS> getMsgs(){
@@ -82,6 +84,7 @@ public class InboxUtil {
 
         return smsMap;
     }
+
 
     //Returns All SMS From/To contactNo
     public ArrayList<SMS> getAllSMSFromTo(String contactNo, int sortingOrder){
@@ -139,6 +142,7 @@ public class InboxUtil {
 
         return smses;
     }
+
 
     public ArrayList<SMS> getAllSMSFromTo(String contactNo){
         return getAllSMSFromTo(contactNo, SORT_DESC);

@@ -16,9 +16,9 @@ import android.widget.EditText;
 import java.util.ArrayList;
 
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.RVNewThreadAdapter_Contacts;
 import dev.sagar.smsblocker.tech.beans.Contact;
-import dev.sagar.smsblocker.tech.utils.ContactUtil;
 
 public class NewThreadActivity extends AppCompatActivity implements RVNewThreadAdapter_Contacts.Callback{
     //View
@@ -35,7 +35,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
     }
 
     public void getData(){
-        contacts = ContactUtil.getAllContacts(this);
+        contacts = ContactUtilSingleton.getAllContacts(this);
     }
 
     public void process(){
@@ -54,7 +54,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
     }
 
     public void searchContacts(String searchStr){
-        ArrayList<Contact> contacts = ContactUtil.searchContacts(this, searchStr);
+        ArrayList<Contact> contacts = ContactUtilSingleton.searchContacts(this, searchStr);
         this.contacts.clear();
         this.contacts.addAll(contacts);
         contactsAdapter.notifyDataSetChanged();

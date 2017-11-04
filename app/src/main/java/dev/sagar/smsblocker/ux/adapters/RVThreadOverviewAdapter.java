@@ -14,7 +14,7 @@ import java.util.Set;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
-import dev.sagar.smsblocker.tech.utils.ContactUtil;
+import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -50,7 +50,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         String thread = threads.get(position);
         SMS sms = smsMap.get(thread);
         String fromNumber = sms.getFrom();
-        String fromName = ContactUtil.getContactName(context, fromNumber);
+        String fromName = ContactUtilSingleton.getContactName(context, fromNumber);
 
         if(fromName == null)
             fromName = fromNumber;

@@ -11,27 +11,34 @@ import android.util.Log;
 
 public class SMSUtil {
 
-    private static final String CLASS_NAME = "SMSUtil";
+    //Log Initiate
+    private static LogUtil log = new LogUtil( "ContactUtilSingleton" );
+
+    //Java Android
     private Context context;
+
+    //Java Core
+
+
 
     public SMSUtil(Context context) {
         this.context = context;
     }
 
-    public void sendSMS(String phoneNo, String msg, String simID) {
-        final String METHOD_NAME = "sendSMS()";
-        Log.e(CLASS_NAME, "==> Inside "+METHOD_NAME);
+
+    public void sendSMS(String phoneNo, String msg) {
+        String methodName = "sendSMS()";
+        log.info(methodName, "Just Entered...");
 
         try {
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNo, null, msg, null, null);
-            Log.e(CLASS_NAME, "SMS Sent...");
+            log.info(methodName, "==> SMS Sent");
         } catch (Exception e) {
-            Log.e(CLASS_NAME, "SMS Sending Failed...");
+            log.error(methodName, "==> SMS Sending Failed");
             e.printStackTrace();
         }
-
-        Log.e(CLASS_NAME, "==> Returning From "+METHOD_NAME);
+        log.info(methodName, "Returning...");
     }
 
 }
