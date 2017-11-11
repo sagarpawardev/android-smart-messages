@@ -9,8 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -39,10 +39,11 @@ public class ThreadActivity extends AppCompatActivity implements
 
     //View
     private RecyclerView recyclerView;
-    private Button btnSend;
+    private ImageButton btnSend;
     private EditText etMsg;
 
     //Java Android
+    RVThreadAdapter adapter;
 
     //Java Core
     private ArrayList<SMS> smses;
@@ -58,10 +59,11 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "process()";
         log.debug(methodName, "Just Entered..");
 
-        RVThreadAdapter adapter = new RVThreadAdapter(this, this, smses);
+        adapter = new RVThreadAdapter(this, this, smses);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(adapter);
+        recyclerView.scrollToPosition(smses.size()-1);
 
         boolean hasPermissions = permissionIstance.hasPermissions(this, Constants.PERMISSIONS);
         if(!hasPermissions) {
@@ -84,7 +86,7 @@ public class ThreadActivity extends AppCompatActivity implements
         threadId = basket.getString(KEY_THREAD_ID);
 
         //By Computation
-        smses = readerUtil.getAllSMSFromTo(threadId);
+        smses = readerUtil.getAllSMSFromTo(threadId, InboxUtil.SORT_ASC);
 
         log.debug(methodName, "Returning..");
     }
@@ -133,6 +135,27 @@ public class ThreadActivity extends AppCompatActivity implements
     }
 
 
+    public void smsSendUpdate() {
+        String msg = etMsg.getText().toString();
+        SMS sms = new SMS();
+        sms.setBody(msg);
+        sms.setDateTime(System.currentTimeMillis());
+        sms.setRead(true);
+        sms.setType(SMS.TYPE_SENT);
+        smses.add(sms);
+
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(smses.size()-1);
+    }
+
+    public void smsReceiveUpdate(SMS sms){
+        smses.add(sms);
+
+        adapter.notifyDataSetChanged();
+        recyclerView.scrollToPosition(smses.size()-1);
+    }
+
+
     private void askPermissions(){
         final String methodName =  "askPermissions()";
         log.debug(methodName, "Just Entered..");
@@ -148,7 +171,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Just Entered..");
 
         recyclerView = (RecyclerView) findViewById(R.id.lv_sms);
-        btnSend = (Button) findViewById(R.id.btn_send);
+        btnSend = (ImageButton) findViewById(R.id.btn_send);
         etMsg = (EditText) findViewById(R.id.et_msg);
 
         if(readerUtil == null) readerUtil = new InboxUtil(this);
@@ -167,6 +190,8 @@ public class ThreadActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 sendMsg();
+                smsSendUpdate();
+                etMsg.setText("");
             }
         });
 
@@ -255,8 +280,8 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName = "onSMSReceived()";
         log.info(methodName, "Just Entered..");
 
-        Toast.makeText(this, "SMS Received From: "+sms.getFrom(), Toast.LENGTH_SHORT).show();
+        smsReceiveUpdate(sms);
 
-        log.info(methodName, "Returnind");
+        log.info(methodName, "Returning");
     }
 }

@@ -1,7 +1,9 @@
 package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ import java.util.Set;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
+import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -52,8 +55,23 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         String fromNumber = sms.getFrom();
         String fromName = ContactUtilSingleton.getContactName(context, fromNumber);
 
+        if(sms.isRead()) {
+            holder.tvFrom.setTextColor(Color.GRAY);
+            holder.tvBody.setTextColor(Color.GRAY);
+            holder.tvTime.setTextColor(Color.GRAY);
+        }
+        else{
+            holder.tvFrom.setTextColor(Color.BLACK);
+            holder.tvBody.setTextColor(Color.BLACK);
+            holder.tvTime.setTextColor(Color.BLACK);
+        }
+
         if(fromName == null)
             fromName = fromNumber;
+
+        long tm = sms.getDateTime();
+        String socialDate = DateUtilSingleton.getInstance().socialFormat(tm);
+        holder.tvTime.setText(socialDate);
 
         holder.tvFrom.setText(fromName);
         holder.tvBody.setText(sms.getBody());

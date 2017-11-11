@@ -12,24 +12,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
         android:id="@+id/linearLayout"
-        android:layout_marginRight="8dp"
-        android:layout_marginLeft="8dp"
+        android:padding="0dp"
+        android:background="@drawable/color"
+        android:layout_marginRight="2dp"
+        android:layout_marginLeft="2dp"
         android:layout_alignParentBottom="true">
+
+        <ImageButton
+            android:id="@+id/btn_emoji"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="15"
+            android:background="@drawable/color"
+            android:src="@drawable/emo" />
+
         <EditText
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="75"
-            android:padding="20dp"
-            android:background="@android:color/white"
+            android:layout_height="match_parent"
+            android:layout_weight="70"
+            android:background="@drawable/color"
             android:id="@+id/et_msg"/>
-        <Button
+
+        <ImageButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Send"
-            android:layout_weight="25"
+            android:src="@drawable/send2"
+            android:layout_gravity="center"
+            android:layout_weight="15"
+            android:padding="10dp"
+            android:background="@drawable/color"
             android:id="@+id/btn_send"/>
+
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

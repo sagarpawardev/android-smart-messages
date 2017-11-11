@@ -1,27 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/user"
+        android:layout_width="40dp"
+        android:layout_height="50dp"
+        android:src="@drawable/user"/>
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_body"/>
-
-    <TextView
+        android:id="@+id/tv_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/user"
+        android:background="@drawable/reciever"
+        android:elevation="1dp"
+        android:padding="20dp"
+        android:maxWidth="250dp"
+        android:text="shlslhs;s;s/sn/slsnl/san;sn/lslsnvlsnvlns;nnnsvns" />
+
+    <TextView
+        android:text="1646646463466"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="1dp"
+        android:padding="4dp"
+        android:textSize="10dp"
+        android:layout_below="@id/tv_body"
+        android:layout_toRightOf="@id/user"
         android:id="@+id/tv_time"/>
 
     <TextView
+        android:text="received"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/reciever"
+        android:elevation="1dp"
+        android:padding="8dp"
+        android:visibility="gone"
         android:id="@+id/tv_type"/>
 
     <TextView
+        android:text="False"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@drawable/reciever"
+        android:elevation="1dp"
+        android:padding="8dp"
+        android:visibility="gone"
         android:id="@+id/tv_read"/>
 </LinearLayout>

@@ -60,6 +60,7 @@ public class SMSReceiver extends BroadcastReceiver {
                     SMS sms = new SMS();
                     sms.setBody(msg.getMessageBody());
                     sms.setFrom(msg.getOriginatingAddress());
+                    sms.setDateTime(msg.getTimestampMillis());
 
                     log.info(methodName, "Received Message From: "+msg.getDisplayOriginatingAddress());
 
