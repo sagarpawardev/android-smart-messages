@@ -20,12 +20,16 @@ public class SMSUtil {
     //Java Core
 
 
-
     public SMSUtil(Context context) {
         this.context = context;
     }
 
 
+    /**
+     * This method sends sms to specified contact number
+     * @param phoneNo
+     * @param msg
+     */
     public void sendSMS(String phoneNo, String msg) {
         String methodName = "sendSMS()";
         log.info(methodName, "Just Entered...");

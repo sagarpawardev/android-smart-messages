@@ -26,12 +26,18 @@ public class ContactUtilSingleton {
     //Java Core
     private static ContactUtilSingleton instance = null;
 
-
+    /**
+     * This method is part of Singleton Design pattern.
+     */
     private ContactUtilSingleton(){
         this.instance = instance;
     }
 
 
+    /**
+     * This method is part of Singleton Design pattern.
+     * @return
+     */
     public static synchronized ContactUtilSingleton getInstance(){
         if(instance == null)
             instance = new ContactUtilSingleton();
@@ -39,7 +45,12 @@ public class ContactUtilSingleton {
     }
 
 
-    //Convert Contact Number to Contact Name
+    /**
+     * This method converts a phone number to Contract name
+     * @param context
+     * @param phoneNumber
+     * @return
+     */
     public String getContactName(Context context, String phoneNumber) {
 
         final String methodName = "getContactName()";
@@ -67,6 +78,12 @@ public class ContactUtilSingleton {
 
 
     //Get All Contacts
+
+    /**
+     * This method returns list of all contacts present in Device
+     * @param context
+     * @return
+     */
     public static ArrayList<Contact> getAllContacts(Context context){
         final String METHOD_NAME = "getAllContacts()";
         Log.e(TAG, "==>Inside "+METHOD_NAME);
@@ -116,6 +133,13 @@ public class ContactUtilSingleton {
 
 
     //Search Contacts in Phone
+
+    /**
+     * This method returns a list of contacts based on the String pattern
+     * @param context
+     * @param searchStr
+     * @return
+     */
     public static ArrayList<Contact> searchContacts(Context context, String searchStr){
         final String METHOD_NAME = "searchContacts()";
         Log.e(TAG, "==>Inside "+METHOD_NAME);

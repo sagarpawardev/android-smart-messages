@@ -8,6 +8,11 @@ public class HeadlessSMSService extends Service {
     public HeadlessSMSService() {
     }
 
+    /**
+     * This method is called when call is rejected with SMS
+     * @param intent
+     * @return
+     */
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.

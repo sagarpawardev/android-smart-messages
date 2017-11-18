@@ -25,9 +25,18 @@ public class NotificationUtilSingleton {
     //Java Core
     private static NotificationUtilSingleton instance = null;
 
+
+    /**
+     * This is part of Singleton Design pattern
+     * @return
+     */
     private NotificationUtilSingleton(){}
 
 
+    /**
+     * This method is part of Singleton Design pattern
+     * @return
+     */
     public synchronized static NotificationUtilSingleton getInstance(){
         if(instance == null)
             instance = new NotificationUtilSingleton();

@@ -9,6 +9,12 @@ import android.content.Intent;
  */
 
 public class MMSReceiver extends BroadcastReceiver {
+
+    /**
+     * This method is called when an MMS is received
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         throw new UnsupportedOperationException("Not yet implemented");

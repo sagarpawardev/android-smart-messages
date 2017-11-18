@@ -28,13 +28,15 @@ public class InboxUtil {
     public static final int SORT_DESC = 0;
     public static final int SORT_ASC = 1;
 
-
     public InboxUtil(Context context) {
         this.context = context;
     }
 
 
-    //Returns Map of Threads
+    /**
+     * This method returns key-value pair of contact_number and most_recent_message <Contact Number, Most Recent Message>
+     * @return
+     */
     public Map<String, SMS> getMsgs(){
         Uri uriSMSURI = Uri.parse("content://sms/");
         String[] projection = {Telephony.Sms._ID,
@@ -87,7 +89,12 @@ public class InboxUtil {
     }
 
 
-    //Returns All SMS From/To contactNo
+    /**
+     * This method returns all Received and Sent from a specified contact number with soring order Ascending or Descending
+     * @param contactNo
+     * @param sortingOrder {valid values: InboxUtil.SORT_DESC, InboxUtil.SORT_ASC}
+     * @return
+     */
     public ArrayList<SMS> getAllSMSFromTo(String contactNo, int sortingOrder){
         Uri uriSMSURI = Uri.parse("content://sms/");
         String[] projection = {Telephony.Sms._ID,
@@ -145,11 +152,21 @@ public class InboxUtil {
     }
 
 
+    /**
+     * This method returns all Received and Sent from a specified contact number by default in Descending order
+     * @param contactNo
+     * @return
+     */
     public ArrayList<SMS> getAllSMSFromTo(String contactNo){
         return getAllSMSFromTo(contactNo, SORT_DESC);
     }
 
 
+    /**
+     * This method marks read of all status
+     * @param fromNumber
+     * @return
+     */
     public int setStatusRead(String fromNumber){
         final String methodName = "setStatusRead()";
         log.debug(methodName, "Just Entered..");

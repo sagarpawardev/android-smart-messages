@@ -42,7 +42,8 @@ public class SMSReceiver extends BroadcastReceiver {
 
 
     /**
-     * This Method is Called When SMS is Received
+     * This Method is Called When SMS is Received. Note:- This will be used by internal architecture
+     * Instead use LocalSMSReceiver
      * @param context
      * @param intent
      */
@@ -62,6 +63,11 @@ public class SMSReceiver extends BroadcastReceiver {
         log.info(methodName, "Returning..");
     }
 
+    /**
+     * This method is called if event is SMS_RECEIVED
+     * @param context
+     * @param intent
+     */
     private void smsReceived(Context context, Intent intent){
         //Start Log
         final String methodName = "smsReceived()";
@@ -85,6 +91,12 @@ public class SMSReceiver extends BroadcastReceiver {
         }
     }
 
+
+    /**
+     * This method is called if event is SMS_DELIVERED
+     * @param context
+     * @param intent
+     */
     private void smsDelivered(Context context, Intent intent){
         //Start Log
         final String methodName = "smsDelivered()";
@@ -96,7 +108,10 @@ public class SMSReceiver extends BroadcastReceiver {
         }
     }
 
-
+    /**
+     * This method broadcast SMS Locally
+     * @param context
+     */
     private void broadcastLocalSMS(Context context, SMS sms){
         Bundle basket = new Bundle();
         String jsonSMS = gson.toJson(sms);

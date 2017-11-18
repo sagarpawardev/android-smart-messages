@@ -23,17 +23,26 @@ public class PermissionUtilSingleton {
     private static PermissionUtilSingleton instance = null;
 
 
+    /**
+     * This is part of Singleton Design pattern
+     * @return
+     */
     private PermissionUtilSingleton(){}
 
 
+    /**
+     * This method is part of Singleton Design pattern
+     * @return
+     */
     public synchronized static PermissionUtilSingleton getInstance(){
         if(instance == null)
             instance = new PermissionUtilSingleton();
         return instance;
     }
 
-    /***
-     * Checks If app has permissions of passed list of permissions
+
+    /**
+     * This method checks if app has list of passed permission
      * @param context
      * @param permissions List of Permissions
      * @return
@@ -54,8 +63,9 @@ public class PermissionUtilSingleton {
         return true;
     }
 
-    /***
-     * This Method Checks if yout app is Default SMS App
+
+    /**
+     * This Method Checks if your app is Default SMS App or Not
      * @param context
      * @return
      */
@@ -70,7 +80,7 @@ public class PermissionUtilSingleton {
         return result;
     }
 
-    /***
+    /**
      * This Method opens dialog to make app default
      * @param context
      * @return

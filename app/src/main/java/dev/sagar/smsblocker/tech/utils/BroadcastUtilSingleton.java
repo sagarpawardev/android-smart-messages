@@ -32,6 +32,12 @@ public class BroadcastUtilSingleton {
     private BroadcastUtilSingleton() {
     }
 
+    /***
+     * This method broadcasts a message locally
+     * @param context
+     * @param eventName
+     * @param basket
+     */
     public void broadcast(Context context, String eventName, Bundle basket){
         Intent intent = new Intent(eventName);
         intent.putExtras(basket);

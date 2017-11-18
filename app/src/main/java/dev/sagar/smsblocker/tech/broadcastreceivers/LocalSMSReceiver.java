@@ -34,6 +34,11 @@ public class LocalSMSReceiver extends BroadcastReceiver {
     }
 
 
+    /**
+     * This method is called by Android when SMS is Received
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         final String methodName = "onReceive()";
