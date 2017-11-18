@@ -2,14 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="dev.sagar.smsblocker">
 
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
-    <uses-permission-sdk-23 android:name="android.permission.RECEIVE_SMS"/>
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
-    <uses-permission-sdk-23 android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission-sdk-23 android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission-sdk-23 android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -35,23 +33,67 @@
         <activity
             android:name=".ux.activities.NewThreadActivity"
             android:label="@string/title_activity_new_thread"
-            android:theme="@style/AppTheme.NoActionBar" />
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <receiver
             android:name=".tech.broadcastreceivers.SMSReceiver"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
+
+                <!-- Start Adding -->
+                <action android:name="android.provider.Telephony.SMS_DELIVER" />
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <!-- Stop Adding -->
+
             </intent-filter>
         </receiver>
-        <!--<receiver android:name=".tech.broadcastreceivers.LocalSMSReceiver"
-            android:enabled="true">
+
+        <!-- BroadcastReceiver that listens to incoming MMS messages -->
+        <receiver
+            android:name=".tech.broadcastreceivers.MMSReceiver"
+            android:permission="android.permission.BROADCAST_WAP_PUSH" >
             <intent-filter>
-                <action android:name="smsblocker.event.LOCAL_SMS_RECEIVED"></action>
+                <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
+                <data android:mimeType="application/vnd.wap.mms-message" />
             </intent-filter>
-        </receiver>-->
+        </receiver>
+
+        <activity
+            android:name=".test.activities.TestMainActivity"
+            android:label="@string/title_activity_test_main"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+
+                <!--<action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />-->
+
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".tech.services.HeadlessSMSService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

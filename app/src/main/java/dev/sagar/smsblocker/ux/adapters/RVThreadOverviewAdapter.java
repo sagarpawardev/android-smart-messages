@@ -53,7 +53,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         String thread = threads.get(position);
         SMS sms = smsMap.get(thread);
         String fromNumber = sms.getFrom();
-        String fromName = ContactUtilSingleton.getContactName(context, fromNumber);
+        String fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNumber);
 
         if(sms.isRead()) {
             holder.tvFrom.setTextColor(Color.GRAY);

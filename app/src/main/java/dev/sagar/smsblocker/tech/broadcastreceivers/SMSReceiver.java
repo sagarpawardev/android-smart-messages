@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -34,6 +35,7 @@ public class SMSReceiver extends BroadcastReceiver {
 
     //Constants
     private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
+    private static final String SMS_DELIVERED = "android.provider.Telephony.SMS_DELIVER";
     private static final String MSG_FORMAT = "3gpp";
     public static final String LOCAL_SMS_RECEIVED = "smsblocker.event.LOCAL_SMS_RECEIVED";
     public static final String KEY_SMS_RECEIVED = "key_sms_received";
@@ -48,26 +50,49 @@ public class SMSReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         //Start Log
         final String methodName = "onReceive()";
-        log.verbose(methodName, "Just Entered");
+        log.info(methodName, "Just Entered..");
+        log.info(methodName, "Action Name: "+intent.getAction());
 
-        //Receive SMS
-        if (intent.getAction() == SMS_RECEIVED) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                Object[] pdus = (Object[])bundle.get("pdus");
-                for (Object pdu: pdus) {
-                    SmsMessage msg = SmsMessage.createFromPdu((byte[])pdu, MSG_FORMAT);
-                    SMS sms = new SMS();
-                    sms.setBody(msg.getMessageBody());
-                    sms.setFrom(msg.getOriginatingAddress());
-                    sms.setDateTime(msg.getTimestampMillis());
+        String event = intent.getAction();
+        switch (event) {
+            case SMS_RECEIVED: smsReceived(context, intent); break;
+            case SMS_DELIVERED: smsDelivered(context, intent); break;
+        }
 
-                    log.info(methodName, "Received Message From: "+msg.getDisplayOriginatingAddress());
+        log.info(methodName, "Returning..");
+    }
 
-                    broadcastLocalSMS(context, sms);
-                    notifUtil.createSMSNotification(context, sms);
-                }
+    private void smsReceived(Context context, Intent intent){
+        //Start Log
+        final String methodName = "smsReceived()";
+        log.verbose(methodName, "Just Entered..");
+
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            Object[] pdus = (Object[])bundle.get("pdus");
+            for (Object pdu: pdus) {
+                SmsMessage msg = SmsMessage.createFromPdu((byte[])pdu, MSG_FORMAT);
+                SMS sms = new SMS();
+                sms.setBody(msg.getMessageBody());
+                sms.setFrom(msg.getOriginatingAddress());
+                sms.setDateTime(msg.getTimestampMillis());
+
+                log.info(methodName, "Received Message From: "+msg.getDisplayOriginatingAddress());
+
+                broadcastLocalSMS(context, sms);
+                notifUtil.createSMSNotification(context, sms);
             }
+        }
+    }
+
+    private void smsDelivered(Context context, Intent intent){
+        //Start Log
+        final String methodName = "smsDelivered()";
+        log.verbose(methodName, "Just Entered..");
+
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            Toast.makeText(context, "Message Delivered.", Toast.LENGTH_SHORT);
         }
     }
 

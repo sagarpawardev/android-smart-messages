@@ -43,7 +43,7 @@ public class NotificationUtilSingleton {
         final int NOTIFICATION_ID = 123;
 
         String from = sms.getFrom();
-        String fromName = ContactUtilSingleton.getContactName(context, from);
+        String fromName = ContactUtilSingleton.getInstance().getContactName(context, from);
         String text = sms.getBody();
 
         NotificationCompat.Builder mBuilder =

@@ -18,7 +18,7 @@ import dev.sagar.smsblocker.tech.beans.Contact;
 public class ContactUtilSingleton {
 
     //Log Initiate
-    private static LogUtil log = new LogUtil( "ContactUtilSingleton" );
+    private LogUtil log = new LogUtil( this.getClass().getName() );
 
     //Constants
     private static final String TAG = "ContactUtilSingleton";
@@ -40,7 +40,7 @@ public class ContactUtilSingleton {
 
 
     //Convert Contact Number to Contact Name
-    public static String getContactName(Context context, String phoneNumber) {
+    public String getContactName(Context context, String phoneNumber) {
 
         final String methodName = "getContactName()";
         log.info(methodName, "Just Entered...");

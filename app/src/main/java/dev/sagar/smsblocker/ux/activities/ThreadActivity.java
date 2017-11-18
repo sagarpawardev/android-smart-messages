@@ -73,6 +73,9 @@ public class ThreadActivity extends AppCompatActivity implements
         registerSMSReceiver();
         updateActionBar();
 
+        InboxUtil inboxUtil = new InboxUtil(getApplicationContext());
+        inboxUtil.setStatusRead(threadId);
+
         log.debug(methodName, "Returning..");
     }
 
@@ -96,7 +99,7 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "updateActionBar()";
         log.debug(methodName, "Just Entered..");
 
-        String contact = ContactUtilSingleton.getContactName(this, threadId);
+        String contact = ContactUtilSingleton.getInstance().getContactName(this, threadId);
         getSupportActionBar().setTitle(contact);
 
         log.debug(methodName, "Returning..");
@@ -147,6 +150,7 @@ public class ThreadActivity extends AppCompatActivity implements
         adapter.notifyDataSetChanged();
         recyclerView.scrollToPosition(smses.size()-1);
     }
+
 
     public void smsReceiveUpdate(SMS sms){
         smses.add(sms);
@@ -275,12 +279,14 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Returning..");
     }
 
+
     @Override
     public void onSMSReceived(SMS sms) {
         final String methodName = "onSMSReceived()";
         log.info(methodName, "Just Entered..");
 
-        smsReceiveUpdate(sms);
+        if(sms.getFrom().equals(threadId))
+            smsReceiveUpdate(sms);
 
         log.info(methodName, "Returning");
     }
