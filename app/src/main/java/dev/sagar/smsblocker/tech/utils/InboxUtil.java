@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.exceptions.NotImplementedException;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -245,5 +246,37 @@ public class InboxUtil {
             result = createdDataUri.toString().replace(SMS_URI.toString()+"/", "");
         log.debug(methodName, "Returning.. :"+result);
         return result;
+    }
+
+
+    /**
+     * This method will one delete SMS from Inbox
+     * @param sms
+     * @return
+     */
+    public boolean deleteSMS(SMS sms){
+        try{
+            throw new NotImplementedException(this.getClass().getSimpleName(), "deleteSMS()");
+        }
+        catch (NotImplementedException e){
+            e.printStackTrace();
+        }
+        return true;
+    }
+
+
+    /**
+     * This method will delete all SMS from (or) SMS sent to, phoneNo
+     * @param phoneNo
+     * @return
+     */
+    public int deleteThread(String phoneNo){
+        try{
+            throw new NotImplementedException(this.getClass().getSimpleName(), "deleteThread()");
+        }
+        catch (NotImplementedException e){
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
