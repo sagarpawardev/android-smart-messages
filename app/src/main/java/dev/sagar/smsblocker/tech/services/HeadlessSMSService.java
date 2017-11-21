@@ -11,7 +11,6 @@ public class HeadlessSMSService extends Service {
     /**
      * This method is called when call is rejected with SMS
      * @param intent
-     * @return
      */
     @Override
     public IBinder onBind(Intent intent) {

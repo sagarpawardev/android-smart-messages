@@ -3,7 +3,8 @@ package dev.sagar.smsblocker.tech.utils;
 
 import android.content.Context;
 import android.telephony.SmsManager;
-import android.util.Log;
+
+import dev.sagar.smsblocker.tech.beans.SMS;
 
 /**
  * Created by sagarpawar on 22/10/17.
@@ -30,19 +31,38 @@ public class SMSUtil {
      * @param phoneNo
      * @param msg
      */
-    public void sendSMS(String phoneNo, String msg) {
+    public SMS sendSMS(String phoneNo, String msg) {
         String methodName = "sendSMS()";
         log.info(methodName, "Just Entered...");
 
+        SMS sms = null;
         try {
+            //Send SMS
+            log.info(methodName,"Trying to Send SMS");
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNo, null, msg, null, null);
             log.info(methodName, "==> SMS Sent");
+
+            boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefaultSMSApp(context);
+            if(isAppDefault) {
+                //Save in DataProvider
+                sms = new SMS();
+                sms.setRead(true);
+                sms.setType(SMS.TYPE_SENT);
+                sms.setDateTime(System.currentTimeMillis());
+                sms.setBody(msg);
+                sms.setFrom(phoneNo);
+                InboxUtil inboxUtil = new InboxUtil(context);
+                String id = inboxUtil.saveSMS(sms, InboxUtil.TYPE_SENT);
+                sms.setId(id);
+            }
         } catch (Exception e) {
             log.error(methodName, "==> SMS Sending Failed");
             e.printStackTrace();
         }
-        log.info(methodName, "Returning...");
+
+        log.info(methodName, "Returning..."+sms);
+        return sms;
     }
 
 }

@@ -10,13 +10,12 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.BroadcastUtilSingleton;
+import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.NotificationUtilSingleton;
+import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 
 public class SMSReceiver extends BroadcastReceiver {
 
@@ -82,11 +81,28 @@ public class SMSReceiver extends BroadcastReceiver {
                 sms.setBody(msg.getMessageBody());
                 sms.setFrom(msg.getOriginatingAddress());
                 sms.setDateTime(msg.getTimestampMillis());
+                sms.setRead(false);
+                sms.setType(SMS.TYPE_RECEIVED);
 
                 log.info(methodName, "Received Message From: "+msg.getDisplayOriginatingAddress());
 
-                broadcastLocalSMS(context, sms);
-                notifUtil.createSMSNotification(context, sms);
+                boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefaultSMSApp(context);
+                if(!isAppDefault) log.error(methodName, "App is not default");
+                if(isAppDefault) {
+                    //Save SMS in DataProvider
+                    log.info(methodName, "Saving SMS in DataProvider");
+                    InboxUtil inboxUtil = new InboxUtil(context);
+                    String id = inboxUtil.saveSMS(sms, InboxUtil.TYPE_INBOX);
+                    log.info(methodName, "Received Created id: " + id);
+                    sms.setId(id);
+
+                    //Broadcast SMS Locally
+                    log.info(methodName, "Broadcasting SMS");
+                    broadcastLocalSMS(context, sms);
+
+                    //Create Notification
+                    notifUtil.createSMSNotification(context, sms);
+                }
             }
         }
     }
