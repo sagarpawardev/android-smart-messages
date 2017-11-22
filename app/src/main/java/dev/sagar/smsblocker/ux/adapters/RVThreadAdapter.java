@@ -36,7 +36,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_rv_thread, parent, false);
 
-        return new RVThreadAdapter.SMSViewHolder(itemView);
+        return new SMSViewHolder(itemView);
     }
 
     @Override

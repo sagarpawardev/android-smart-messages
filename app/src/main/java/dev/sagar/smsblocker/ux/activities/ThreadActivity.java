@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -33,6 +35,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
     //Log Initiate
     LogUtil log = new LogUtil(this.getClass().getName());
+
 
     //Constants
     public static final String KEY_THREAD_ID = "THREAD_ID";
@@ -73,9 +76,6 @@ public class ThreadActivity extends AppCompatActivity implements
         registerSMSReceiver();
         updateActionBar();
 
-        InboxUtil inboxUtil = new InboxUtil(getApplicationContext());
-        inboxUtil.setStatusRead(threadId);
-
         log.debug(methodName, "Returning..");
     }
 
@@ -101,6 +101,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
         String contact = ContactUtilSingleton.getInstance().getContactName(this, threadId);
         getSupportActionBar().setTitle(contact);
+
 
         log.debug(methodName, "Returning..");
     }
@@ -151,7 +152,6 @@ public class ThreadActivity extends AppCompatActivity implements
         recyclerView.scrollToPosition(smses.size()-1);
     }
 
-
     public void smsReceiveUpdate(SMS sms){
         smses.add(sms);
 
@@ -192,9 +192,17 @@ public class ThreadActivity extends AppCompatActivity implements
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
+
             public void onClick(View view) {
-                sendMsg();
-                smsSendUpdate();
+                String msg = etMsg.getText().toString().trim();
+                if (TextUtils.isEmpty(msg)) {
+                    Toast toast = Toast.makeText(getApplicationContext(), "Blank Message can not be send", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                } else {
+                    sendMsg();
+                    smsSendUpdate();
+                }
                 etMsg.setText("");
             }
         });
@@ -274,20 +282,24 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Just Entered..");
 
         unregisterSMSReceiver();
+        //setStatusRead
+        InboxUtil Inbox = new InboxUtil(this);
+        Inbox.setStatusRead(threadId);
+
+
         super.onStop();
 
         log.debug(methodName, "Returning..");
     }
-
 
     @Override
     public void onSMSReceived(SMS sms) {
         final String methodName = "onSMSReceived()";
         log.info(methodName, "Just Entered..");
 
-        if(sms.getFrom().equals(threadId))
-            smsReceiveUpdate(sms);
+        smsReceiveUpdate(sms);
 
         log.info(methodName, "Returning");
     }
+
 }

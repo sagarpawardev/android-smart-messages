@@ -32,16 +32,16 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RVNewThrea
     }
 
     @Override
-    public RVNewThreadAdapter_Contacts.ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ContactViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_rv_new_thread__contacts, parent, false);
 
         itemView.setOnClickListener(this);
-        return new RVNewThreadAdapter_Contacts.ContactViewHolder(itemView);
+        return new ContactViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(RVNewThreadAdapter_Contacts.ContactViewHolder holder, int position) {
+    public void onBindViewHolder(ContactViewHolder holder, int position) {
         Contact contact = contacts.get(position);
         String displayName = contact.getDisplayName();
         String phoneNo = contact.getNumber();

@@ -131,6 +131,13 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     }
 
     @Override
+    protected void onStart() {
+
+        process();
+        super.onStart();
+    }
+
+    @Override
     public void onItemClicked(String threadId) {
         Intent intent = new Intent(this, ThreadActivity.class);
         Bundle basket = new Bundle();
