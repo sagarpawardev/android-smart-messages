@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
@@ -22,22 +23,22 @@ import dev.sagar.smsblocker.tech.exceptions.NotImplementedException;
 public class InboxUtil {
 
     //Log Initiate
-    LogUtil log = new LogUtil( this.getClass().getName() );
+    private LogUtil log = new LogUtil( this.getClass().getName() );
 
     //Java Android References
     private Context context;
     private InboxUtil reader = null;
 
     //Java Core References
-    private static final String _id = Telephony.Sms._ID;
-    private static final String address = Telephony.Sms.ADDRESS;
-    private static final String body = Telephony.Sms.BODY;
-    private static final String read = Telephony.Sms.READ;
-    private static final String date = Telephony.Sms.DATE;
-    private static final String type = Telephony.Sms.TYPE;
-    private static final Uri INBOX_URI = Telephony.Sms.Inbox.CONTENT_URI;
-    private static final Uri SENT_URI = Telephony.Sms.Sent.CONTENT_URI;
-    private static final Uri SMS_URI = Telephony.Sms.CONTENT_URI;
+    private final String _id = Telephony.Sms._ID;
+    private final String address = Telephony.Sms.ADDRESS;
+    private final String body = Telephony.Sms.BODY;
+    private final String read = Telephony.Sms.READ;
+    private final String date = Telephony.Sms.DATE;
+    private final String type = Telephony.Sms.TYPE;
+    private final Uri INBOX_URI = Telephony.Sms.Inbox.CONTENT_URI;
+    private final Uri SENT_URI = Telephony.Sms.Sent.CONTENT_URI;
+    private final Uri SMS_URI = Telephony.Sms.CONTENT_URI;
     public static final String TYPE_INBOX = "inbox";
     public static final String TYPE_SENT = "sent";
     public static final int SORT_DESC = 0;
@@ -53,6 +54,9 @@ public class InboxUtil {
      * @return
      */
     public Map<String, SMS> getMsgs(){
+        final String methodName =  "getMsgs()";
+        log.debug(methodName, "Just Entered..");
+
         Uri uriSMSURI = Uri.parse("content://sms/");
         String[] projection = {Telephony.Sms._ID,
                 Telephony.Sms.ADDRESS,
@@ -100,17 +104,21 @@ public class InboxUtil {
             if (c!=null) c.close();
         }
 
+        log.debug(methodName, "Returning..");
         return smsMap;
     }
 
 
     /**
      * This method returns all Received and Sent from a specified contact number with soring order Ascending or Descending
-     * @param contactNo
-     * @param sortingOrder {valid values: InboxUtil.SORT_DESC, InboxUtil.SORT_ASC}
-     * @return
+     * @param contactNo Phone Number to get SMS
+     * @param sortingOrder Sorting order {valid values: InboxUtil.SORT_DESC, InboxUtil.SORT_ASC}
+     * @return Returns list of SMS from contact number
      */
     public ArrayList<SMS> getAllSMSFromTo(String contactNo, int sortingOrder){
+        final String methodName =  "getAllSMSFromTo()";
+        log.debug(methodName, "Just Entered..");
+
         Uri uriSMSURI = Uri.parse("content://sms/");
         String[] projection = {_id,
                 address,
@@ -163,24 +171,31 @@ public class InboxUtil {
             if (c!=null) c.close();
         }
 
+        log.debug(methodName, "Returning..");
         return smses;
     }
 
 
     /**
      * This method returns all Received and Sent from a specified contact number by default in Descending order
-     * @param contactNo
-     * @return
+     * @param contactNo Phone Number to get SMS
+     * @return List of SMS from a contract number
      */
-    public ArrayList<SMS> getAllSMSFromTo(String contactNo){
-        return getAllSMSFromTo(contactNo, SORT_DESC);
+    public List<SMS> getAllSMSFromTo(String contactNo){
+        final String methodName =  "getAllSMSFromTo()";
+        log.debug(methodName, "Just Entered..");
+
+        List<SMS> smses = getAllSMSFromTo(contactNo, SORT_DESC);;
+
+        log.debug(methodName, "Returning..");
+        return smses;
     }
 
 
     /**
-     * This method marks read of all status
-     * @param fromNumber
-     * @return
+     * This method marks read of all SMS from a given phone number
+     * @param fromNumber Phone Number to set Read status as true
+     * @return Number of Fields updated
      */
     public int setStatusRead(String fromNumber){
         final String methodName = "setStatusRead()";
@@ -203,9 +218,9 @@ public class InboxUtil {
 
 
     /**
-     * This Method heps in saving a SMS in DataProvider and returns URI of  and null if Unsuccessfull
-     * @param sms
-     * @return
+     * This Method heps in saving a SMS in DataProvider
+     * @param sms SMS to save
+     * @return ID of newly created SMS and null if not created
      */
     public String saveSMS(SMS sms, String messageType){
         final String methodName = "saveSMS()";
@@ -251,32 +266,46 @@ public class InboxUtil {
 
     /**
      * This method will one delete SMS from Inbox
-     * @param sms
-     * @return
+     * @param sms SMS to delete
+     * @return True if SMS deleted else false
      */
     public boolean deleteSMS(SMS sms){
-        try{
-            throw new NotImplementedException(this.getClass().getSimpleName(), "deleteSMS()");
-        }
-        catch (NotImplementedException e){
-            e.printStackTrace();
-        }
+        final String methodName =  "deleteSMS()";
+        log.debug(methodName, "Just Entered..");
+
+        String id = sms.getId();
+        ContentValues values = new ContentValues();
+        values.put(this._id, id);
+
+        log.info(methodName, "Deleting SMS from DataProvider");
+
+        String selection = _id+"= ?";
+        String selectionArgs[] = {id};
+        int count = context.getContentResolver().delete(SMS_URI, selection, selectionArgs);
+        log.info(methodName, "Deleted "+count+" Rows");
+
+        log.debug(methodName, "Returning..");
         return true;
     }
 
 
     /**
      * This method will delete all SMS from (or) SMS sent to, phoneNo
-     * @param phoneNo
-     * @return
+     * @param phoneNo Phne Number as Thread Id to deletes
+     * @return Number of SMS deleted
      */
     public int deleteThread(String phoneNo){
+        final String methodName =  "deleteThread()";
+        log.debug(methodName, "Just Entered..");
+
         try{
-            throw new NotImplementedException(this.getClass().getSimpleName(), "deleteThread()");
+            throw new NotImplementedException(this.getClass().getSimpleName(), methodName);
         }
         catch (NotImplementedException e){
             e.printStackTrace();
         }
+
+        log.debug(methodName, "Returning..");
         return 0;
     }
 }
