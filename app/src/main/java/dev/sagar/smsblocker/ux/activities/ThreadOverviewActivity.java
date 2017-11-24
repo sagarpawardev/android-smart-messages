@@ -18,6 +18,7 @@ import java.util.Map;
 
 import dev.sagar.smsblocker.Constants;
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
@@ -25,18 +26,37 @@ import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 
 public class ThreadOverviewActivity extends AppCompatActivity implements RVThreadOverviewAdapter.Callback{
 
+    //Log Initiate
+    private LogUtil log = new LogUtil(this.getClass().getName());
+
     //View
     RecyclerView recyclerView;
     FloatingActionButton fab;
 
-    //Internal
-    InboxUtil reader = null;
+    //Java Core
+    InboxUtil inboxUtil = null;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
     private PermissionUtilSingleton permissionInstance = PermissionUtilSingleton.getInstance();
+
+    //Java Android
+    Map<String, SMS> smsMap = null;
+    RVThreadOverviewAdapter adapter;
 
     private void init(){
         fab = (FloatingActionButton) findViewById(R.id.fab);
         recyclerView = (RecyclerView) findViewById(R.id.lv_threads);
+    }
+
+    private void preGetData(){
+        inboxUtil = new InboxUtil(this);
+    }
+
+    private void getData(){
+        smsMap = inboxUtil.getMsgs();
+    }
+
+    private void postGetData(){
+        adapter = new RVThreadOverviewAdapter(this, smsMap, this);
     }
 
     private void addListeners(){
@@ -59,14 +79,11 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
 
     private void showInbox(){
 
-        if(reader==null) reader = new InboxUtil(this);
-        Map<String, SMS> smsMap = reader.getMsgs();
         if(smsMap.size() == 0) {
             Toast.makeText(this, "You have not recieved any SMS Yet!!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        RVThreadOverviewAdapter adapter = new RVThreadOverviewAdapter(this, smsMap, this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(adapter);
@@ -79,6 +96,18 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     private void startNewThreadActivity(){
         Intent intent = new Intent(this, NewThreadActivity.class);
         startActivity(intent);
+    }
+
+    private void refresh(){
+        String methodName = "refresh()";
+        log.info(methodName, "Entering..");
+
+        smsMap.clear();
+        Map<String, SMS> map = inboxUtil.getMsgs();
+        smsMap.putAll(map);
+        adapter.notifyDataSetChanged();
+
+        log.error(methodName, "Returning..");
     }
 
     @Override
@@ -108,6 +137,9 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         setSupportActionBar(toolbar);
 
         init();
+        preGetData();
+        getData();
+        postGetData();
         process();
         addListeners();
     }
@@ -132,8 +164,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
 
     @Override
     protected void onStart() {
-
-        process();
+        refresh();
         super.onStart();
     }
 

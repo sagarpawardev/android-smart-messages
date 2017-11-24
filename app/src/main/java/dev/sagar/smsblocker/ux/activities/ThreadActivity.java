@@ -38,8 +38,7 @@ public class ThreadActivity extends AppCompatActivity implements
         LocalSMSReceiver.Callback{
 
     //Log Initiate
-    LogUtil log = new LogUtil(this.getClass().getName());
-
+    private LogUtil log = new LogUtil(this.getClass().getName());
 
     //Constants
     public static final String KEY_THREAD_ID = "THREAD_ID";
@@ -297,19 +296,31 @@ public class ThreadActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onPause() {
+        final String methodName =  "onPause()";
+        log.debug(methodName, "Just Entered..");
+
+        //setStatusRead
+        inboxUtil.setStatusRead(threadId);
+
+
+        super.onPause();
+
+        log.debug(methodName, "Returning..");
+    }
+
+    @Override
     protected void onStop() {
         final String methodName =  "onStop()";
         log.debug(methodName, "Just Entered..");
 
         unregisterSMSReceiver();
-        //setStatusRead
-        inboxUtil.setStatusRead(threadId);
-
 
         super.onStop();
 
         log.debug(methodName, "Returning..");
     }
+
     //--- Activity Overriders End ---
 
 
