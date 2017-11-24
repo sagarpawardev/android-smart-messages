@@ -36,23 +36,4 @@
         android:layout_toRightOf="@id/user"
         android:id="@+id/tv_time"/>
 
-    <TextView
-        android:text="received"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/reciever"
-        android:elevation="1dp"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:id="@+id/tv_type"/>
-
-    <TextView
-        android:text="False"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/reciever"
-        android:elevation="1dp"
-        android:padding="8dp"
-        android:visibility="gone"
-        android:id="@+id/tv_read"/>
 </LinearLayout>

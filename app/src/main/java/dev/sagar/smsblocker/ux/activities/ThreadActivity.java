@@ -5,11 +5,14 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,6 +31,7 @@ import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
+import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThread;
 
 public class ThreadActivity extends AppCompatActivity implements
         RVThreadAdapter.Callback,
@@ -47,11 +51,12 @@ public class ThreadActivity extends AppCompatActivity implements
 
     //Java Android
     RVThreadAdapter adapter;
+    AMCallbackThread amCallback;
 
     //Java Core
     private ArrayList<SMS> smses;
     private String threadId;
-    private InboxUtil readerUtil = null;
+    private InboxUtil inboxUtil = null;
     private SMSUtil smsUtil;
     private final int REQUEST_CODE_ALL_PERMISSIONS = 123;
     private PermissionUtilSingleton permissionIstance = PermissionUtilSingleton.getInstance();
@@ -62,7 +67,6 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "process()";
         log.debug(methodName, "Just Entered..");
 
-        adapter = new RVThreadAdapter(this, this, smses);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(adapter);
@@ -89,7 +93,7 @@ public class ThreadActivity extends AppCompatActivity implements
         threadId = basket.getString(KEY_THREAD_ID);
 
         //By Computation
-        smses = readerUtil.getAllSMSFromTo(threadId, InboxUtil.SORT_ASC);
+        smses = inboxUtil.getAllSMSFromTo(threadId, InboxUtil.SORT_ASC);
 
         log.debug(methodName, "Returning..");
     }
@@ -101,7 +105,6 @@ public class ThreadActivity extends AppCompatActivity implements
 
         String contact = ContactUtilSingleton.getInstance().getContactName(this, threadId);
         getSupportActionBar().setTitle(contact);
-
 
         log.debug(methodName, "Returning..");
     }
@@ -178,9 +181,26 @@ public class ThreadActivity extends AppCompatActivity implements
         btnSend = (ImageButton) findViewById(R.id.btn_send);
         etMsg = (EditText) findViewById(R.id.et_msg);
 
-        if(readerUtil == null) readerUtil = new InboxUtil(this);
+        log.debug(methodName, "Returning..");
+    }
+
+    private void preGetData(){
+        final String methodName =  "postGetData()";
+        log.debug(methodName, "Just Entered..");
+
+        if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         smsUtil = new SMSUtil(this);
         smsReceiver = new LocalSMSReceiver(this);
+
+        log.debug(methodName, "Returning..");
+    }
+
+    private void postGetData(){
+        final String methodName =  "postGetData()";
+        log.debug(methodName, "Just Entered..");
+
+        adapter = new RVThreadAdapter(this, this, smses);
+        amCallback = new AMCallbackThread(adapter);
 
         log.debug(methodName, "Returning..");
     }
@@ -211,6 +231,7 @@ public class ThreadActivity extends AppCompatActivity implements
     }
 
 
+    //--- Activity Overriders Start ---
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -231,13 +252,14 @@ public class ThreadActivity extends AppCompatActivity implements
         });*/
 
         init();
+        preGetData();
         getData();
+        postGetData();
         process();
         addListeners();
 
         log.debug(methodName, "Returning..");
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -262,7 +284,6 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Returning..");
     }
 
-
     @Override
     protected void onStart() {
         final String methodName =  "onStart()";
@@ -275,7 +296,6 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Returning..");
     }
 
-
     @Override
     protected void onStop() {
         final String methodName =  "onStop()";
@@ -283,15 +303,17 @@ public class ThreadActivity extends AppCompatActivity implements
 
         unregisterSMSReceiver();
         //setStatusRead
-        InboxUtil Inbox = new InboxUtil(this);
-        Inbox.setStatusRead(threadId);
+        inboxUtil.setStatusRead(threadId);
 
 
         super.onStop();
 
         log.debug(methodName, "Returning..");
     }
+    //--- Activity Overriders End ---
 
+
+    //--- LocalSMSReceiver.Callback Overriders Start ---
     @Override
     public void onSMSReceived(SMS sms) {
         final String methodName = "onSMSReceived()";
@@ -301,5 +323,15 @@ public class ThreadActivity extends AppCompatActivity implements
 
         log.info(methodName, "Returning");
     }
+    //--- LocalSMSReceiver.Callback Overriders Start ---
+
+
+    //--- RVThreadAdapter.Callback Starts ---
+    @Override
+    public void onItemLongClicked() {
+        startActionMode(amCallback);
+    }
+    //--- RVThreadAdapter.Callback Ends ---
+
 
 }
