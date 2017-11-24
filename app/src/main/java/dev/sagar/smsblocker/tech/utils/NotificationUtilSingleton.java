@@ -18,7 +18,7 @@ import dev.sagar.smsblocker.ux.activities.ThreadActivity;
 public class NotificationUtilSingleton {
 
     //Log Initiate
-    LogUtil log = new LogUtil(this.getClass().getName());
+    private LogUtil log = new LogUtil(this.getClass().getName());
 
     //Java Android
 

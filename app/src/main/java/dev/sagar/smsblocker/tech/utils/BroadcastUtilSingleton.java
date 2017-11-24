@@ -15,7 +15,7 @@ import java.util.Map;
 public class BroadcastUtilSingleton {
 
     //Log Initiate
-    LogUtil log = new LogUtil(this.getClass().getName());
+    private LogUtil log = new LogUtil(this.getClass().getName());
 
     //Java Android
     private Gson gson = new Gson();
@@ -29,8 +29,7 @@ public class BroadcastUtilSingleton {
     }
 
 
-    private BroadcastUtilSingleton() {
-    }
+    private BroadcastUtilSingleton() {}
 
     /***
      * This method broadcasts a message locally
