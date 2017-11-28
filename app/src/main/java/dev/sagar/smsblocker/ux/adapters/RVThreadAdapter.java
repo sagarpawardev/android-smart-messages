@@ -116,7 +116,6 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             holder.tvBody.setBackgroundResource(R.drawable.reciever);
         }
 
-
         holder.tvBody.setText(body);
         holder.tvTime.setText(socialDate);
 

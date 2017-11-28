@@ -1,5 +1,7 @@
 package dev.sagar.smsblocker.tech.beans;
 
+import android.net.Uri;
+
 /**
  * Created by sagarpawar on 22/10/17.
  */
@@ -9,6 +11,8 @@ public class Contact {
     private String id,
     displayName,
     number;
+
+    private Uri dp;
 
     public String getId() {
         return id;
@@ -32,5 +36,13 @@ public class Contact {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public Uri getDp() {
+        return dp;
+    }
+
+    public void setDp(Uri dp) {
+        this.dp = dp;
     }
 }

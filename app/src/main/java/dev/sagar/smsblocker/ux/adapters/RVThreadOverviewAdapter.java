@@ -2,11 +2,13 @@ package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -55,27 +57,32 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         String fromNumber = sms.getFrom();
         String fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNumber);
 
-             if(sms.isRead()) {
-                    holder.tvFrom.setTextColor(Color.GRAY);
-                    holder.tvBody.setTextColor(Color.GRAY);
-                    holder.tvTime.setTextColor(Color.GRAY);
-                    }
-             else{
-                    holder.tvFrom.setTextColor(Color.BLACK);
-                    holder.tvBody.setTextColor(Color.BLACK);
-                    holder.tvTime.setTextColor(Color.BLACK);
-                }
+        if(sms.isRead()) {
+            holder.tvFrom.setTextColor(Color.GRAY);
+            holder.tvBody.setTextColor(Color.GRAY);
+            holder.tvTime.setTextColor(Color.GRAY);
+        }
+        else{
+            holder.tvFrom.setTextColor(Color.BLACK);
+            holder.tvBody.setTextColor(Color.BLACK);
+            holder.tvTime.setTextColor(Color.BLACK);
+        }
 
-                if(fromName == null)
-                    fromName = fromNumber;
+        if(fromName == null)
+            fromName = fromNumber;
 
-            long tm = sms.getDateTime();
-            String socialDate = DateUtilSingleton.getInstance().socialFormat(tm);
-            holder.tvTime.setText(socialDate);
+        long tm = sms.getDateTime();
+        String socialDate = DateUtilSingleton.getInstance().socialFormat(tm);
+        holder.tvTime.setText(socialDate);
 
-            holder.tvFrom.setText(fromName);
-            holder.tvBody.setText(sms.getBody());
-            holder.tvThreadId.setText(sms.getFrom());
+        holder.tvFrom.setText(fromName);
+        holder.tvBody.setText(sms.getBody());
+        holder.tvThreadId.setText(sms.getFrom());
+        Uri dpUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
+        if(dpUri != null)
+            holder.ivDP.setImageURI(dpUri);
+        else
+            holder.ivDP.setImageResource(R.drawable.male);
     }
 
     @Override
@@ -99,6 +106,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
 
     protected class SMSViewHolder extends RecyclerView.ViewHolder {
         TextView tvFrom, tvBody, tvTime, tvThreadId;
+        ImageView ivDP;
 
         SMSViewHolder(View view) {
             super(view);
@@ -106,6 +114,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
             tvThreadId = view.findViewById(R.id.tv_thread_id);
+            ivDP = view.findViewById(R.id.iv_dp);
         }
     }
 }

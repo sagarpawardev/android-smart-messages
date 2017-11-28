@@ -35,7 +35,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
     }
 
     public void getData(){
-        contacts = ContactUtilSingleton.getAllContacts(this);
+        contacts = ContactUtilSingleton.getInstance().getAllContacts(this);
     }
 
     public void process(){
@@ -54,7 +54,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
     }
 
     public void searchContacts(String searchStr){
-        ArrayList<Contact> contacts = ContactUtilSingleton.searchContacts(this, searchStr);
+        ArrayList<Contact> contacts = ContactUtilSingleton.getInstance().searchContacts(this, searchStr);
         this.contacts.clear();
         this.contacts.addAll(contacts);
         contactsAdapter.notifyDataSetChanged();
