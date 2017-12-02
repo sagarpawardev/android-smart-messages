@@ -1,5 +1,6 @@
 package dev.sagar.smsblocker.tech.utils;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -55,11 +56,24 @@ public class NotificationUtilSingleton {
         String fromName = ContactUtilSingleton.getInstance().getContactName(context, from);
         String text = sms.getBody();
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle(fromName)
-                        .setContentText(text);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(fromName)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentText(text)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
+
+
+        /*//-- On Notification Expand Start --
+        NotificationCompat.InboxStyle inboxStyle =
+                new NotificationCompat.InboxStyle();
+        String[] events = text.split("\n");
+        inboxStyle.setBigContentTitle(fromName);
+        for (int i=0; i<events.length; i++) {
+            inboxStyle.addLine(events[i]);
+        }
+        mBuilder.setStyle(inboxStyle);
+        //-- On Notification Expand End --*/
 
         Intent resultIntent = new Intent(context, ThreadActivity.class);
         Bundle bundle = new Bundle();
