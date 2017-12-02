@@ -78,7 +78,22 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         isSelectionModeOn = isModeOn;
         selectedSMS.clear();
 
+        if(!isModeOn) notifyDataSetChanged();
+
         log.debug(methodName, "Returning..");
+    }
+
+    private void setViewSelected(View view, boolean selected){
+        if(selected) {
+            view.setSelected(true);
+        }
+        else{
+            view.setSelected(false);
+        }
+    }
+
+    private void setViewSelected(SMSViewHolder holder, boolean selected){
+        setViewSelected(holder.llParent, selected);
     }
 
 
@@ -107,14 +122,19 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         boolean isRead = sms.isRead();
         String socialDate = DateUtilSingleton.getInstance().socialFormat(time);
 
+        //If SMS type is sent
         if(type == SMS.TYPE_SENT) {
-            holder.lvParent.setGravity(Gravity.END);
+            holder.llParent.setGravity(Gravity.END);
             holder.tvBody.setBackgroundResource(R.drawable.sender);
         }
         else {
-            holder.lvParent.setGravity(Gravity.START);
+            holder.llParent.setGravity(Gravity.START);
             holder.tvBody.setBackgroundResource(R.drawable.reciever);
         }
+
+        //If SMS is selected in RecyclerView
+        boolean isSelected = selectedSMS.contains(sms);
+        setViewSelected(holder, isSelected);
 
         holder.tvBody.setText(body);
         holder.tvTime.setText(socialDate);
@@ -140,7 +160,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
     class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener{
         TextView tvBody, tvTime;
-        LinearLayout lvParent;
+        LinearLayout llParent;
         //Log Initiate
         LogUtil log = new LogUtil(this.getClass().getName());
 
@@ -149,7 +169,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             final String methodName =  "SMSViewHolder()";
             log.debug(methodName, "Just Entered..");
 
-            lvParent = (LinearLayout)view;
+            llParent = (LinearLayout)view;
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
 
@@ -171,6 +191,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
                 int position = getAdapterPosition();
                 SMS sms = smses.get(position);
                 selectedSMS.add(sms);
+                setViewSelected(view, true);
 
                 return true;
             }
@@ -192,10 +213,12 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
                 SMS sms = smses.get(position);
                 if(!selectedSMS.contains(sms)){
                     selectedSMS.add(sms);
+                    setViewSelected(view, true);
                     log.info(methodName, "Item Added in Selected List");
                 }
                 else{
                     selectedSMS.remove(sms);
+                    setViewSelected(view, false);
                     log.info(methodName, "Item removed from Selected List");
                 }
 
