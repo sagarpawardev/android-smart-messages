@@ -74,36 +74,48 @@ public class SMSReceiver extends BroadcastReceiver {
 
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            Object[] pdus = (Object[])bundle.get("pdus");
-            for (Object pdu: pdus) {
-                SmsMessage msg = SmsMessage.createFromPdu((byte[])pdu, MSG_FORMAT);
-                SMS sms = new SMS();
-                sms.setBody(msg.getMessageBody());
-                sms.setFrom(msg.getOriginatingAddress());
-                sms.setDateTime(msg.getTimestampMillis());
-                sms.setRead(false);
-                sms.setType(SMS.TYPE_RECEIVED);
+            Object[] pdus = (Object[]) bundle.get("pdus");
+            final SmsMessage[] messages = new SmsMessage[pdus.length];
+            log.debug(methodName, String.format("message count = %s", messages.length));
 
-                log.info(methodName, "Received Message From: "+msg.getDisplayOriginatingAddress());
-
-                boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefaultSMSApp(context);
-                if(!isAppDefault) log.error(methodName, "App is not default");
-                if(isAppDefault) {
-                    //Save SMS in DataProvider
-                    log.info(methodName, "Saving SMS in DataProvider");
-                    InboxUtil inboxUtil = new InboxUtil(context);
-                    String id = inboxUtil.saveSMS(sms, InboxUtil.TYPE_INBOX);
-                    log.info(methodName, "Received Created id: " + id);
-                    sms.setId(id);
-
-                    //Broadcast SMS Locally
-                    log.info(methodName, "Broadcasting SMS");
-                    broadcastLocalSMS(context, sms);
-
-                    //Create Notification
-                    notifUtil.createSMSNotification(context, sms);
-                }
+            //Join Multi parts
+            StringBuilder sbMessage = new StringBuilder();
+            for (int i = 0; i < pdus.length; i++) {
+                messages[i] = SmsMessage.createFromPdu((byte[])pdus[i], MSG_FORMAT);
+                String msg = messages[i].getMessageBody();
+                sbMessage.append(msg);
             }
+
+            //Create an SMS body
+            String msgBody = sbMessage.toString();
+            SmsMessage smsMessage = SmsMessage.createFromPdu((byte[])pdus[0], MSG_FORMAT);
+            SMS sms = new SMS();
+            sms.setFrom(smsMessage.getOriginatingAddress());
+            sms.setDateTime(smsMessage.getTimestampMillis());
+            sms.setBody(msgBody);
+            sms.setRead(false);
+            sms.setType(SMS.TYPE_RECEIVED);
+
+            log.info(methodName, "Received Message From: "+smsMessage.getDisplayOriginatingAddress());
+
+            boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefaultSMSApp(context);
+            if(!isAppDefault) log.error(methodName, "App is not default");
+            if(isAppDefault) {
+                //Save SMS in DataProvider
+                log.info(methodName, "Saving SMS in DataProvider");
+                InboxUtil inboxUtil = new InboxUtil(context);
+                String id = inboxUtil.saveSMS(sms, InboxUtil.TYPE_INBOX);
+                log.info(methodName, "Received Created id: " + id);
+                sms.setId(id);
+
+                //Broadcast SMS Locally
+                log.info(methodName, "Broadcasting SMS");
+                broadcastLocalSMS(context, sms);
+
+                //Create Notification
+                notifUtil.createSMSNotification(context, sms);
+            }
+
         }
     }
 
