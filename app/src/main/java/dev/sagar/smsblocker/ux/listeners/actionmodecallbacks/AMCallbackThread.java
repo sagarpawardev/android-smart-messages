@@ -19,10 +19,52 @@ public class AMCallbackThread implements ActionMode.Callback{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
+    private ActionMode actionMode = null;
 
     private RVThreadAdapter adapter;
     public AMCallbackThread(RVThreadAdapter adapter){
         this.adapter = adapter;
+    }
+
+    public void enableCopy(boolean isEnable){
+        final String methodName =  "enableCopy()";
+        log.debug(methodName, "Just Entered..");
+
+        if(actionMode != null) {
+            log.debug(methodName, "Enabling copy: "+isEnable);
+            MenuItem item = actionMode.getMenu().findItem(R.id.action_copy);
+            item.setVisible(!isEnable);
+        }
+
+        log.debug(methodName, "Returning..");
+    }
+
+    private void delete(){
+        final String methodName =  "onActionItemClicked()";
+        log.debug(methodName, "Just Entered..");
+
+        adapter.deleteSelections();
+
+        log.debug(methodName, "Returning..");
+    }
+
+    private void copy(){
+        final String methodName =  "onActionItemClicked()";
+        log.debug(methodName, "Just Entered..");
+
+        adapter.copySelection();
+
+        log.debug(methodName, "Returning..");
+    }
+
+    public void finish(){
+        final String methodName =  "onActionItemClicked()";
+        log.debug(methodName, "Just Entered..");
+
+        if(actionMode!=null)
+            actionMode.finish();
+
+        log.debug(methodName, "Returning..");
     }
 
     //--- ActionMode.Callback Overrides Start ---
@@ -31,10 +73,11 @@ public class AMCallbackThread implements ActionMode.Callback{
         final String methodName =  "onActionItemClicked()";
         log.debug(methodName, "Just Entered..");
 
-        if(item.getItemId() == R.id.action_delete){
-            adapter.deleteSelections();
-            mode.finish();
+        switch (item.getItemId()){
+            case R.id.action_delete: delete(); break;
+            case R.id.action_copy: copy(); break;
         }
+        mode.finish();
 
         log.debug(methodName, "Returning..");
         return false;
@@ -58,6 +101,7 @@ public class AMCallbackThread implements ActionMode.Callback{
 
         MenuInflater inflater = actionMode.getMenuInflater();
         inflater.inflate( R.menu.contextual_thread, menu );
+        this.actionMode = actionMode;
 
         log.debug(methodName, "Returning..");
         return true;
@@ -69,6 +113,7 @@ public class AMCallbackThread implements ActionMode.Callback{
         log.debug(methodName, "Just Entered..");
 
         adapter.setSelectionModeOn(false);
+        this.actionMode = null;
 
         log.debug(methodName, "Returning..");
     }

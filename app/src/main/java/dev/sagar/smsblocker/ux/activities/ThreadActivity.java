@@ -49,8 +49,8 @@ public class ThreadActivity extends AppCompatActivity implements
     private EditText etMsg;
 
     //Java Android
-    RVThreadAdapter adapter;
-    AMCallbackThread amCallback;
+    private RVThreadAdapter adapter;
+    private AMCallbackThread amCallback;
 
     //Java Core
     private ArrayList<SMS> smses;
@@ -155,10 +155,14 @@ public class ThreadActivity extends AppCompatActivity implements
     }
 
     public void smsReceiveUpdate(SMS sms){
+        final String methodName =  "smsReceiveUpdate()";
+        log.debug(methodName, "Just Entered..");
         smses.add(sms);
 
         adapter.notifyDataSetChanged();
         recyclerView.scrollToPosition(smses.size()-1);
+
+        log.debug(methodName, "Returning..");
     }
 
 
@@ -340,7 +344,42 @@ public class ThreadActivity extends AppCompatActivity implements
     //--- RVThreadAdapter.Callback Starts ---
     @Override
     public void onItemLongClicked() {
+        final String methodName =  "onItemLongClicked()";
+        log.debug(methodName, "Just Entered..");
+
         startActionMode(amCallback);
+
+        log.debug(methodName, "Returning..");
+    }
+
+    @Override
+    public void singleSelectionMode() {
+        final String methodName =  "singleSelectionMode()";
+        log.debug(methodName, "Just Entered..");
+
+        amCallback.enableCopy(false);
+
+        log.debug(methodName, "Returning..");
+    }
+
+    @Override
+    public void multiSelectionMode() {
+        final String methodName =  "multiSelectionMode()";
+        log.debug(methodName, "Just Entered..");
+
+        amCallback.enableCopy(true);
+
+        log.debug(methodName, "Returning..");
+    }
+
+    @Override
+    public void allDeselected() {
+        final String methodName =  "allDeselected()";
+        log.debug(methodName, "Just Entered..");
+
+        amCallback.finish();
+
+        log.debug(methodName, "Returning..");
     }
     //--- RVThreadAdapter.Callback Ends ---
 

@@ -17,6 +17,7 @@ import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.tech.utils.SystemUtilSingleton;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -65,6 +66,24 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             notifyItemRemoved(position);
         }
         selectedSMS.clear();
+
+        log.debug(methodName, "Returning..");
+        return true;
+    }
+
+
+    public boolean copySelection(){
+        final String methodName="copySelection()";
+        log.debug(methodName, "Just Entered..");
+
+        if(selectedSMS.size() != 1){
+            log.error(methodName, "Selected SMS are either greater or less than 1");
+            return false;
+        }
+
+        SMS sms = selectedSMS.get(0);
+        SystemUtilSingleton systemUtil = SystemUtilSingleton.getInstance();
+        systemUtil.copy(context, sms);
 
         log.debug(methodName, "Returning..");
         return true;
@@ -155,6 +174,9 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
     public interface Callback{
         void onItemLongClicked();
+        void singleSelectionMode();
+        void multiSelectionMode();
+        void allDeselected();
     }
 
 
@@ -220,6 +242,12 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
                     selectedSMS.remove(sms);
                     setViewSelected(view, false);
                     log.info(methodName, "Item removed from Selected List");
+                }
+
+                switch (selectedSMS.size()){
+                    case 0: callback.allDeselected(); break;
+                    case 1: callback.singleSelectionMode(); break;
+                    default: callback.multiSelectionMode(); break;
                 }
 
             }
