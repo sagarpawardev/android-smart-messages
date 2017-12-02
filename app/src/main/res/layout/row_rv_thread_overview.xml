@@ -5,39 +5,82 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/ripple_effect"
-    android:padding="8dp">
+    android:padding="@dimen/parent_padding">
 
-    <ImageView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="10dp"
+    <!--<ImageView
+        android:layout_width="43dp"
+        android:layout_height="43dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="6dp"
         app:srcCompat="@drawable/male"
         android:id="@+id/iv_dp"/>
+-->
+
+    <RelativeLayout
+        android:layout_width="@dimen/circular_img"
+        android:layout_height="@dimen/circular_img"
+        android:layout_marginStart="@dimen/circular_img_margin"
+        android:layout_marginEnd="@dimen/circular_img_margin"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/blue_color"
+        android:layout_alignParentTop="true"
+        android:id="@+id/dp_holder">
+        <TextView
+            android:layout_width="@dimen/circular_img"
+            android:layout_height="@dimen/circular_img"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:alpha="0.4"
+            android:textSize="30dp"
+            android:text="A"
+            android:textStyle="bold"
+            android:id="@+id/tv_icon"/>
+        <dev.sagar.smsblocker.ux.customviews.CircularImageView
+            android:layout_width="@dimen/circular_img"
+            android:layout_height="@dimen/circular_img"
+            app:srcCompat="@drawable/blue_color"
+            android:elevation="0dp"
+            android:visibility="gone"
+            android:id="@+id/iv_dp" />
+    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textColor="#000000"
-        android:layout_toEndOf="@id/iv_dp"
+        android:paddingStart="4dp"
+        android:textSize="18dp"
+        android:alpha="0.8"
+        android:layout_toEndOf="@id/dp_holder"
         android:id="@+id/tv_from"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/iv_dp"
+        android:layout_toEndOf="@id/dp_holder"
         android:layout_below="@id/tv_from"
+        android:ellipsize="end"
         android:maxLines="2"
+        android:alpha="0.8"
+        android:textSize="14sp"
+        android:padding="4dp"
+        android:text="Hello!! This is body"
         android:textColor="#000000"
         android:id="@+id/tv_body"/>
-
-
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/iv_dp"
+        android:layout_toEndOf="@id/dp_holder"
         android:layout_below="@id/tv_body"
+        android:gravity="end"
+        android:textSize="12sp"
+        android:padding="2dp"
+        android:alpha="0.52"
+        android:text="12 days ago"
         android:textColor="#000000"
         android:id="@+id/tv_time"/>
 
@@ -47,11 +90,23 @@
         android:visibility="gone"
         android:id="@+id/tv_thread_id"/>
 
-    <View
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="2dp"
         android:layout_below="@id/tv_time"
-        android:background="#E0E0E0"/>
+        android:orientation="horizontal">
+        <View
+            android:layout_width="@dimen/circular_img"
+            android:layout_marginEnd="@dimen/circular_img_margin"
+            android:layout_marginStart="@dimen/circular_img_margin"
+            android:layout_height="match_parent"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#000000"
+            android:alpha="0.1"/>
+    </LinearLayout>
 
 </RelativeLayout>

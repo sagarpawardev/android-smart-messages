@@ -12,4 +12,5 @@
     
     <color name="selected_thread">#90CAF9AA</color>
     <color name="text_msg">#E0F7FA</color>
+    <color name="blueA200">#448AFF</color>
 </resources>

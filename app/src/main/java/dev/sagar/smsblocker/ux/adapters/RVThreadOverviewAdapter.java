@@ -2,6 +2,7 @@ package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
@@ -64,14 +65,14 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         String fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNumber);
 
         if(sms.isRead()) {
-            holder.tvFrom.setTextColor(Color.GRAY);
-            holder.tvBody.setTextColor(Color.GRAY);
-            holder.tvTime.setTextColor(Color.GRAY);
+            holder.tvFrom.setTypeface(null, Typeface.NORMAL);
+            holder.tvBody.setTypeface(null, Typeface.NORMAL);
+            holder.tvTime.setTypeface(null, Typeface.NORMAL);
         }
         else{
-            holder.tvFrom.setTextColor(Color.BLACK);
-            holder.tvBody.setTextColor(Color.BLACK);
-            holder.tvTime.setTextColor(Color.BLACK);
+            holder.tvFrom.setTypeface(null, Typeface.BOLD);
+            holder.tvBody.setTypeface(null, Typeface.BOLD);
+            //holder.tvTime.setTypeface(null, Typeface.BOLD);
         }
 
         if(fromName == null)
@@ -85,10 +86,22 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         holder.tvBody.setText(sms.getBody());
         holder.tvThreadId.setText(sms.getFrom());
         Uri dpUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
-        if(dpUri != null)
+        if(dpUri != null) {
+            holder.ivDP.setVisibility(View.VISIBLE);
             holder.ivDP.setImageURI(dpUri);
-        else
-            holder.ivDP.setImageResource(R.drawable.male);
+        }
+        else {
+            //holder.ivDP.setImageResource(R.drawable.male);
+            holder.ivDP.setVisibility(View.GONE);
+            holder.ivDP.setImageURI(null);
+            if(!fromName.equals(fromNumber)) {
+                String c = String.valueOf(fromName.charAt(0));
+                holder.tvIcon.setText(c);
+            }
+            else{
+                holder.tvIcon.setText(R.string.hash);
+            }
+        }
     }
 
     @Override
@@ -111,7 +124,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
 
 
     protected class SMSViewHolder extends RecyclerView.ViewHolder {
-        TextView tvFrom, tvBody, tvTime, tvThreadId;
+        TextView tvFrom, tvBody, tvTime, tvThreadId, tvIcon;
         ImageView ivDP;
 
         SMSViewHolder(View view) {
@@ -119,6 +132,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
             tvFrom = view.findViewById(R.id.tv_from);
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
+            tvIcon = view.findViewById(R.id.tv_icon);
             tvThreadId = view.findViewById(R.id.tv_thread_id);
             ivDP = view.findViewById(R.id.iv_dp);
         }
