@@ -1,8 +1,11 @@
 package dev.sagar.smsblocker.tech.utils;
 
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.telephony.SmsManager;
+
+import java.util.ArrayList;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
 
@@ -35,12 +38,28 @@ public class SMSUtil {
         String methodName = "sendSMS()";
         log.info(methodName, "Just Entered...");
 
+        final int REQUEST_CODE = 0;
         SMS sms = null;
         try {
             //Send SMS
             log.info(methodName,"Trying to Send SMS");
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+
+            ArrayList<String> parts =smsManager.divideMessage(msg);
+            int numParts = parts.size();
+
+            ArrayList<PendingIntent> sentIntents = new ArrayList<>();
+            ArrayList<PendingIntent> deliveryIntents = new ArrayList<>();
+
+            /*for (int i = 0; i < numParts; i++) {
+                sentIntents.add(PendingIntent.getBroadcast(context, REQUEST_CODE, null, 0));
+                deliveryIntents.add(PendingIntent.getBroadcast(context, REQUEST_CODE, null, 0));
+            }*/
+
+            smsManager.sendMultipartTextMessage(phoneNo, null, parts, null, null);
+
+
+            //smsManager.sendTextMessage(phoneNo, null, msg, null, null);
             log.info(methodName, "==> SMS Sent");
 
             boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefaultSMSApp(context);

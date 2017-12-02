@@ -187,6 +187,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Returning..");
     }
 
+
     private void preGetData(){
         final String methodName =  "postGetData()";
         log.debug(methodName, "Just Entered..");
@@ -197,6 +198,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
         log.debug(methodName, "Returning..");
     }
+
 
     private void postGetData(){
         final String methodName =  "postGetData()";
