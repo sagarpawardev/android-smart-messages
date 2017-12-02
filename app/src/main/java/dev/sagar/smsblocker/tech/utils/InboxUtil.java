@@ -50,8 +50,8 @@ public class InboxUtil {
 
 
     /**
-     * This method returns key-value pair of contact_number and most_recent_message <Contact Number, Most Recent Message>
-     * @return
+     * Helps in getting most recent SMSes from all contacts
+     * @return key-value pair of contact_number and most_recent_message <Contact Number, Most Recent Message>
      */
     public Map<String, SMS> getMsgs(){
         final String methodName =  "getMsgs()";
@@ -77,8 +77,8 @@ public class InboxUtil {
             log.info(methodName, "Query returned null cursor");
             return smsMap;
         }
-        while (c.moveToNext()) {
 
+        while (c.moveToNext()) {
             String id = c.getString(c.getColumnIndexOrThrow("_id"));
             String from = c.getString(c.getColumnIndexOrThrow("address"));
             String body = c.getString(c.getColumnIndexOrThrow("body"));
@@ -99,9 +99,7 @@ public class InboxUtil {
             }
 
         }
-
-
-        if (c!=null) c.close();
+        c.close();
 
 
         log.debug(methodName, "Returning..");

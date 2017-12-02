@@ -36,9 +36,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         this.smsMap = smsMap;
         this.callback = callback;
 
-        Set<String> keys = smsMap.keySet();
-        threads = new ArrayList<>(keys);
-
+        threads = new ArrayList<>();
     }
 
     @Override
@@ -49,8 +47,13 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         return new SMSViewHolder(itemView);
     }
 
+
     @Override
     public void onBindViewHolder(SMSViewHolder holder, int position) {
+
+        Set<String> keys = smsMap.keySet();
+        threads.clear();
+        threads.addAll(keys);
 
         String thread = threads.get(position);
         SMS sms = smsMap.get(thread);
@@ -87,7 +90,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
 
     @Override
     public int getItemCount() {
-        return threads.size();
+        return smsMap.size();
     }
 
     @Override
