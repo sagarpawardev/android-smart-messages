@@ -51,9 +51,12 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
     @Override
     public void onBindViewHolder(SMSViewHolder holder, int position) {
 
+        /* This part need to change later it is a performance issue though solved Bug #30*/
+        //Section start
         Set<String> keys = smsMap.keySet();
         threads.clear();
         threads.addAll(keys);
+        //Section End
 
         String thread = threads.get(position);
         SMS sms = smsMap.get(thread);
