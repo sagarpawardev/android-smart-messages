@@ -61,6 +61,7 @@ public class NotificationUtilSingleton {
                 .setContentTitle(fromName)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentText(text)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text));
 
 
