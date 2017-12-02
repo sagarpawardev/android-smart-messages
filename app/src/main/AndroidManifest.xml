@@ -27,14 +27,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Here android:windowSoftInputMode="stateHidden" helps in hiding keyboard when activity
+        starts and edditext is focused in activity-->
         <activity
             android:name=".ux.activities.ThreadActivity"
             android:label="@string/title_activity_thread"
+            android:windowSoftInputMode="stateHidden"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".ux.activities.NewThreadActivity"
             android:label="@string/title_activity_new_thread"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <receiver
             android:name=".tech.broadcastreceivers.SMSReceiver"

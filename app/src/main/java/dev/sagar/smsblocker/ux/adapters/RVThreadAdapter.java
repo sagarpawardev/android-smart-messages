@@ -39,6 +39,10 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     private boolean isSelectionModeOn = false;
     private List<SMS> selectedSMSes = new ArrayList<>();
 
+    //Constants
+    private static final int TYPE_RECEIVED = 0;
+    private static final int TYPE_SENT = 1;
+
     public RVThreadAdapter(Context context, Callback callback, ArrayList<SMS> smses) {
         final String methodName =  "RVThreadAdapter()";
         log.debug(methodName, "Just Entered..");
@@ -122,11 +126,27 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         final String methodName =  "onCreateViewHolder()";
         log.debug(methodName, "Just Entered..");
 
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_rv_thread, parent, false);
+        View itemView = null;
+
+        switch (viewType){
+            case TYPE_SENT: itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.row_rv_thread__received, parent, false);
+                    break;
+            case TYPE_RECEIVED: itemView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.row_rv_thread__sent, parent, false);
+                    break;
+            default: break;
+        }
 
         log.debug(methodName, "Returning..");
         return new SMSViewHolder(itemView);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        SMS sms = smses.get(position);
+        boolean isType = sms.getType()==SMS.TYPE_SENT;
+        return  isType ? TYPE_RECEIVED: TYPE_SENT ;
     }
 
     @Override
@@ -142,14 +162,14 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         String socialDate = DateUtilSingleton.getInstance().socialFormat(time);
 
         //If SMS type is sent
-        if(type == SMS.TYPE_SENT) {
+       /* if(type == SMS.TYPE_SENT) {
             holder.llParent.setGravity(Gravity.END);
             holder.tvBody.setBackgroundResource(R.drawable.sender);
         }
         else {
             holder.llParent.setGravity(Gravity.START);
-            holder.tvBody.setBackgroundResource(R.drawable.reciever);
-        }
+            holder.tvBody.setBackgroundResource(R.drawable.msg_body_left);
+        }*/
 
         //If SMS is selected in RecyclerView
         boolean isSelected = selectedSMS.contains(sms);

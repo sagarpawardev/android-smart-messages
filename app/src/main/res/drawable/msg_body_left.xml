@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/text_msg" />
+    <!--<stroke
+        android:width="0dip"
+        android:color="#C2185B" />-->
+    <corners android:bottomRightRadius="@dimen/text_radius_bottomright"
+        android:topLeftRadius="@dimen/text_radius_topleft"
+        android:topRightRadius="@dimen/text_radius_topright"
+        android:bottomLeftRadius="@dimen/text_radius_bottomleft"/>
+    <!--<padding
+        android:bottom="8dp"
+        android:left="8dp"
+        android:right="8dp"
+        android:top="8dp" />-->
+</shape>

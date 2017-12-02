@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:background="@drawable/selector_thread"
+    android:padding="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <View
+            android:layout_width="20dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:elevation="1dp"
+            android:id="@+id/arrow_speak"
+            android:background="@drawable/img_speak_right"/>
+        
+        <TextView
+            android:id="@+id/tv_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/msg_body_right"
+            android:elevation="1dp"
+            android:textColor="@color/black"
+            android:layout_toStartOf="@id/arrow_speak"
+            android:paddingStart="@dimen/msg_body_paddingstart"
+            android:paddingEnd="@dimen/msg_body_paddingstart"
+            android:paddingTop="@dimen/msg_body_paddingstart"
+            android:paddingBottom="@dimen/msg_body_paddingstart"
+            android:layout_alignParentBottom="true"
+            android:maxWidth="250dp"
+            android:autoLink="all"
+            android:textIsSelectable="true"
+            android:text="shlslhs;s;s/sn/slsnl/san;sn/lslsnvlsnvlns;nnnsvns" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:text="1646646463466"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="1dp"
+        android:padding="4dp"
+        android:layout_gravity="end"
+        android:textSize="10dp"
+        android:id="@+id/tv_time"/>
+
+</LinearLayout>

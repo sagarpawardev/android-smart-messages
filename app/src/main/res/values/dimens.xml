@@ -1,3 +1,15 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
+    <dimen name="input_text_padding_top">8dp</dimen>
+    <dimen name="input_text_padding_bottom">8dp</dimen>
+    <dimen name="input_text_padding_start">8dp</dimen>
+    <dimen name="input_text_padding_end">8dp</dimen>
+    <dimen name="text_radius_bottomright">8dp</dimen>
+    <dimen name="text_radius_topleft">8dp</dimen>
+    <dimen name="text_radius_topright">8dp</dimen>
+    <dimen name="text_radius_bottomleft">0dp</dimen>
+    <dimen name="msg_body_paddingstart">10dp</dimen>
+    <dimen name="msg_body_paddingend">8dp</dimen>
+    <dimen name="msg_body_paddingtop">16dp</dimen>
+    <dimen name="msg_body_paddingbottom">16dp</dimen>
 </resources>

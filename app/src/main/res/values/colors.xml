@@ -9,5 +9,7 @@
     <color name="red">#F44336</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    
     <color name="selected_thread">#90CAF9AA</color>
+    <color name="text_msg">#E0F7FA</color>
 </resources>
