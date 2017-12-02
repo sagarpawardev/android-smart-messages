@@ -107,7 +107,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         smsMap.putAll(map);
         adapter.notifyDataSetChanged();
 
-        log.error(methodName, "Returning..");
+        log.info(methodName, "Returning..");
     }
 
     @Override

@@ -72,37 +72,37 @@ public class InboxUtil {
                 .query(uriSMSURI, projection, selection, selectionArgs, sortOrder);
         LinkedHashMap<String, SMS> smsMap = new LinkedHashMap<>();
 
-        Log.e("My TAG", "Reading Msg... ");
-        try {
-            while (c.moveToNext()) {
+        log.info(methodName, "Reading Messages..");
+        if(c==null){
+            log.info(methodName, "Query returned null cursor");
+            return smsMap;
+        }
+        while (c.moveToNext()) {
 
-                String id = c.getString(c.getColumnIndexOrThrow("_id"));
-                String from = c.getString(c.getColumnIndexOrThrow("address"));
-                String body = c.getString(c.getColumnIndexOrThrow("body"));
-                boolean readState = c.getInt(c.getColumnIndex("read")) == 1;
-                long time = c.getLong(c.getColumnIndexOrThrow("date"));
-                long type = c.getLong(c.getColumnIndexOrThrow("type"));
+            String id = c.getString(c.getColumnIndexOrThrow("_id"));
+            String from = c.getString(c.getColumnIndexOrThrow("address"));
+            String body = c.getString(c.getColumnIndexOrThrow("body"));
+            boolean readState = c.getInt(c.getColumnIndex("read")) == 1;
+            long time = c.getLong(c.getColumnIndexOrThrow("date"));
+            long type = c.getLong(c.getColumnIndexOrThrow("type"));
 
-                if(!smsMap.containsKey(from)) {
-                    SMS sms = new SMS();
-                    sms.setId(id);
-                    sms.setFrom(from);
-                    sms.setBody(body);
-                    sms.setRead(readState);
-                    sms.setDateTime(time);
-                    sms.setType(type);
+            if(!smsMap.containsKey(from)) {
+                SMS sms = new SMS();
+                sms.setId(id);
+                sms.setFrom(from);
+                sms.setBody(body);
+                sms.setRead(readState);
+                sms.setDateTime(time);
+                sms.setType(type);
 
-                    smsMap.put(from, sms);
-                }
-
+                smsMap.put(from, sms);
             }
+
         }
-        catch (NullPointerException e){
-            e.printStackTrace();
-        }
-        finally {
-            if (c!=null) c.close();
-        }
+
+
+        if (c!=null) c.close();
+
 
         log.debug(methodName, "Returning..");
         return smsMap;

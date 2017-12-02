@@ -68,7 +68,7 @@ public class ContactUtilSingleton {
             contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
         }
 
-        if(cursor != null && !cursor.isClosed()) {
+        if(!cursor.isClosed()) {
             cursor.close();
         }
 
@@ -83,8 +83,8 @@ public class ContactUtilSingleton {
      * @return List of all contacts
      */
     public ArrayList<Contact> getAllContacts(Context context){
-        final String METHOD_NAME = "getAllContacts()";
-        Log.e(TAG, "==>Inside "+METHOD_NAME);
+        final String methodName = "getAllContacts()";
+        log.info(methodName, "Just Entered..");
 
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
@@ -102,34 +102,42 @@ public class ContactUtilSingleton {
         String mOrder = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC";
 
         Cursor cursor = contentResolver.query(uri, projection , selection, selectionArg, mOrder);
-        Log.e(TAG, "Reading Contacts...");
+        log.info(methodName, "Reading Contacts...");
         ArrayList<Contact> contacts = new ArrayList<>();
-        try {
-            while (cursor.moveToNext()) {
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                Uri dpUri = Uri.parse(image_uri);
+        if(cursor == null){
+            log.error(methodName, "Received Cursor: "+null);
+            return contacts;
+        }
 
-                Contact contact = new Contact();
-                contact.setDisplayName(name);
-                contact.setId(id);
-                contact.setNumber(number);
-                contact.setDp(dpUri);
-
-                contacts.add(contact);
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            if(number == null){
+                log.info(methodName, name+" Does not have a number and its id is: "+id);
+                continue;
             }
+
+            Contact contact = new Contact();
+            contact.setDisplayName(name);
+            contact.setId(id);
+            contact.setNumber(number);
+
+            String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            if(image_uri != null){
+                Uri dpUri = Uri.parse(image_uri);
+                contact.setDp(dpUri);
+            }
+            else {
+                log.info(methodName, number+" Does Not have picture");
+            }
+
+            contacts.add(contact);
+
         }
 
-        catch (NullPointerException e){
-            e.printStackTrace();
-        }
-        finally {
-            if (cursor!=null) cursor.close();
-        }
-
-        Log.e(TAG, "==>Returning from "+METHOD_NAME);
+        if (!cursor.isClosed()) cursor.close();
+        log.info(methodName, "Returning..");
         return contacts;
     }
 
@@ -141,8 +149,8 @@ public class ContactUtilSingleton {
      * @return List of matched contacts
      */
     public ArrayList<Contact> searchContacts(Context context, String searchStr){
-        final String METHOD_NAME = "searchContacts()";
-        Log.e(TAG, "==>Inside "+METHOD_NAME);
+        final String methodName = "searchContacts()";
+        log.info(methodName, "Just Entered..");
 
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
@@ -160,34 +168,41 @@ public class ContactUtilSingleton {
         String mOrder = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC";
 
         Cursor cursor = contentResolver.query(uri, projection , selection, selectionArg, mOrder);
-        Log.e(TAG, "Reading Contacts...");
+        log.info(methodName, "Reading Contacts...");
         ArrayList<Contact> contacts = new ArrayList<>();
-        try {
-            while (cursor.moveToNext()) {
-                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-                Uri dpUri = Uri.parse(image_uri);
+        if(cursor == null){
+            log.error(methodName, "Received Cursor: "+null);
+            return contacts;
+        }
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+            String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                Contact contact = new Contact();
-                contact.setDisplayName(name);
-                contact.setId(id);
-                contact.setNumber(number);
-                contact.setDp(dpUri);
-
-                contacts.add(contact);
+            if(number == null){
+                log.info(methodName, name+" Does not have a number and its id is: "+id);
+                continue;
             }
-        }
 
-        catch (NullPointerException e){
-            e.printStackTrace();
-        }
-        finally {
-            if (cursor!=null) cursor.close();
-        }
+            Contact contact = new Contact();
+            contact.setDisplayName(name);
+            contact.setId(id);
+            contact.setNumber(number);
 
-        Log.e(TAG, "==>Returning from "+METHOD_NAME);
+            String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
+            if(image_uri != null){
+                Uri dpUri = Uri.parse(image_uri);
+                contact.setDp(dpUri);
+            }
+            else {
+                log.info(methodName, number+" Does Not have picture");
+            }
+
+            contacts.add(contact);
+        }
+        cursor.close();
+
+        log.info(methodName, "Returning..");
         return contacts;
     }
 
@@ -209,14 +224,14 @@ public class ContactUtilSingleton {
 
         String selection = ContactsContract.CommonDataKinds.Phone.NUMBER +"= ?";
         String selectionArg[] = {phoneNo};
-        String mOrder = null;
+        String mOrder = "";
 
         Cursor contactsCursor = null;
         Uri imgUri = null;
         try{
             contactsCursor = contentResolver.query(uri, projection, selection, selectionArg, mOrder);
 
-            if(contactsCursor == null){
+            if(contactsCursor == null || contactsCursor.getCount()==0){
                 throw new NoSuchContactException(phoneNo);
             }
 
@@ -236,13 +251,13 @@ public class ContactUtilSingleton {
 
         }
         catch (NoSuchContactException ex){
-            log.error(methodName, phoneNo+" Does not exist");
+            log.error(methodName, phoneNo+" is not there in Contacts");
         }
         catch (NoContactPictureException ex){
             log.error(methodName, phoneNo+" Does not have a Picture");
         }
         catch (Exception ex){
-            log.error(methodName, phoneNo+" got Some Unknown Exception: "+ex.getMessage());
+            log.error(methodName, phoneNo+" got Some Unknown Exception with message: "+ex.getMessage());
         }
         finally {
             if(contactsCursor!=null && !contactsCursor.isClosed())
