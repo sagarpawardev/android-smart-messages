@@ -15,8 +15,8 @@ public class LogUtil {
 
     /**
      * This method logs an Error
-     * @param method
-     * @param msg
+     * @param method Current Method Name
+     * @param msg Message to Log
      */
     public void error(String method, String msg){
         Log.e(className, method+" ==> "+msg);
@@ -25,8 +25,8 @@ public class LogUtil {
 
     /**
      * This method logs an Information
-     * @param method
-     * @param msg
+     * @param method Current Method Name
+     * @param msg Message to Log
      */
     public void info(String method, String msg){
         Log.i(className, method+" ==> "+msg);
@@ -35,8 +35,8 @@ public class LogUtil {
 
     /**
      * This method logs a Debug
-     * @param method
-     * @param msg
+     * @param method Current Method Name
+     * @param msg Message to Log
      */
     public void debug(String method, String msg){
         Log.d(className, method+" ==> "+msg);
@@ -45,10 +45,28 @@ public class LogUtil {
 
     /**
      * This method logs a Verbose
-     * @param method
-     * @param msg
+     * @param method Current Method Name
+     * @param msg Message to Log
      */
     public void verbose(String method, String msg){
         Log.v(className, method+" ==> "+msg);
+    }
+
+
+    /**
+     * This method print Returning.. in log
+     * @param method Current Method Name
+     */
+    public void returning(String method){
+        debug(method, "Returning..");
+    }
+
+
+    /**
+     * This method print Just Entered.. in log
+     * @param method Current Method Name
+     */
+    public void justEntered(String method){
+        debug(method, "Just Entered..");
     }
 }

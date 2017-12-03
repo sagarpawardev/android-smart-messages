@@ -4,11 +4,12 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/ripple_effect"
+    android:background="@drawable/selector_threadoverview"
     android:paddingStart="@dimen/parent_padding"
     android:paddingEnd="@dimen/parent_padding"
     android:paddingTop="@dimen/parent_padding"
-    android:paddingLeft="0dp">
+    android:paddingBottom="0dp"
+    android:id="@+id/holder">
 
     <!--<ImageView
         android:layout_width="43dp"

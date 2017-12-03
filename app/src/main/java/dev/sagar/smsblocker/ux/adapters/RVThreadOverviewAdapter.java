@@ -1,11 +1,9 @@
 package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,16 +19,29 @@ import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
+import dev.sagar.smsblocker.tech.utils.InboxUtil;
+import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
  * Created by sagarpawar on 15/10/17.
  */
 
-public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOverviewAdapter.SMSViewHolder> implements View.OnClickListener{
+public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOverviewAdapter.SMSViewHolder>
+        implements View.OnClickListener{
+
+    //Log Initiate
+    private LogUtil log = new LogUtil(this.getClass().getName());
+
+    //Java Android
     private Context context;
+
+    //Java Core
     private Map<String, SMS> smsMap;
     private Callback callback;
     private List<String> threads;
+    private boolean isSelectionModeOn=false;
+    private ArrayList<String> selectedThreads = new ArrayList<>(); //Better if Changed to Set
+    private InboxUtil inboxUtil;
 
     public RVThreadOverviewAdapter(Context context, Map<String, SMS> smsMap, Callback callback) {
         this.context = context;
@@ -38,21 +49,85 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         this.callback = callback;
 
         threads = new ArrayList<>();
+        inboxUtil = new InboxUtil(context);
     }
 
+    public void setSelectionModeOn(boolean isModeOn){
+        final String methodName =  "setSelectionModeOn()";
+        log.debug(methodName, "Just Entered..");
+
+        isSelectionModeOn = isModeOn;
+        selectedThreads.clear();
+
+        //This Line Clears items when Action Mode is destroyed
+        if(!isModeOn) notifyDataSetChanged();
+
+        log.debug(methodName, "Returning..");
+    }
+
+    private void setViewSelected(View view, boolean selected){
+        final String methodName =  "setViewSelected()";
+        log.justEntered(methodName);
+
+        if(selected) {
+            view.setSelected(true);
+        }
+        else{
+            view.setSelected(false);
+        }
+
+        log.returning(methodName);
+    }
+
+    public int deleteSelections(){
+        final String methodName =  "deleteSelections()";
+        log.justEntered(methodName);
+
+        int count = 0;
+
+        for (String thread: selectedThreads) {
+            //Delete SMS from database
+            int deleteCount = inboxUtil.deleteThread(thread);
+            count += deleteCount;
+
+            //Delete SMS from UI
+            int position = selectedThreads.indexOf(thread);
+
+            if(deleteCount>0) {
+                notifyItemRemoved(position);
+                threads.remove(thread);
+                smsMap.remove(thread);
+            }
+            log.debug(methodName, "Deleted "+deleteCount+ " in this Thread but Total: "+count);
+        }
+        selectedThreads.clear();
+
+        log.returning(methodName);
+        return count;
+    }
+
+    //--- RecyclerView.Adapter Overrides Start ---
     @Override
     public SMSViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final String methodName =  "onCreateViewHolder()";
+        log.debug(methodName, "Just Entered..");
+
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_rv_thread_overview, parent, false);
         itemView.setOnClickListener(this);
-        return new SMSViewHolder(itemView);
-    }
+        SMSViewHolder holder = new SMSViewHolder(itemView);
 
+        log.debug(methodName, "Returning..");
+        return holder;
+    }
 
     @Override
     public void onBindViewHolder(SMSViewHolder holder, int position) {
+        final String methodName =  "onBindViewHolder()";
+        log.debug(methodName, "Just Entered..");
 
         /* This part need to change later it is a performance issue though solved Bug #30*/
+        log.error(methodName, "This part Reduces performance. Need to change later");
         //Section start
         Set<String> keys = smsMap.keySet();
         threads.clear();
@@ -64,6 +139,11 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         String fromNumber = sms.getFrom();
         String fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNumber);
 
+        //If SMS is selected in Multiselect mode
+        boolean isSelected = selectedThreads.contains(fromName);
+        holder.parent.setSelected(isSelected);
+
+        //If SMS is read
         if(sms.isRead()) {
             holder.tvFrom.setTypeface(null, Typeface.NORMAL);
             holder.tvBody.setTypeface(null, Typeface.NORMAL);
@@ -81,10 +161,11 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         long tm = sms.getDateTime();
         String socialDate = DateUtilSingleton.getInstance().socialFormat(tm);
         holder.tvTime.setText(socialDate);
-
         holder.tvFrom.setText(fromName);
         holder.tvBody.setText(sms.getBody());
         holder.tvThreadId.setText(sms.getFrom());
+
+        //Setting User Image
         Uri dpUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
         if(dpUri != null) {
             holder.ivDP.setVisibility(View.VISIBLE);
@@ -102,30 +183,64 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
                 holder.tvIcon.setText(R.string.hash);
             }
         }
+
+        log.debug(methodName, "Returning..");
     }
 
     @Override
     public int getItemCount() {
-        return smsMap.size();
-    }
+        final String methodName =  "getItemCount()";
+        log.debug(methodName, "Just Entered..");
 
+        int size = smsMap.size();
+
+        log.debug(methodName, "Returning..");
+        return size;
+    }
+    //--- RecyclerView.Adapter Overrides Ends ---
+
+
+    //--- View.OnClickListener Overrides Start ---
     @Override
     public void onClick(View view) {
+        final String methodName =  "onClick()";
+        log.justEntered(methodName);
+
         TextView tvThreadID = view.findViewById(R.id.tv_thread_id);
         String threadId = tvThreadID.getText().toString();
 
-        callback.onItemClicked(threadId);
+        if(!isSelectionModeOn) {
+            log.debug(methodName, "sending Callback..");
+            callback.onItemClicked(threadId);
+        }
+        else{
+            log.debug(methodName, "Selection Mode is on.");
+            if(!selectedThreads.contains(threadId)){
+                selectedThreads.add(threadId);
+                setViewSelected(view, true);
+                log.info(methodName, "Item Added in Selected List");
+            }
+            else{
+                selectedThreads.remove(threadId);
+                setViewSelected(view, false);
+                log.info(methodName, "Item removed from Selected List");
+            }
+
+            switch (selectedThreads.size()){
+                case 0: callback.onAllDeselected(); break;
+                default: break;
+            }
+        }
+
+        log.returning(methodName);
     }
+    //--- View.OnClickListener Overrides End ---
 
 
-    public interface Callback{
-        void onItemClicked(String threadId);
-    }
-
-
-    protected class SMSViewHolder extends RecyclerView.ViewHolder {
+    protected class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
         TextView tvFrom, tvBody, tvTime, tvThreadId, tvIcon;
         ImageView ivDP;
+        View parent;
 
         SMSViewHolder(View view) {
             super(view);
@@ -135,6 +250,38 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
             tvIcon = view.findViewById(R.id.tv_icon);
             tvThreadId = view.findViewById(R.id.tv_thread_id);
             ivDP = view.findViewById(R.id.iv_dp);
+            parent = view;
+
+            view.setOnLongClickListener(this);
         }
+
+        //--- View.OnLongClickListener Overrides Start ---
+        @Override
+        public boolean onLongClick(View view) {
+            final String methodName =  "onLongClick()";
+            log.debug(methodName, "Just Entered..");
+
+            if (!isSelectionModeOn) {
+                callback.onItemLongClicked();
+
+                //Add Long Pressed Item in Selected List
+                int position = getAdapterPosition();
+                String thread = threads.get(position);
+                selectedThreads.add(thread);
+                setViewSelected(view, true);
+
+                return true;
+            }
+
+            log.debug(methodName, "Returning..");
+            return false;
+        }
+        //--- View.OnLongClickListener Overrides End ---
+    }
+
+    public interface Callback{
+        void onItemClicked(String threadId);
+        void onItemLongClicked();
+        void onAllDeselected();
     }
 }

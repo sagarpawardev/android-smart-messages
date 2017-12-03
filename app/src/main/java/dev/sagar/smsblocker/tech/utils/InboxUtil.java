@@ -1,5 +1,6 @@
 package dev.sagar.smsblocker.tech.utils;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -117,7 +118,7 @@ public class InboxUtil {
         final String methodName =  "getAllSMSFromTo()";
         log.debug(methodName, "Just Entered..");
 
-        Uri uriSMSURI = Uri.parse("content://sms/");
+        Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
         String[] projection = {_id,
                 address,
                 body,
@@ -135,7 +136,7 @@ public class InboxUtil {
         }
 
         Cursor c = context.getContentResolver()
-                .query(uriSMSURI, projection, selection, selectionArgs, mSortOrder);
+                .query(uriSmsURI, projection, selection, selectionArgs, mSortOrder);
 
         ArrayList<SMS> smses = new ArrayList<>();
         Log.e("My TAG", "Reading Msg... ");
@@ -294,16 +295,38 @@ public class InboxUtil {
      */
     public int deleteThread(String phoneNo){
         final String methodName =  "deleteThread()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
+
+        Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
+        //phoneNo = Uri.encode(phoneNo);
+
+        log.error(methodName, "Performance issues Temporarily adding. Need to remove later");
+        ContentResolver contentResolver = context.getContentResolver();
+        int count=0;
+        List<SMS> smses = getAllSMSFromTo(phoneNo);
+        for(SMS sms: smses){
+            String id = sms.getId();
+            Uri tempUri = Uri.withAppendedPath(Telephony.Sms.CONTENT_URI, Uri.encode(id));
+            int tempCount = contentResolver.delete(tempUri, null, null);
+            log.debug(methodName,"Delete Count: "+tempCount);
+            count += tempCount;
+        }
+
+        /*String selection = address+" = ?";
+        String[] selectionArgs = {phoneNo};
+        log.debug(methodName, "Deleting message from: "+phoneNo);
+        int deleteCount = context.getContentResolver()
+                .delete(uriSmsURI, selection, selectionArgs);
+        log.debug(methodName, "Delete Count: "+deleteCount);
 
         try{
             throw new NotImplementedException(this.getClass().getSimpleName(), methodName);
         }
         catch (NotImplementedException e){
             e.printStackTrace();
-        }
+        }*/
 
         log.debug(methodName, "Returning..");
-        return 0;
+        return count;
     }
 }

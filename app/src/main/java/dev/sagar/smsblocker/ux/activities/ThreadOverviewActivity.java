@@ -23,6 +23,7 @@ import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
+import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
 
 public class ThreadOverviewActivity extends AppCompatActivity implements RVThreadOverviewAdapter.Callback{
 
@@ -41,6 +42,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     //Java Android
     Map<String, SMS> smsMap = null;
     RVThreadOverviewAdapter adapter;
+    private AMCallbackThreadOverview amCallback;
 
     private void init(){
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -57,6 +59,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
 
     private void postGetData(){
         adapter = new RVThreadOverviewAdapter(this, smsMap, this);
+        amCallback = new AMCallbackThreadOverview(adapter);
     }
 
     private void addListeners(){
@@ -110,6 +113,8 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         log.info(methodName, "Returning..");
     }
 
+
+    //--- AppCompatActivity Overrides Start ---
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -127,7 +132,6 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +171,10 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         refresh();
         super.onStart();
     }
+    //--- AppCompatActivity Overrides End ---
 
+
+    //--- RVThreadOverviewAdapter.Callback Overrides Start ---
     @Override
     public void onItemClicked(String threadId) {
         Intent intent = new Intent(this, ThreadActivity.class);
@@ -177,4 +184,25 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         intent.putExtras(basket);
         startActivity(intent);
     }
+
+    @Override
+    public void onItemLongClicked() {
+        final String methodName =  "onItemLongClicked()";
+        log.debug(methodName, "Just Entered..");
+
+        startActionMode(amCallback);
+
+        log.debug(methodName, "Returning..");
+    }
+
+    @Override
+    public void onAllDeselected() {
+        final String methodName =  "allDeselected()";
+        log.debug(methodName, "Just Entered..");
+
+        amCallback.finish();
+
+        log.debug(methodName, "Returning..");
+    }
+    //--- RVThreadOverviewAdapter.Callback Overrides End ---
 }
