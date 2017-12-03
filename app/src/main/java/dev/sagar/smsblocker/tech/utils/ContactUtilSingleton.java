@@ -216,7 +216,7 @@ public class ContactUtilSingleton {
     public Uri getPictureUri(Context context, String phoneNo){
         final String methodName = "getPictureUri()";
         log.info(methodName, "Just Entered..");
-        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNo));
         ContentResolver contentResolver = context.getContentResolver();
         String projection[] = {
                 ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
