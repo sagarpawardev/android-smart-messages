@@ -5,7 +5,10 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/ripple_effect"
-    android:padding="@dimen/parent_padding">
+    android:paddingStart="@dimen/parent_padding"
+    android:paddingEnd="@dimen/parent_padding"
+    android:paddingTop="@dimen/parent_padding"
+    android:paddingLeft="0dp">
 
     <!--<ImageView
         android:layout_width="43dp"
@@ -23,7 +26,7 @@
         android:layout_height="@dimen/circular_img"
         android:layout_marginStart="@dimen/circular_img_margin"
         android:layout_marginEnd="@dimen/circular_img_margin"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/blue_color"
         android:layout_alignParentTop="true"
         android:id="@+id/dp_holder">
@@ -90,11 +93,11 @@
         android:visibility="gone"
         android:id="@+id/tv_thread_id"/>
 
+    <!-- Seperator Line-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="6dp"
-        android:layout_marginBottom="2dp"
         android:layout_below="@id/tv_time"
         android:orientation="horizontal">
         <View
