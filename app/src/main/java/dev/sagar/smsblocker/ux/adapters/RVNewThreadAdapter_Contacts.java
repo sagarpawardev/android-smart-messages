@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
+import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
  * Created by sagarpawar on 22/10/17.
@@ -18,6 +19,9 @@ import dev.sagar.smsblocker.tech.beans.Contact;
 
 public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements View.OnClickListener{
+
+    //Log Initiate
+    private LogUtil log = new LogUtil(this.getClass().getName());
 
     //Java Android
     private Context context;
@@ -37,21 +41,34 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
     }
 
     private ContactViewHolder contactViewHolder(ViewGroup parent, LayoutInflater inflater){
+        final String methodName =  "contactViewHolder()";
+        log.justEntered(methodName);
+
         View itemView= inflater.inflate(R.layout.row_rv_new_thread__contacts, parent, false);
         itemView.setOnClickListener(this);
         ContactViewHolder holder = new ContactViewHolder(itemView);
+
+        log.returning(methodName);
         return holder;
     }
 
     private NonContactViewHolder nonContactViewHolder(ViewGroup parent, LayoutInflater inflater){
+        final String methodName =  "nonContactViewHolder()";
+        log.justEntered(methodName);
+
         View itemView= inflater.inflate(R.layout.row_rv_new_thread__noncontacts, parent, false);
         itemView.setOnClickListener(this);
 
         NonContactViewHolder holder = new NonContactViewHolder(itemView);
+
+        log.returning(methodName);
         return holder;
     }
 
     private void contactsOnBindViewHolder(RecyclerView.ViewHolder viewHolder, int position){
+        final String methodName =  "contactsOnBindViewHolder()";
+        log.justEntered(methodName);
+
         ContactViewHolder holder = (ContactViewHolder) viewHolder;
         Contact contact = contacts.get(position);
         String displayName = contact.getDisplayName();
@@ -60,52 +77,107 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
         holder.tvId.setText(id);
         holder.tvName.setText(displayName);
         holder.tvNumber.setText(phoneNo);
+
+        log.returning(methodName);
     }
 
     private void nonContactsOnBindViewHolder(RecyclerView.ViewHolder viewHolder){
+        final String methodName =  "nonContactsOnBindViewHolder()";
+        log.justEntered(methodName);
+
         NonContactViewHolder holder = (NonContactViewHolder) viewHolder;
-        String phoneNo = callback.onEmptySearchList();
+        String phoneNo = callback.needSearchString();
         holder.tvNumber.setText(phoneNo);
+
+        log.returning(methodName);
+    }
+
+    private boolean isNumber(char c){
+        final String methodName =  "isNumber()";
+        log.justEntered(methodName);
+
+        boolean result = '0'<=c && c<='9';
+
+        log.returning(methodName);
+        return result;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final String methodName =  "onCreateViewHolder()";
+        log.justEntered(methodName);
+
         RecyclerView.ViewHolder holder = null;
         LayoutInflater inflater = LayoutInflater.from(context);
         switch (viewType){
             case CONTACTS: holder = contactViewHolder(parent, inflater);  break;
             case NON_CONTACTS: holder = nonContactViewHolder(parent, inflater);  break;
         }
+
+        log.returning(methodName);
         return holder;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return contacts.size()==0 ? NON_CONTACTS : CONTACTS;
+        final String methodName =  "getItemViewType()";
+        log.justEntered(methodName);
+
+        int type = contacts.size()==0 ? NON_CONTACTS : CONTACTS;
+
+        log.returning(methodName);
+        return type;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        final String methodName =  "onBindViewHolder()";
+        log.justEntered(methodName);
+
         if(viewHolder instanceof  ContactViewHolder){
             contactsOnBindViewHolder(viewHolder, position);
         }
         else if(viewHolder instanceof NonContactViewHolder){
             nonContactsOnBindViewHolder(viewHolder);
         }
+
+        log.returning(methodName);
     }
 
     @Override
     public int getItemCount() {
+        final String methodName =  "getItemCount()";
+        log.justEntered(methodName);
+
         int size = contacts.size();
-        if(size == 0) size = 1;
+        if(size == 0){
+            String searchStr = callback.needSearchString();
+
+            //If Neither Numeric not spaces like '+91 8877993322' notify Activity and return size 0
+            for(char c: searchStr.toCharArray()){
+                if( !isNumber(c) && c!='+') {
+                    callback.onEmptySearch();
+                    log.returning(methodName);
+                    return 0;
+                }
+            }
+            return 1;
+        }
+
+        log.returning(methodName);
         return size;
     }
 
     @Override
     public void onClick(View view) {
+        final String methodName =  "onClick()";
+        log.justEntered(methodName);
+
         TextView tvPhoneNo = view.findViewById(R.id.tv_phone_no);
         String phoneNo = tvPhoneNo.getText().toString();
         callback.onClicked(phoneNo);
+
+        log.returning(methodName);
     }
 
     class ContactViewHolder extends RecyclerView.ViewHolder{
@@ -113,6 +185,7 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
 
         ContactViewHolder(View view) {
             super(view);
+
             tvName = view.findViewById(R.id.tv_display_name);
             tvNumber = view.findViewById(R.id.tv_phone_no);
             tvId = view.findViewById(R.id.tv_contact_id);
@@ -131,6 +204,7 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
 
     public interface Callback{
         void onClicked(String threadId);
-        String onEmptySearchList();
+        String needSearchString();
+        void onEmptySearch();
     }
 }
