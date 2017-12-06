@@ -102,8 +102,16 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
         addListeners();
     }
 
+    //--- RVNewThreadAdapter_Contacts.Callback Override Starts---
     @Override
     public void onClicked(String phoneNo) {
         onContactSelected(phoneNo);
     }
+
+    @Override
+    public String onEmptySearchList() {
+        String text = etSearchContact.getText().toString();
+        return text;
+    }
+    //--- RVNewThreadAdapter_Contacts.Callback Override Ends---
 }
