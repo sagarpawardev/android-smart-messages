@@ -2,7 +2,6 @@ package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,6 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
     //Java Core
     private ArrayList<SMS> smses;
-    private ArrayList<SMS> selectedSMS = new ArrayList<>();
     private boolean isSelectionModeOn = false;
     private List<SMS> selectedSMSes = new ArrayList<>();
 
@@ -55,21 +53,28 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         log.debug(methodName, "Returning..");
     }
 
+    public void logSelectedSize(){
+        log.debug("logSelectedSize()", "Current Size: "+selectedSMSes.size());
+    }
 
     public boolean deleteSelections(){
         final String methodName =  "deleteSelections()";
         log.debug(methodName, "Just Entered..");
 
-        for (SMS sms: selectedSMS) {
+        log.verbose(methodName, "This can be improved");
+        log.info(methodName, "Selected SMS count: "+ selectedSMSes.size());
+        for (SMS sms: selectedSMSes) {
+            log.debug(methodName, "Deleting SMS: "+sms.getBody());
+
             //Delete SMS from database
             inboxUtil.deleteSMS(sms);
 
             //Delete SMS from UI
-            int position = selectedSMS.indexOf(sms);
+            int position = selectedSMSes.indexOf(sms);
             smses.remove(sms);
             notifyItemRemoved(position);
         }
-        selectedSMS.clear();
+        selectedSMSes.clear();
 
         log.debug(methodName, "Returning..");
         return true;
@@ -80,12 +85,12 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         final String methodName="copySelection()";
         log.debug(methodName, "Just Entered..");
 
-        if(selectedSMS.size() != 1){
+        if(selectedSMSes.size() != 1){
             log.error(methodName, "Selected SMS are either greater or less than 1");
             return false;
         }
 
-        SMS sms = selectedSMS.get(0);
+        SMS sms = selectedSMSes.get(0);
         SystemUtilSingleton systemUtil = SystemUtilSingleton.getInstance();
         systemUtil.copy(context, sms);
 
@@ -99,7 +104,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         log.debug(methodName, "Just Entered..");
 
         isSelectionModeOn = isModeOn;
-        selectedSMS.clear();
+        selectedSMSes.clear();
 
         if(!isModeOn) notifyDataSetChanged();
 
@@ -172,7 +177,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         }*/
 
         //If SMS is selected in RecyclerView
-        boolean isSelected = selectedSMS.contains(sms);
+        boolean isSelected = selectedSMSes.contains(sms);
         setViewSelected(holder, isSelected);
 
         holder.tvBody.setText(body);
@@ -225,6 +230,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         public boolean onLongClick(View view) {
             final String methodName =  "onLongClick()";
             log.debug(methodName, "Just Entered..");
+            boolean result = false;
 
             if (!isSelectionModeOn) {
                 callback.onItemLongClicked();
@@ -232,14 +238,16 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
                 //Add Long Pressed Item in Selected List
                 int position = getAdapterPosition();
                 SMS sms = smses.get(position);
-                selectedSMS.add(sms);
+                selectedSMSes.add(sms);
+
+                log.debug(methodName, "Size: "+selectedSMSes.size());
                 setViewSelected(view, true);
 
-                return true;
+                result = true;
             }
 
             log.debug(methodName, "Returning..");
-            return false;
+            return result;
         }
 
         @Override
@@ -253,18 +261,18 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
                 int position = getAdapterPosition();
                 SMS sms = smses.get(position);
-                if(!selectedSMS.contains(sms)){
-                    selectedSMS.add(sms);
+                if(!selectedSMSes.contains(sms)){
+                    selectedSMSes.add(sms);
                     setViewSelected(view, true);
                     log.info(methodName, "Item Added in Selected List");
                 }
                 else{
-                    selectedSMS.remove(sms);
+                    selectedSMSes.remove(sms);
                     setViewSelected(view, false);
                     log.info(methodName, "Item removed from Selected List");
                 }
 
-                switch (selectedSMS.size()){
+                switch (selectedSMSes.size()){
                     case 0: callback.allDeselected(); break;
                     case 1: callback.singleSelectionMode(); break;
                     default: callback.multiSelectionMode(); break;

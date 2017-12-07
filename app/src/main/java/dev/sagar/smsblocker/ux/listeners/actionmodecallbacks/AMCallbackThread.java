@@ -1,10 +1,14 @@
 package dev.sagar.smsblocker.ux.listeners.actionmodecallbacks;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
@@ -21,9 +25,13 @@ public class AMCallbackThread implements ActionMode.Callback{
     private LogUtil log = new LogUtil(this.getClass().getName());
     private ActionMode actionMode = null;
 
+    //Java Android
     private RVThreadAdapter adapter;
-    public AMCallbackThread(RVThreadAdapter adapter){
+    private Context context;
+
+    public AMCallbackThread(Context context, RVThreadAdapter adapter){
         this.adapter = adapter;
+        this.context = context;
     }
 
     public void enableCopy(boolean isEnable){
@@ -43,7 +51,11 @@ public class AMCallbackThread implements ActionMode.Callback{
         final String methodName =  "onActionItemClicked()";
         log.debug(methodName, "Just Entered..");
 
-        adapter.deleteSelections();
+        boolean isDeleted = adapter.deleteSelections();
+        if(isDeleted) {
+            String txtDeleted = context.getResources().getString(R.string.txt_thread__deleted);
+            Toast.makeText(context, txtDeleted, Toast.LENGTH_SHORT).show();
+        }
 
         log.debug(methodName, "Returning..");
     }
@@ -52,7 +64,11 @@ public class AMCallbackThread implements ActionMode.Callback{
         final String methodName =  "onActionItemClicked()";
         log.debug(methodName, "Just Entered..");
 
-        adapter.copySelection();
+        boolean isCopied = adapter.copySelection();
+        if(isCopied){
+            String txtDeleted = context.getResources().getString(R.string.txt_thread__copied);
+            Toast.makeText(context, txtDeleted, Toast.LENGTH_SHORT).show();
+        }
 
         log.debug(methodName, "Returning..");
     }
@@ -66,6 +82,38 @@ public class AMCallbackThread implements ActionMode.Callback{
 
         log.debug(methodName, "Returning..");
     }
+
+    /*
+    Currently not using this method as it contains bugs. Action mode destroys as soon as an action is selected
+    Thus clears selected lists but selectors remain active if we comment line selectedSMS.clear()
+    */
+    /*private void showAlertDialog(){
+        final String methodName =  "onActionItemClicked()";
+        log.justEntered(methodName);
+
+        adapter.logSelectedSize();
+        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+        alertDialog.setTitle("Delete Messages");
+        alertDialog.setMessage("Messages will be lost forever?");
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        adapter.logSelectedSize();
+                        AMCallbackThread.this.finish();
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                adapter.logSelectedSize();
+                adapter.deleteSelections();
+            }
+        });
+
+        alertDialog.show();
+
+        log.returning(methodName);
+    }*/
 
     //--- ActionMode.Callback Overrides Start ---
     @Override
@@ -118,4 +166,5 @@ public class AMCallbackThread implements ActionMode.Callback{
         log.debug(methodName, "Returning..");
     }
     //--- ActionMode.Callback Overrides End ---
+
 }

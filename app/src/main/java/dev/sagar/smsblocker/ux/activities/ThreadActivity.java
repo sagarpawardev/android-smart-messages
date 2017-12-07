@@ -205,7 +205,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Just Entered..");
 
         adapter = new RVThreadAdapter(this, this, smses);
-        amCallback = new AMCallbackThread(adapter);
+        amCallback = new AMCallbackThread(this, adapter);
 
         log.debug(methodName, "Returning..");
     }

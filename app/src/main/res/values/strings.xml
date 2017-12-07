@@ -10,4 +10,7 @@
     <string name="title_contextual_thread">Select</string>
     <string name="hash">#</string>
     <string name="send_to">Send to</string>
+
+    <string name="txt_thread__deleted">Deleted!</string>
+    <string name="txt_thread__copied">Copied</string>
 </resources>
