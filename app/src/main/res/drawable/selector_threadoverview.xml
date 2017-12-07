@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- When selected-->
     <item android:state_selected="true">
         <color android:color="@color/selected_thread"/>
@@ -7,9 +8,13 @@
 
     <!-- When Not selected-->
     <item android:state_selected="false">
-        <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:color="#E0E0E0"
+        <ripple
+            android:color="?android:colorControlHighlight"
+            tools:targetApi="lollipop">
+            <item android:drawable="@color/white"/>
+        </ripple>
+        <!--<ripple
+            android:color="#"
             tools:targetApi="lollipop">
             <item android:id="@android:id/mask">
                 <shape android:shape="rectangle">
@@ -23,6 +28,7 @@
                         android:radius="0dp"/>
                 </shape>
             </item>
-        </ripple>
+        </ripple>-->
     </item>
+
 </selector>

@@ -2,7 +2,9 @@ package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -142,6 +144,15 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         //If SMS is selected in Multiselect mode
         boolean isSelected = selectedThreads.contains(fromName);
         holder.parent.setSelected(isSelected);
+
+        if(position == 0){
+            Drawable drawable = ContextCompat.getDrawable(context, R.drawable.bkg_threadoverview__top_rounded);
+            holder.parent.setBackground(drawable);
+        }
+        else{
+            Drawable drawable = ContextCompat.getDrawable(context, R.drawable.selector_threadoverview);
+            holder.parent.setBackground(drawable);
+        }
 
         //If SMS is read
         if(sms.isRead()) {

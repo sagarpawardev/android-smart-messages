@@ -5,9 +5,9 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/selector_threadoverview"
-    android:paddingStart="@dimen/parent_padding"
-    android:paddingEnd="@dimen/parent_padding"
-    android:paddingTop="@dimen/parent_padding"
+    android:paddingStart="@dimen/padding_row_threadoverview__horiz"
+    android:paddingEnd="@dimen/padding_row_threadoverview__horiz"
+    android:paddingTop="@dimen/padding_row_threadoverview__vert"
     android:paddingBottom="0dp"
     android:id="@+id/holder">
 
@@ -36,7 +36,7 @@
             android:layout_height="@dimen/circular_img"
             android:gravity="center"
             android:textColor="@color/white"
-            android:alpha="0.4"
+            android:alpha="0.6"
             android:textSize="30dp"
             android:text="A"
             android:textStyle="bold"
@@ -84,6 +84,7 @@
         android:textSize="12sp"
         android:padding="2dp"
         android:alpha="0.52"
+        android:layout_marginEnd="5dp"
         android:text="12 days ago"
         android:textColor="#000000"
         android:id="@+id/tv_time"/>
@@ -101,11 +102,11 @@
         android:layout_marginTop="6dp"
         android:layout_below="@id/tv_time"
         android:orientation="horizontal">
-        <View
+        <!--<View
             android:layout_width="@dimen/circular_img"
             android:layout_marginEnd="@dimen/circular_img_margin"
             android:layout_marginStart="@dimen/circular_img_margin"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"/>-->
         <View
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
