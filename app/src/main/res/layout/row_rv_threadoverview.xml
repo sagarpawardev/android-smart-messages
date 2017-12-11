@@ -51,6 +51,20 @@
     </RelativeLayout>
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="end"
+        android:textSize="12sp"
+        android:padding="2dp"
+        android:alpha="0.52"
+        android:layout_marginEnd="5dp"
+        android:text="12 days ago"
+        android:textColor="#000000"
+        android:id="@+id/tv_time"/>
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
@@ -58,6 +72,8 @@
         android:paddingStart="4dp"
         android:textSize="18dp"
         android:alpha="0.8"
+        android:text="Sagar Pawar"
+        android:layout_toStartOf="@id/tv_time"
         android:layout_toEndOf="@id/dp_holder"
         android:id="@+id/tv_from"/>
 
@@ -70,24 +86,10 @@
         android:maxLines="2"
         android:alpha="0.8"
         android:textSize="14sp"
-        android:padding="4dp"
+        android:paddingBottom="18dp"
         android:text="Hello!! This is body"
         android:textColor="#000000"
         android:id="@+id/tv_body"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/dp_holder"
-        android:layout_below="@id/tv_body"
-        android:gravity="end"
-        android:textSize="12sp"
-        android:padding="2dp"
-        android:alpha="0.52"
-        android:layout_marginEnd="5dp"
-        android:text="12 days ago"
-        android:textColor="#000000"
-        android:id="@+id/tv_time"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -99,8 +101,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="6dp"
-        android:layout_below="@id/tv_time"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/padding_row_threadoverview__vert"
         android:orientation="horizontal">
         <!--<View
             android:layout_width="@dimen/circular_img"

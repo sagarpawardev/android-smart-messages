@@ -115,7 +115,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         log.debug(methodName, "Just Entered..");
 
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_rv_thread_overview, parent, false);
+                .inflate(R.layout.row_rv_threadoverview, parent, false);
         itemView.setOnClickListener(this);
         SMSViewHolder holder = new SMSViewHolder(itemView);
 
