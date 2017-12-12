@@ -103,6 +103,7 @@
         android:layout_height="1dp"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="@dimen/padding_row_threadoverview__vert"
+        android:visibility="invisible"
         android:orientation="horizontal">
         <!--<View
             android:layout_width="@dimen/circular_img"

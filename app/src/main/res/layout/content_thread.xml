@@ -13,14 +13,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="4dp"
         android:id="@+id/linearLayout"
         android:padding="0dp"
-        android:background="@drawable/color"
+        android:background="@android:color/transparent"
         android:layout_marginRight="2dp"
         android:layout_marginLeft="2dp"
+        android:layout_marginBottom="6dp"
+        android:layout_marginTop="0dp"
         android:layout_alignParentBottom="true">
 
+        <!--Emoji Button-->
         <ImageButton
             android:id="@+id/btn_emoji"
             android:layout_width="0dp"
@@ -32,25 +34,30 @@
             android:src="@drawable/emo" />
 
         <EditText
+            android:id="@+id/et_msg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:maxHeight="150dp"
             android:layout_gravity="center_vertical"
-            android:layout_weight="70"
-            android:paddingTop="@dimen/input_text_padding_top"
-            android:paddingBottom="@dimen/input_text_padding_bottom"
-            android:paddingStart="@dimen/input_text_padding_start"
-            android:paddingEnd="@dimen/input_text_padding_end"
+            android:layout_weight="1"
             android:background="@drawable/color"
-            android:id="@+id/et_msg"/>
+            android:maxHeight="150dp"
+            android:minHeight="42dp"
+            android:elevation="1dp"
+            android:paddingBottom="@dimen/input_text_padding_bottom"
+            android:paddingEnd="@dimen/input_text_padding_end"
+            android:paddingStart="@dimen/input_text_padding_start"
+            android:paddingTop="@dimen/input_text_padding_top"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="6dp"/>
 
-        <ImageButton
-            android:layout_width="0dp"
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/send2"
             android:layout_gravity="center"
-            android:layout_weight="15"
             android:padding="10dp"
+            android:elevation="1dp"
+            android:layout_marginEnd="6dp"
+            app:srcCompat="@drawable/send2"
             android:background="@drawable/color"
             android:id="@+id/btn_send"/>
 
@@ -60,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lv_sms"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="0dp"
         android:layout_above="@id/linearLayout"/>
 
 </RelativeLayout>
