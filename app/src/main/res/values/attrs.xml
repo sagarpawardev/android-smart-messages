@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="NotificationView">
+        <attr name="titleColor" format="color"/>
+        <attr name="descColor" format="color"/>
+        <attr name="titleText" format="color"/>
+        <attr name="descText" format="color"/>
+    </declare-styleable>
+</resources>

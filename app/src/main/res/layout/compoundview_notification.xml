@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:background="@drawable/bkg_notificationview__close_btn"
+        android:src="@drawable/ic_close_white_24dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/imgbtn_close"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxLines="1"
+        android:layout_toStartOf="@id/imgbtn_close"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingEnd="4dp"
+        android:text="Set App as Default"
+        android:textSize="18dp"
+        android:textColor="@color/white"
+        android:id="@+id/tv_title"/>
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_toStartOf="@id/imgbtn_close"
+        android:layout_below="@id/tv_title"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingEnd="4dp"
+        android:textColor="@color/white"
+        android:text="setting app defaults helps Smart Messages to handle SMS better"
+        android:id="@+id/tv_desc"/>
+
+</merge>

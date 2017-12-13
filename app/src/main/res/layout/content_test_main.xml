@@ -8,4 +8,11 @@
     tools:context="dev.sagar.smsblocker.test.activities.TestMainActivity"
     tools:showIn="@layout/test_activity_main">
 
+    <dev.sagar.smsblocker.ux.customviews.NotificationView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:maxHeight="130dp"
+        android:padding="6dp"
+        android:background="@color/colorPrimary"/>
+
 </android.support.constraint.ConstraintLayout>

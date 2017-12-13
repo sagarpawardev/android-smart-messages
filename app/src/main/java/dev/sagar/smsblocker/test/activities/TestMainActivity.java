@@ -23,7 +23,7 @@ public class TestMainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        makeAppDefault();
+        //makeAppDefault();
         super.onResume();
     }
 
