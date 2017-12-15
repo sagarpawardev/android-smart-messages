@@ -23,6 +23,7 @@ import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
+import dev.sagar.smsblocker.ux.customviews.NotificationView;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
 
 public class ThreadOverviewActivity extends AppCompatActivity implements RVThreadOverviewAdapter.Callback{
@@ -33,6 +34,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     //View
     RecyclerView recyclerView;
     FloatingActionButton fab;
+    NotificationView notificationView;
 
     //Java Core
     InboxUtil inboxUtil = null;
@@ -47,6 +49,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     private void init(){
         fab = (FloatingActionButton) findViewById(R.id.fab);
         recyclerView = (RecyclerView) findViewById(R.id.lv_threads);
+        notificationView = (NotificationView) findViewById(R.id.notificationView);
     }
 
     private void preGetData(){
@@ -69,9 +72,31 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
                 startNewThreadActivity();
             }
         });
+        notificationView.setOnCloseClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                notificationView.setVisibility(View.GONE);
+            }
+        });
+
+        notificationView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                permissionInstance.askToMakeAppDefault(ThreadOverviewActivity.this);
+            }
+        });
     }
 
     private void process(){
+        if(!permissionInstance.isAppDefaultSMSApp(this)){
+            notificationView.setTitleText(R.string.notif_default_app_title);
+            notificationView.setDescText(R.string.notif_default_app_desc);
+            notificationView.setVisibility(View.VISIBLE);
+        }
+        else {
+            notificationView.setVisibility(View.GONE);
+        }
+
         boolean hasPermissions = permissionInstance.hasPermissions(this, Constants.PERMISSIONS);
         if(!hasPermissions) {
             askPermissions();

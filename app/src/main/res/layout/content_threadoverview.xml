@@ -20,4 +20,12 @@
         android:layout_marginTop="10dp"
         android:id="@+id/lv_threads"/>
 
+    <dev.sagar.smsblocker.ux.customviews.NotificationView
+        android:id="@+id/notificationView"
+        android:background="@color/colorPrimaryLight"
+        android:alpha="0.95"
+        android:padding="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </android.support.constraint.ConstraintLayout>
