@@ -15,4 +15,14 @@
         android:padding="6dp"
         android:background="@color/colorPrimary"/>
 
+    <dev.sagar.smsblocker.ux.customviews.DisplayPictureView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        app:pictureSrc="@drawable/sagar"
+        app:letterText="A"
+        app:letterColor="#FFFFFF"
+        app:letterBackground="@color/blueA200Darker">
+    </dev.sagar.smsblocker.ux.customviews.DisplayPictureView>
+
 </android.support.constraint.ConstraintLayout>

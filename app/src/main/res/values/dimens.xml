@@ -16,4 +16,9 @@
     <dimen name="padding_row_threadoverview__vert">15dp</dimen>
     <dimen name="circular_img">48dp</dimen>
     <dimen name="circular_img_margin">14dp</dimen>
+    <dimen name="dp_magin">14dp</dimen>
+
+    <!--DisplayPictureView Dimes-->
+    <dimen name="dp_size">48dp</dimen>
+
 </resources>

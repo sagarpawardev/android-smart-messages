@@ -21,8 +21,7 @@
         app:srcCompat="@drawable/male"
         android:id="@+id/iv_dp"/>
 -->
-
-    <RelativeLayout
+    <!--<RelativeLayout
         android:layout_width="@dimen/circular_img"
         android:layout_height="@dimen/circular_img"
         android:layout_marginStart="@dimen/circular_img_margin"
@@ -48,7 +47,21 @@
             android:elevation="0dp"
             android:visibility="gone"
             android:id="@+id/iv_dp" />
-    </RelativeLayout>
+    </RelativeLayout>-->
+
+
+    <dev.sagar.smsblocker.ux.customviews.DisplayPictureView
+        android:layout_width="@dimen/circular_img"
+        android:layout_height="@dimen/circular_img"
+        android:layout_marginStart="@dimen/circular_img_margin"
+        android:layout_marginEnd="@dimen/circular_img_margin"
+        android:layout_marginTop="8dp"
+        android:layout_centerVertical="true"
+        android:padding="1dp"
+        app:letterText="#"
+        app:letterColor="@color/white"
+        app:letterBackground="@color/blueA200Darker"
+        android:id="@+id/dpv_picture"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -74,18 +87,19 @@
         android:alpha="0.8"
         android:text="Sagar Pawar"
         android:layout_toStartOf="@id/tv_time"
-        android:layout_toEndOf="@id/dp_holder"
+        android:layout_toEndOf="@id/dpv_picture"
         android:id="@+id/tv_from"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/dp_holder"
+        android:layout_toEndOf="@id/dpv_picture"
         android:layout_below="@id/tv_from"
         android:ellipsize="end"
         android:maxLines="2"
         android:alpha="0.8"
         android:textSize="14sp"
+        android:paddingStart="4dp"
         android:paddingBottom="18dp"
         android:text="Hello!! This is body"
         android:textColor="#000000"

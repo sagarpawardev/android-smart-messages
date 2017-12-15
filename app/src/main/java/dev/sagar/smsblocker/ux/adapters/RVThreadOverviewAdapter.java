@@ -23,6 +23,7 @@ import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.ux.customviews.DisplayPictureView;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -179,19 +180,16 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         //Setting User Image
         Uri dpUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
         if(dpUri != null) {
-            holder.ivDP.setVisibility(View.VISIBLE);
-            holder.ivDP.setImageURI(dpUri);
+            holder.dpView.setPictureSrc(dpUri);
         }
         else {
-            //holder.ivDP.setImageResource(R.drawable.male);
-            holder.ivDP.setVisibility(View.GONE);
-            holder.ivDP.setImageURI(null);
             if(!fromName.equals(fromNumber)) {
                 String c = String.valueOf(fromName.charAt(0));
-                holder.tvIcon.setText(c);
+                holder.dpView.setLetterText(c);
             }
             else{
-                holder.tvIcon.setText(R.string.hash);
+                String str = context.getResources().getString(R.string.hash);
+                holder.dpView.setLetterText(str);
             }
         }
 
@@ -249,8 +247,8 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
 
 
     protected class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
-        TextView tvFrom, tvBody, tvTime, tvThreadId, tvIcon;
-        ImageView ivDP;
+        TextView tvFrom, tvBody, tvTime, tvThreadId;
+        DisplayPictureView dpView;
         View parent;
 
         SMSViewHolder(View view) {
@@ -258,9 +256,8 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
             tvFrom = view.findViewById(R.id.tv_from);
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
-            tvIcon = view.findViewById(R.id.tv_icon);
+            dpView = view.findViewById(R.id.dpv_picture);
             tvThreadId = view.findViewById(R.id.tv_thread_id);
-            ivDP = view.findViewById(R.id.iv_dp);
             parent = view;
 
             view.setOnLongClickListener(this);

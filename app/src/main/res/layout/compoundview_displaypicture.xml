@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:shape="ring"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="23dp">
+        <ImageView
+            android:id="@+id/iv_dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:scaleType="centerCrop"/>
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:shape="ring"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="23dp"
+        android:id="@+id/tv_holder">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:alpha="0.6"
+            android:textSize="30sp"
+            android:elevation="2dp"
+            android:text="B"
+            android:textStyle="bold"
+            android:shape="ring"
+            android:id="@+id/tv_letter"/>
+    </android.support.v7.widget.CardView>
+
+    <!--<android.support.v4.widget.CircleImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="0dp"
+        android:visibility="gone"
+        android:id="@+id/iv_dp" />-->
+</merge>

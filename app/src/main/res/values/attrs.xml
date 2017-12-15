@@ -6,4 +6,11 @@
         <attr name="titleText" format="color"/>
         <attr name="descText" format="color"/>
     </declare-styleable>
+
+    <declare-styleable name="DisplayPictureView">
+        <attr name="letterText" format="string"/>
+        <attr name="letterBackground" format="reference"/>
+        <attr name="letterColor" format="color"/>
+        <attr name="pictureSrc" format="reference"/>
+    </declare-styleable>
 </resources>
