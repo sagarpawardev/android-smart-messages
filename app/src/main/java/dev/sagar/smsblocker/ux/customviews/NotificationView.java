@@ -15,6 +15,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
@@ -216,7 +217,8 @@ public class NotificationView extends RelativeLayout implements View.OnClickList
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                NotificationView.this.setVisibility(GONE);
+                setVisibility(GONE);
+                clearAnimation();
             }
 
             @Override

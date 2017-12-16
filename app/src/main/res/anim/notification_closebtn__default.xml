@@ -3,19 +3,21 @@
     android:fillAfter="true" >
 
     <!--Fade Out-->
-    <!--<alpha
+    <alpha
         android:duration="400"
         android:fromAlpha="1.0"
         android:interpolator="@android:anim/decelerate_interpolator"
-        android:toAlpha="0.0" />-->
+        android:toAlpha="0.0"
+        android:fillEnabled="false"
+        android:fillAfter="false"/>
 
 
     <!-- Slide up-->
-    <translate
+    <!--<translate
         android:duration="300"
         android:fromYDelta="0%p"
         android:interpolator="@android:anim/decelerate_interpolator"
-        android:toYDelta="-100%" />
+        android:toYDelta="-100%" />-->
 
 
 </set>

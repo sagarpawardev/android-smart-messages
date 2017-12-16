@@ -66,10 +66,10 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "process()";
         log.debug(methodName, "Just Entered..");
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mLayoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(adapter);
-        recyclerView.scrollToPosition(smses.size()-1);
 
         boolean hasPermissions = permissionIstance.hasPermissions(this, Constants.PERMISSIONS);
         if(!hasPermissions) {
@@ -92,7 +92,7 @@ public class ThreadActivity extends AppCompatActivity implements
         threadId = basket.getString(KEY_THREAD_ID);
 
         //By Computation
-        smses = inboxUtil.getAllSMSFromTo(threadId, InboxUtil.SORT_ASC);
+        smses = inboxUtil.getAllSMSFromTo(threadId, InboxUtil.SORT_DESC);
 
         log.debug(methodName, "Returning..");
     }
