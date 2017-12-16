@@ -3,12 +3,15 @@ package dev.sagar.smsblocker.ux.customviews;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.graphics.drawable.Animatable2;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,9 +21,11 @@ import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
  * Created by sagarpawar on 14/12/17.
+ * Notification Default Action in OnClickListener is Hiding Visibility of NotifcationView.
+ * However you can override it simply calling setOnCloseBtnClickListener().
  */
 
-public class NotificationView extends RelativeLayout {
+public class NotificationView extends RelativeLayout implements View.OnClickListener{
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
 
@@ -86,6 +91,8 @@ public class NotificationView extends RelativeLayout {
             setDescColor(descColor);
             setCloseBtnColor(closeButtonColor);
             setCloseBtnBackground(closeBtnBackground);
+
+            closeBtn.setOnClickListener(this);
 
             typedArray.recycle();
         }
@@ -196,6 +203,30 @@ public class NotificationView extends RelativeLayout {
 
         log.returning(methodName);
     }
+
+
+    //--- View.OnClickListener Overrides Start ----
+    @Override
+    public void onClick(View view) {
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.notification_closebtn__default);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                NotificationView.this.setVisibility(GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        startAnimation(animation);
+    }
+    //--- View.OnClickListener Overrides End ----
 
     /*@Override
     public void setOnClickListener(@Nullable OnClickListener listener) {

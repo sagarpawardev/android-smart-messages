@@ -1,11 +1,8 @@
 package dev.sagar.smsblocker.test.activities;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.widget.Toast;
 
 import dev.sagar.smsblocker.R;
@@ -30,7 +27,7 @@ public class TestMainActivity extends AppCompatActivity {
 
     public void makeAppDefault(){
         PermissionUtilSingleton permissions = PermissionUtilSingleton.getInstance();
-        boolean isAppDefault = permissions.isAppDefaultSMSApp(this);
+        boolean isAppDefault = permissions.isAppDefault(this);
 
         if(isAppDefault)
             Toast.makeText(this, "App is Already Default", Toast.LENGTH_SHORT).show();

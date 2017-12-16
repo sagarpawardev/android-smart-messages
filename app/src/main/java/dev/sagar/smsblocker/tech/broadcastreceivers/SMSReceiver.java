@@ -98,7 +98,7 @@ public class SMSReceiver extends BroadcastReceiver {
 
             log.info(methodName, "Received Message From: "+smsMessage.getDisplayOriginatingAddress());
 
-            boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefaultSMSApp(context);
+            boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefault(context);
             if(!isAppDefault) log.error(methodName, "App is not default");
             if(isAppDefault) {
                 //Save SMS in DataProvider

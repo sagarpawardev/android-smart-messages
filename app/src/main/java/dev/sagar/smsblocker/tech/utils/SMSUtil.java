@@ -62,7 +62,7 @@ public class SMSUtil {
             //smsManager.sendTextMessage(phoneNo, null, msg, null, null);
             log.info(methodName, "==> SMS Sent");
 
-            boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefaultSMSApp(context);
+            boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefault(context);
             if(isAppDefault) {
                 //Save in DataProvider
                 sms = new SMS();

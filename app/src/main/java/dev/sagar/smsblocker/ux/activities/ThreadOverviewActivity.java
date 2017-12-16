@@ -72,12 +72,6 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
                 startNewThreadActivity();
             }
         });
-        notificationView.setOnCloseClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                notificationView.setVisibility(View.GONE);
-            }
-        });
 
         notificationView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,9 +82,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     }
 
     private void process(){
-        if(!permissionInstance.isAppDefaultSMSApp(this)){
-            notificationView.setTitleText(R.string.notif_default_app_title);
-            notificationView.setDescText(R.string.notif_default_app_desc);
+        if(!permissionInstance.isAppDefault(this)){
             notificationView.setVisibility(View.VISIBLE);
         }
         else {

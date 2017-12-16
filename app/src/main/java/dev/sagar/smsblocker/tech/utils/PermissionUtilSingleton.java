@@ -69,8 +69,8 @@ public class PermissionUtilSingleton {
      * @param context
      * @return
      */
-    public boolean isAppDefaultSMSApp(Context context){
-        final String methodName = "isAppDefaultSMSApp()";
+    public boolean isAppDefault(Context context){
+        final String methodName = "isAppDefault()";
         log.info(methodName, "Just Entered...");
 
         final String myPackageName = context.getPackageName();

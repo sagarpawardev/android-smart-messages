@@ -25,6 +25,11 @@
         android:background="@color/colorPrimaryLight"
         android:alpha="0.95"
         android:padding="8dp"
+        app:titleText="@string/notif_default_app_title"
+        app:descText="@string/notif_default_app_desc"
+        app:titleColor="@color/white"
+        app:descColor="@color/white"
+        app:closeBtnBackground="@drawable/ripple_effect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

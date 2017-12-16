@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true" >
+
+    <!--Fade Out-->
+    <!--<alpha
+        android:duration="400"
+        android:fromAlpha="1.0"
+        android:interpolator="@android:anim/decelerate_interpolator"
+        android:toAlpha="0.0" />-->
+
+
+    <!-- Slide up-->
+    <translate
+        android:duration="300"
+        android:fromYDelta="0%p"
+        android:interpolator="@android:anim/decelerate_interpolator"
+        android:toYDelta="-100%" />
+
+
+</set>
