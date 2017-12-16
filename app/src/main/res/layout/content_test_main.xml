@@ -13,6 +13,12 @@
         android:layout_height="wrap_content"
         android:maxHeight="130dp"
         android:padding="6dp"
+        app:closeBtnBackground="@drawable/ripple_effect"
+        app:closeBtnColor="@color/red"
+        app:titleText="Set Defalt App"
+        app:descText="@string/notif_default_app_desc"
+        app:titleColor="@color/white"
+        app:descColor="@color/white"
         android:background="@color/colorPrimary"/>
 
     <dev.sagar.smsblocker.ux.customviews.DisplayPictureView
@@ -22,6 +28,7 @@
         app:pictureSrc="@drawable/sagar"
         app:letterText="A"
         app:letterColor="#FFFFFF"
+        android:visibility="gone"
         app:letterBackground="@color/blueA200Darker">
     </dev.sagar.smsblocker.ux.customviews.DisplayPictureView>
 

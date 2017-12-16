@@ -15,6 +15,6 @@
     <string name="txt_thread__copied">Copied</string>
 
     <string name="notif_default_app_title">Set App as Default</string>
-    <string name="notif_default_app_desc">Setting app default helps Smart Messages to hand SMS better</string>
+    <string name="notif_default_app_desc">Setting app default helps Smart Messages to handle SMS smarter</string>
 
 </resources>

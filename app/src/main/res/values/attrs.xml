@@ -3,8 +3,11 @@
     <declare-styleable name="NotificationView">
         <attr name="titleColor" format="color"/>
         <attr name="descColor" format="color"/>
-        <attr name="titleText" format="color"/>
-        <attr name="descText" format="color"/>
+        <attr name="titleText" format="string"/>
+        <attr name="descText" format="string"/>
+        <attr name="closeBtnColor" format="color"/>
+        <attr name="closeBtnBackground" format="reference"/>
+
     </declare-styleable>
 
     <declare-styleable name="DisplayPictureView">
