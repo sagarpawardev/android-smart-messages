@@ -8,6 +8,7 @@ import android.provider.ContactsContract;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.exceptions.NoContactPictureException;
@@ -27,6 +28,8 @@ public class ContactUtilSingleton {
 
     //Java Core
     private static ContactUtilSingleton instance = null;
+    private static HashMap<String, Uri> uriMap = new HashMap<>();
+    private static HashMap<String, String> nameMap = new HashMap<>();
 
     /**
      * This method is part of Singleton Design pattern.
@@ -52,10 +55,13 @@ public class ContactUtilSingleton {
      * @return Name of Contact from Phone Number
      */
     public String getContactName(Context context, String phoneNumber) {
-
         final String methodName = "getContactName()";
         log.info(methodName, "Just Entered...");
 
+        //Caching
+        if(nameMap.containsKey(phoneNumber)) return nameMap.get(phoneNumber);
+
+        //Actual Procedure
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         Cursor cursor = contentResolver.query(uri, new String[]{ ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
@@ -72,6 +78,7 @@ public class ContactUtilSingleton {
             cursor.close();
         }
 
+        nameMap.put(phoneNumber, contactName);
         log.info(methodName, "Returing...");
         return contactName;
     }
@@ -216,6 +223,12 @@ public class ContactUtilSingleton {
     public Uri getPictureUri(Context context, String phoneNo){
         final String methodName = "getPictureUri()";
         log.info(methodName, "Just Entered..");
+
+
+        //Caching
+        if(uriMap.containsKey(phoneNo)) return uriMap.get(phoneNo);
+
+        //Actual Procedure
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNo));
         ContentResolver contentResolver = context.getContentResolver();
         String projection[] = {
@@ -265,6 +278,7 @@ public class ContactUtilSingleton {
         }
 
         log.info(methodName, "Returning...");
+        uriMap.put(phoneNo, imgUri);
         return imgUri;
     }
 
