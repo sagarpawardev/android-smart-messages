@@ -4,7 +4,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_copy">Copy</string>
     <string name="title_activity_thread">ThreadActivity</string>
-    <string name="title_activity_new_thread">Start New Conversation</string>
+    <string name="title_activity_new_thread">New Conversation</string>
     <string name="title_activity_test_main">TestMainActivity</string>
 
     <string name="title_contextual_thread">Select</string>

@@ -39,7 +39,8 @@
         <activity
             android:name=".ux.activities.NewThreadActivity"
             android:label="@string/title_activity_new_thread"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
         <receiver
             android:name=".tech.broadcastreceivers.SMSReceiver"

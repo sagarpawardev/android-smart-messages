@@ -1,14 +1,21 @@
 package dev.sagar.smsblocker.ux.activities;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -22,11 +29,12 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
 
-    //View
+    //Java Android
     private EditText etSearchContact;
     private RecyclerView rvContacts;
+    private SearchView searchView;
 
-    //Internal Objects
+    //Java Core
     private ArrayList<Contact> contacts;
     private RVNewThreadAdapter_Contacts contactsAdapter;
 
@@ -34,7 +42,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
         final String methodName =  "init()";
         log.justEntered(methodName);
 
-        etSearchContact = (EditText) findViewById(R.id.et_search_contact);
+        //etSearchContact = (EditText) findViewById(R.id.et_search_contact);
         rvContacts = (RecyclerView) findViewById(R.id.rv_contacts);
 
         log.returning(methodName);
@@ -90,7 +98,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
         final String methodName =  "addListeners()";
         log.justEntered(methodName);
 
-        etSearchContact.addTextChangedListener(new TextWatcher() {
+        /*etSearchContact.addTextChangedListener(new TextWatcher() {
             private LogUtil log = new LogUtil(this.getClass().getName());
 
             @Override
@@ -114,12 +122,12 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
                 final String methodName =  "afterTextChanged()";
                 log.justEntered(methodName);
 
-                String searchStr = editable.toString();
-                searchContacts(searchStr);
+                *//*String searchStr = editable.toString();
+                searchContacts(searchStr);*//*
 
                 log.returning(methodName);
             }
-        });
+        });*/
 
         log.returning(methodName);
     }
@@ -143,6 +151,42 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
 
         log.returning(methodName);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_newthread, menu);
+
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                searchView.setIconified(true);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                searchContacts(s);
+                return false;
+            }
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.search) {
+            //onSearchRequested();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
     //--- AppCompatActivity Overrides Ends ---
 
 
@@ -162,8 +206,8 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
         final String methodName =  "needSearchString()";
         log.justEntered(methodName);
 
-        String text = etSearchContact.getText().toString();
-
+        //String text = etSearchContact.getText().toString();
+        String text = searchView.getQuery().toString();
         log.returning(methodName);
         return text;
     }
