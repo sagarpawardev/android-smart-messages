@@ -16,5 +16,6 @@
 
     <string name="notif_default_app_title">Set App as Default</string>
     <string name="notif_default_app_desc">Setting app default helps Smart Messages to handle SMS smarter</string>
+    <string name="thread_hint__send_message">Send Message..</string>
 
 </resources>

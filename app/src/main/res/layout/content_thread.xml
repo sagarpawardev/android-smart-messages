@@ -48,7 +48,9 @@
             android:paddingStart="@dimen/input_text_padding_start"
             android:paddingTop="@dimen/input_text_padding_top"
             android:layout_marginStart="4dp"
-            android:layout_marginEnd="6dp"/>
+            android:layout_marginEnd="6dp"
+            android:textSize="16dp"
+            android:hint="@string/thread_hint__send_message"/>
 
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"

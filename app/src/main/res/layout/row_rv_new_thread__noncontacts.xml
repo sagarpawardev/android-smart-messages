@@ -1,27 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
-
-    <TextView
-        android:layout_width="match_parent"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="4dp"
+    android:background="@drawable/bkg_newcontact"
+    android:layout_marginBottom="4dp">
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:text="@string/send_to"/>
+        android:padding="8dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/send_to"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="20sp"
-        android:text="+91 8237324748"
-        android:id="@+id/tv_phone_no"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:text="+91 8237324748"
+                android:id="@+id/tv_phone_no"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_contact_id"
-        android:visibility="gone"/>
-
-</LinearLayout>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_contact_id"
+                android:visibility="gone"/>
+    </LinearLayout>
+</android.support.v7.widget.CardView>
