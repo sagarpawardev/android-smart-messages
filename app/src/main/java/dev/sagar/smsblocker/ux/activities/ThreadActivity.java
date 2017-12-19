@@ -109,15 +109,16 @@ public class ThreadActivity extends AppCompatActivity implements
     }
 
 
-    private void sendMsg(){
+    private SMS sendMsg(){
         final String methodName =  "sendMsg()";
         log.debug(methodName, "Just Entered..");
 
         String msg = etMsg.getText().toString();
         String phoneNo = threadId;
-        smsUtil.sendSMS(phoneNo, msg);
+        SMS newSMS = smsUtil.sendSMS(phoneNo, msg);
 
         log.debug(methodName, "Returning..");
+        return newSMS;
     }
 
 
@@ -141,28 +142,29 @@ public class ThreadActivity extends AppCompatActivity implements
     }
 
 
-    public void smsSendUpdate() {
-        String msg = etMsg.getText().toString();
-        SMS sms = new SMS();
-        sms.setBody(msg);
-        sms.setDateTime(System.currentTimeMillis());
-        sms.setRead(true);
-        sms.setType(SMS.TYPE_SENT);
-        smses.add(sms);
+    public void smsSendUpdate(SMS newSMS) {
+        final String methodName =  "smsSendUpdate()";
+        log.justEntered(methodName);
 
-        adapter.notifyDataSetChanged();
+        //add item in list
+        smses.add(0, newSMS);
+
+        //notify adapter that item is inserted
+        adapter.notifyItemInserted(0);
         recyclerView.scrollToPosition(smses.size()-1);
+
+        log.returning(methodName);
     }
 
     public void smsReceiveUpdate(SMS sms){
         final String methodName =  "smsReceiveUpdate()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
         smses.add(sms);
 
         adapter.notifyDataSetChanged();
         recyclerView.scrollToPosition(smses.size()-1);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
 
@@ -225,8 +227,8 @@ public class ThreadActivity extends AppCompatActivity implements
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
                 } else {
-                    sendMsg();
-                    smsSendUpdate();
+                    SMS newSMS = sendMsg();
+                    smsSendUpdate(newSMS);
                 }
                 etMsg.setText("");
             }
