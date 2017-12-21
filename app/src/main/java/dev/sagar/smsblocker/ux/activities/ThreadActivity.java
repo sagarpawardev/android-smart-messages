@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class ThreadActivity extends AppCompatActivity implements
     private RecyclerView recyclerView;
     private ImageButton btnSend;
     private EditText etMsg;
+    private TextView tvHeader;
 
     //Java Android
     private RVThreadAdapter adapter;
@@ -103,7 +105,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Just Entered..");
 
         String contact = ContactUtilSingleton.getInstance().getContactName(this, threadId);
-        getSupportActionBar().setTitle(contact);
+        tvHeader.setText(contact);
 
         log.debug(methodName, "Returning..");
     }
@@ -185,8 +187,8 @@ public class ThreadActivity extends AppCompatActivity implements
         recyclerView = (RecyclerView) findViewById(R.id.lv_sms);
         btnSend = (ImageButton) findViewById(R.id.btn_send);
         etMsg = (EditText) findViewById(R.id.et_msg);
-
-        log.debug(methodName, "Returning..");
+        tvHeader = (TextView) findViewById(R.id.tv_header);
+        log.returning(methodName);
     }
 
 
@@ -198,7 +200,7 @@ public class ThreadActivity extends AppCompatActivity implements
         smsUtil = new SMSUtil(this);
         smsReceiver = new LocalSMSReceiver(this);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
 
