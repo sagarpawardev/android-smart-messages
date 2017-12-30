@@ -7,10 +7,6 @@ import android.Manifest;
  */
 
 public class Constants {
-    public final static String[] PERMISSIONS = {
-            Manifest.permission.READ_CONTACTS,
-            Manifest.permission.READ_SMS,
-            Manifest.permission.SEND_SMS,
-            Manifest.permission.RECEIVE_SMS
-    };
+
+
 }

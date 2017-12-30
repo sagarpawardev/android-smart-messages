@@ -137,6 +137,13 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         threads.addAll(keys);
         //Section End
 
+        //Adi changes Start
+        Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
+        holder.tvBody.setTypeface(myFont);
+        holder.tvFrom.setTypeface(myFont);
+        holder.tvTime.setTypeface(myFont);
+        //Adi changes End
+
         String thread = threads.get(position);
         SMS sms = smsMap.get(thread);
         String fromNumber = sms.getFrom();
@@ -157,13 +164,13 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
 
         //If SMS is read
         if(sms.isRead()) {
-            holder.tvFrom.setTypeface(null, Typeface.NORMAL);
-            holder.tvBody.setTypeface(null, Typeface.NORMAL);
-            holder.tvTime.setTypeface(null, Typeface.NORMAL);
+            holder.tvFrom.setTypeface(myFont, Typeface.NORMAL);
+            holder.tvBody.setTypeface(myFont, Typeface.NORMAL);
+            holder.tvTime.setTypeface(myFont, Typeface.NORMAL);
         }
         else{
-            holder.tvFrom.setTypeface(null, Typeface.BOLD);
-            holder.tvBody.setTypeface(null, Typeface.BOLD);
+            holder.tvFrom.setTypeface(myFont,Typeface.BOLD);
+            holder.tvBody.setTypeface(myFont,Typeface.BOLD);
             //holder.tvTime.setTypeface(null, Typeface.BOLD);
         }
 

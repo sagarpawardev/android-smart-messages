@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4CAF50</color>
-    <color name="colorPrimaryLight">#4DB6AC</color>
-    <color name="colorPrimaryDark">#2E7D32</color>
+    <color name="colorPrimary">#C2185B</color>
+    <color name="colorPrimaryLight">#C2185B</color>
+    <color name="colorPrimaryDark">#C2185B</color>
     <color name="colorAccent">#FF5252</color>
-    <color name="statusbar">#2E7D32</color>
+    <color name="statusbar">#C2185B</color>
     <color name="background_material_light">#ffffff</color>
     <color name="light_gr">#01EAB2</color>
     <color name="red">#F44336</color>
@@ -15,7 +15,9 @@
     <color name="blueA200Darker">#ABE3D7</color>
 
 
-    <color name="selected_thread">#90CAF9AA</color>
+    <color name="selected_thread">#E1F5FE</color>
     <color name="text_msg">#FFFFFF</color>
     <color name="blueA200_2">#448AFF</color>
+    <color name="transparent">#10FFFFFF</color>
+
 </resources>

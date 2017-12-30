@@ -11,7 +11,7 @@
                 <stroke android:color="@android:color/transparent"
                     android:width="10dp"/>
                 <solid
-                    android:color="@color/text_msg" />
+                    android:color="@color/light_gr" />
             </shape>
         </rotate>
     </item>

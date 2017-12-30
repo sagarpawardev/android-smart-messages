@@ -28,6 +28,8 @@ public class LocalSMSReceiver extends BroadcastReceiver {
     //Java Core
     Callback callback = null;
 
+    public boolean isRegistered = false;
+
 
     public LocalSMSReceiver(Callback callback){
         this.callback = callback;

@@ -10,6 +10,8 @@ import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.Arrays;
+
 /**
  * Created by sagarpawar on 15/10/17.
  */
@@ -45,22 +47,51 @@ public class PermissionUtilSingleton {
      * This method checks if app has list of passed permission
      * @param context
      * @param permissions List of Permissions
-     * @return
+     * @return if app has permission with index in same order
      */
-    public boolean hasPermissions(Context context, String... permissions) {
+    public boolean[] hasPermissions(Context context, String... permissions) {
         final String methodName = "hasPermissions()";
-        log.info(methodName, "Just Entered...");
+        log.justEntered(methodName);
 
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
+        boolean result[] = new boolean[permissions.length];
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null ) {
+            for(int i=0; i<permissions.length; i++){
+                String permission = permissions[i];
+                boolean hasPermission = ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED;
+                result[i] = hasPermission;
             }
         }
+        else{
+            Arrays.fill(result, true);
+        }
 
-        log.info(methodName, "Returing...");
-        return true;
+        log.returning(methodName);
+        return result;
+    }
+
+
+    /**
+     * This method checks if app has list of passed permission
+     * @param context Context of APp
+     * @param permission Permission
+     * @return if app has permission with index in same order
+     */
+    public boolean hasPermission(Context context, String permission) {
+        final String methodName = "hasPermissions()";
+        log.justEntered(methodName);
+
+        boolean hasPermission = false;
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null ) {
+            hasPermission = ActivityCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED;
+        }
+        else{
+            hasPermission = true;
+        }
+
+        log.returning(methodName);
+        return hasPermission;
     }
 
 
@@ -87,7 +118,7 @@ public class PermissionUtilSingleton {
      */
     public void askToMakeAppDefault(Context context){
         final String methodName = "askToMakeAppDefault()";
-        log.info(methodName, "Just Entered...");
+        log.justEntered(methodName);
 
         String myPackageName = context.getPackageName();
         Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
@@ -95,5 +126,25 @@ public class PermissionUtilSingleton {
         context.startActivity(intent);
 
         log.info(methodName, "Returing...");
+    }
+
+
+    public void ask(Activity activity, String permission, int requestCode){
+        final String methodName = "askPermission()";
+        log.justEntered(methodName);
+
+        String[] permissions = {permission};
+        ActivityCompat.requestPermissions(activity, permissions, requestCode);
+
+        log.returning(methodName);
+    }
+
+    public void ask(Activity activity, String[] permissions, int requestCode){
+        final String methodName = "askPermissions()";
+        log.justEntered(methodName);
+
+        ActivityCompat.requestPermissions(activity, permissions, requestCode);
+
+        log.returning(methodName);
     }
 }

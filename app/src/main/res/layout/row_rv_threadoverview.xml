@@ -60,7 +60,7 @@
         android:padding="1dp"
         app:letterText="#"
         app:letterColor="@color/white"
-        app:letterBackground="@color/blueA200Darker"
+        app:letterBackground="@color/red"
         android:id="@+id/dpv_picture"/>
 
     <TextView
@@ -96,7 +96,7 @@
         android:layout_toEndOf="@id/dpv_picture"
         android:layout_below="@id/tv_from"
         android:ellipsize="end"
-        android:maxLines="2"
+        android:maxLines="1"
         android:alpha="0.8"
         android:textSize="14sp"
         android:paddingStart="4dp"

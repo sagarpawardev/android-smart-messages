@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="dev.sagar.smsblocker.ux.activities.ThreadActivity"
     tools:showIn="@layout/activity_thread">
@@ -39,29 +38,28 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:background="@drawable/color"
+            android:background="@drawable/bkg_thread__et_sendmsg"
             android:maxHeight="150dp"
             android:minHeight="42dp"
             android:elevation="1dp"
+            android:hint="@string/hint_thread__send"
             android:paddingBottom="@dimen/input_text_padding_bottom"
             android:paddingEnd="@dimen/input_text_padding_end"
             android:paddingStart="@dimen/input_text_padding_start"
             android:paddingTop="@dimen/input_text_padding_top"
             android:layout_marginStart="4dp"
-            android:layout_marginEnd="6dp"
-            android:textSize="16dp"
-            android:hint="@string/thread_hint__send_message"/>
+            android:layout_marginEnd="6dp"/>
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:padding="10dp"
-            android:elevation="1dp"
-            android:layout_marginEnd="6dp"
-            app:srcCompat="@drawable/send2"
+            android:layout_marginEnd="@dimen/margin_thread__fullpage"
             android:background="@drawable/color"
-            android:id="@+id/btn_send"/>
+            android:elevation="1dp"
+            android:padding="8dp"
+            app:srcCompat="@drawable/send2" />
 
     </LinearLayout>
 

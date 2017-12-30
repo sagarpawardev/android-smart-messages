@@ -1,10 +1,12 @@
 package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -69,6 +71,9 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
         final String methodName =  "contactsOnBindViewHolder()";
         log.justEntered(methodName);
 
+
+
+
         ContactViewHolder holder = (ContactViewHolder) viewHolder;
         Contact contact = contacts.get(position);
         String displayName = contact.getDisplayName();
@@ -77,6 +82,13 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
         holder.tvId.setText(id);
         holder.tvName.setText(displayName);
         holder.tvNumber.setText(phoneNo);
+
+        //Adi changes Start
+
+        Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
+        holder.tvName.setTypeface(myFont,Typeface.BOLD);
+        holder.tvNumber.setTypeface(myFont);
+        //Adi changes End
 
         log.returning(methodName);
     }
@@ -134,6 +146,7 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
         final String methodName =  "onBindViewHolder()";
         log.justEntered(methodName);
 
+
         if(viewHolder instanceof  ContactViewHolder){
             contactsOnBindViewHolder(viewHolder, position);
         }
@@ -152,6 +165,11 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
         int size = contacts.size();
         if(size == 0){
             String searchStr = callback.needSearchString();
+
+            //If Search String is empty and size also 0 then permissions problem or no contact
+            if(searchStr.isEmpty()){
+                return 0;
+            }
 
             //If Neither Numeric not spaces like '+91 8877993322' notify Activity and return size 0
             for(char c: searchStr.toCharArray()){
@@ -182,6 +200,7 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
 
     class ContactViewHolder extends RecyclerView.ViewHolder{
         TextView tvName, tvNumber, tvId;
+        EditText etSearch;
 
         ContactViewHolder(View view) {
             super(view);
@@ -189,6 +208,8 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
             tvName = view.findViewById(R.id.tv_display_name);
             tvNumber = view.findViewById(R.id.tv_phone_no);
             tvId = view.findViewById(R.id.tv_contact_id);
+            etSearch =view.findViewById(R.id.et_search_contact);
+
         }
     }
 

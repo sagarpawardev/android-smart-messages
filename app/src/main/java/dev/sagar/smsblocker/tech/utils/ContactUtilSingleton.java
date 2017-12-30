@@ -10,9 +10,11 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.exceptions.NoContactPictureException;
 import dev.sagar.smsblocker.tech.exceptions.NoSuchContactException;
+import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -25,6 +27,11 @@ public class ContactUtilSingleton {
 
     //Constants
     private static final String TAG = "ContactUtilSingleton";
+    final String[] ALL_PERMISSIONS = Permission.ALL;
+    final String READ_SMS = Permission.READ_SMS;
+    final String RECEIVE_SMS = Permission.RECEIVE_SMS;
+    final String SEND_SMS = Permission.SEND_SMS;
+    final String READ_CONTACTS = Permission.READ_CONTACTS;
 
     //Java Core
     private static ContactUtilSingleton instance = null;
@@ -61,6 +68,12 @@ public class ContactUtilSingleton {
         //Caching
         if(nameMap.containsKey(phoneNumber)) return nameMap.get(phoneNumber);
 
+        //Check Permissions if donot have permission return behave like you don't have contact
+        boolean hasContactPerm = PermissionUtilSingleton.getInstance().hasPermission(context, READ_CONTACTS);
+        if(!hasContactPerm){
+            return phoneNumber;
+        }
+
         //Actual Procedure
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
@@ -89,9 +102,15 @@ public class ContactUtilSingleton {
      * @param context Context of activity
      * @return List of all contacts
      */
-    public ArrayList<Contact> getAllContacts(Context context){
+    public ArrayList<Contact> getAllContacts(Context context) throws ReadContactPermissionException{
         final String methodName = "getAllContacts()";
         log.info(methodName, "Just Entered..");
+
+        //Checking Permission
+        boolean hasReadContactPermission = PermissionUtilSingleton.getInstance().hasPermission(context, READ_CONTACTS);
+        if(!hasReadContactPermission){
+            throw  new ReadContactPermissionException();
+        }
 
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
@@ -107,6 +126,8 @@ public class ContactUtilSingleton {
          ;
         String selectionArg[] = {};
         String mOrder = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC";
+
+
 
         Cursor cursor = contentResolver.query(uri, projection , selection, selectionArg, mOrder);
         log.info(methodName, "Reading Contacts...");
@@ -155,9 +176,15 @@ public class ContactUtilSingleton {
      * @param searchStr search String could be partial phone number or contact name
      * @return List of matched contacts
      */
-    public ArrayList<Contact> searchContacts(Context context, String searchStr){
+    public ArrayList<Contact> searchContacts(Context context, String searchStr) throws ReadContactPermissionException{
         final String methodName = "searchContacts()";
         log.info(methodName, "Just Entered..");
+
+        //Checking Permission
+        boolean hasReadContactPermission = PermissionUtilSingleton.getInstance().hasPermission(context, READ_CONTACTS);
+        if(!hasReadContactPermission){
+            throw  new ReadContactPermissionException();
+        }
 
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;

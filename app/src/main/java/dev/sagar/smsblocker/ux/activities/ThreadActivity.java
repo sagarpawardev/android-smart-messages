@@ -4,24 +4,25 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import dev.sagar.smsblocker.Constants;
+import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.SMSReceiver;
@@ -43,6 +44,11 @@ public class ThreadActivity extends AppCompatActivity implements
 
     //Constants
     public static final String KEY_THREAD_ID = "THREAD_ID";
+    final String[] ALL_PERMISSIONS = Permission.ALL;
+    final String READ_SMS = Permission.READ_SMS;
+    final String RECEIVE_SMS = Permission.RECEIVE_SMS;
+    final String SEND_SMS = Permission.SEND_SMS;
+    final String READ_CONTACTS = Permission.READ_CONTACTS;
 
     //View
     private RecyclerView recyclerView;
@@ -55,48 +61,24 @@ public class ThreadActivity extends AppCompatActivity implements
     private AMCallbackThread amCallback;
 
     //Java Core
-    private ArrayList<SMS> smses;
+    private List<SMS> smses = new ArrayList<>();
     private String threadId;
     private InboxUtil inboxUtil = null;
     private SMSUtil smsUtil;
     private final int REQUEST_CODE_ALL_PERMISSIONS = 123;
-    private PermissionUtilSingleton permissionIstance = PermissionUtilSingleton.getInstance();
+    private PermissionUtilSingleton permUtil = PermissionUtilSingleton.getInstance();
     private LocalSMSReceiver smsReceiver = null;
 
 
-    private void process()  {
-        final String methodName =  "process()";
-        log.debug(methodName, "Just Entered..");
-
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mLayoutManager.setReverseLayout(true);
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setAdapter(adapter);
-
-        boolean hasPermissions = permissionIstance.hasPermissions(this, Constants.PERMISSIONS);
-        if(!hasPermissions) {
-            askPermissions();
-            return;
-        }
-        registerSMSReceiver();
-        updateActionBar();
-
-        log.debug(methodName, "Returning..");
+    private void showMsgs(){
+        smses.clear();
+        List<SMS> tmp = inboxUtil.getAllSMSFromTo(threadId);
+        smses.addAll(tmp);
+        adapter.notifyDataSetChanged();
     }
 
+    private void hideMsgs(){
 
-    private void getData(){
-        final String methodName =  "getData()";
-        log.debug(methodName, "Just Entered..");
-
-        //From Previous Activity
-        Bundle basket = getIntent().getExtras();
-        threadId = basket.getString(KEY_THREAD_ID);
-
-        //By Computation
-        smses = inboxUtil.getAllSMSFromTo(threadId, InboxUtil.SORT_DESC);
-
-        log.debug(methodName, "Returning..");
     }
 
 
@@ -104,7 +86,12 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "updateActionBar()";
         log.debug(methodName, "Just Entered..");
 
-        String contact = ContactUtilSingleton.getInstance().getContactName(this, threadId);
+        //If has permissions than Set Name otherwise Set number by default
+        boolean hasContactPermission = permUtil.hasPermission(this, READ_CONTACTS);
+        String contact = threadId;
+        if(hasContactPermission){
+            contact = ContactUtilSingleton.getInstance().getContactName(this, threadId);
+        }
         tvHeader.setText(contact);
 
         log.debug(methodName, "Returning..");
@@ -129,6 +116,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Just Entered..");
 
         registerReceiver(smsReceiver, new IntentFilter(SMSReceiver.LOCAL_SMS_RECEIVED));
+        smsReceiver.isRegistered = true;
 
         log.debug(methodName, "Returning..");
     }
@@ -138,7 +126,9 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "unregisterSMSReceiver()";
         log.debug(methodName, "Just Entered..");
 
-        unregisterReceiver(smsReceiver);
+        if(smsReceiver.isRegistered)
+            unregisterReceiver(smsReceiver);
+        smsReceiver.isRegistered = false;
 
         log.debug(methodName, "Returning..");
     }
@@ -153,30 +143,20 @@ public class ThreadActivity extends AppCompatActivity implements
 
         //notify adapter that item is inserted
         adapter.notifyItemInserted(0);
-        recyclerView.scrollToPosition(smses.size()-1);
+        recyclerView.scrollToPosition(0); //Scroll to bottom
 
         log.returning(methodName);
     }
 
-    public void smsReceiveUpdate(SMS sms){
-        final String methodName =  "smsReceiveUpdate()";
-        log.justEntered(methodName);
-        smses.add(sms);
-
-        adapter.notifyDataSetChanged();
-        recyclerView.scrollToPosition(smses.size()-1);
-
-        log.returning(methodName);
-    }
-
-
-    private void askPermissions(){
-        final String methodName =  "askPermissions()";
+    public void updateSMSinUI(SMS sms){
+        final String methodName =  "updateSMSinUI()";
         log.debug(methodName, "Just Entered..");
 
-        ActivityCompat.requestPermissions(this, Constants.PERMISSIONS, REQUEST_CODE_ALL_PERMISSIONS);
+        smses.add(0, sms); //Adding Element to first in List
+        adapter.notifyDataSetChanged();
+        //recyclerView.scrollToPosition(smses.size()-1);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
 
@@ -188,31 +168,25 @@ public class ThreadActivity extends AppCompatActivity implements
         btnSend = (ImageButton) findViewById(R.id.btn_send);
         etMsg = (EditText) findViewById(R.id.et_msg);
         tvHeader = (TextView) findViewById(R.id.tv_header);
-        log.returning(methodName);
-    }
-
-
-    private void preGetData(){
-        final String methodName =  "postGetData()";
-        log.debug(methodName, "Just Entered..");
 
         if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         smsUtil = new SMSUtil(this);
         smsReceiver = new LocalSMSReceiver(this);
 
+        //From Previous Activity
+        Bundle basket = getIntent().getExtras();
+        threadId = basket.getString(KEY_THREAD_ID);
+        adapter = new RVThreadAdapter(this, this, smses);
+        amCallback = new AMCallbackThread(this, adapter);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        mLayoutManager.setReverseLayout(true);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setAdapter(adapter);
+
         log.returning(methodName);
     }
 
 
-    private void postGetData(){
-        final String methodName =  "postGetData()";
-        log.debug(methodName, "Just Entered..");
-
-        adapter = new RVThreadAdapter(this, this, smses);
-        amCallback = new AMCallbackThread(this, adapter);
-
-        log.debug(methodName, "Returning..");
-    }
 
 
     private void addListeners(){
@@ -248,23 +222,19 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Just Entered..");
 
         setContentView(R.layout.activity_thread);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
+        //Set Action Bar Transparent
+        Window window = this.getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
 
         init();
-        preGetData();
-        getData();
-        postGetData();
-        process();
+        updateActionBar();
+        hideMsgs();
         addListeners();
 
         log.debug(methodName, "Returning..");
@@ -273,50 +243,57 @@ public class ThreadActivity extends AppCompatActivity implements
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         final String methodName =  "onRequestPermissionsResult()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         switch (requestCode) {
             case REQUEST_CODE_ALL_PERMISSIONS:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Permission Granted
+                boolean hasInboxPerm = permUtil.hasPermission(this, READ_CONTACTS);
+                if(hasInboxPerm){
+                    showMsgs();
                     updateActionBar();
-                } else {
-                    // Permission Denied
-                    Toast.makeText(ThreadActivity.this, "Permissions Denied", Toast.LENGTH_SHORT)
-                            .show();
+                }
+                else{
+                    hideMsgs();
+                    Toast.makeText(ThreadActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
     protected void onStart() {
         final String methodName =  "onStart()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
-        if(smsReceiver!=null)
+        boolean hasPermission = permUtil.hasPermission(this, READ_CONTACTS);
+        if(hasPermission){
+            showMsgs();
             registerSMSReceiver();
+        }
+        else{
+            permUtil.ask(this, ALL_PERMISSIONS, REQUEST_CODE_ALL_PERMISSIONS);
+        }
+
         super.onStart();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
     protected void onPause() {
         final String methodName =  "onPause()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         //setStatusRead
         inboxUtil.setStatusRead(threadId);
 
-
         super.onPause();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
@@ -330,7 +307,6 @@ public class ThreadActivity extends AppCompatActivity implements
 
         log.debug(methodName, "Returning..");
     }
-
     //--- Activity Overriders End ---
 
 
@@ -340,7 +316,7 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName = "onSMSReceived()";
         log.info(methodName, "Just Entered..");
 
-        smsReceiveUpdate(sms);
+        updateSMSinUI(sms);
 
         log.info(methodName, "Returning");
     }

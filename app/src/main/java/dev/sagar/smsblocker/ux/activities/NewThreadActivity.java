@@ -1,27 +1,27 @@
 package dev.sagar.smsblocker.ux.activities;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.RVNewThreadAdapter_Contacts;
 import dev.sagar.smsblocker.tech.beans.Contact;
 
@@ -29,38 +29,34 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
 
-    //Java Android
+    //View
     private EditText etSearchContact;
     private RecyclerView rvContacts;
-    private SearchView searchView;
 
-    //Java Core
-    private ArrayList<Contact> contacts;
+    //Internal Objects
+    private ArrayList<Contact> contacts = new ArrayList<>();
     private RVNewThreadAdapter_Contacts contactsAdapter;
+    private PermissionUtilSingleton permUtil;
+    private ContactUtilSingleton contactUtil;
+
+    //Constants
+    public static final String KEY_THREAD_ID = "THREAD_ID";
+    final String[] ALL_PERMISSIONS = Permission.ALL;
+    final String READ_SMS = Permission.READ_SMS;
+    final String RECEIVE_SMS = Permission.RECEIVE_SMS;
+    final String SEND_SMS = Permission.SEND_SMS;
+    final String READ_CONTACTS = Permission.READ_CONTACTS;
+    private final int REQUEST_CODE_ALL_PERMISSIONS = 123;
 
     public void init(){
         final String methodName =  "init()";
         log.justEntered(methodName);
 
-        //etSearchContact = (EditText) findViewById(R.id.et_search_contact);
+        etSearchContact = (EditText) findViewById(R.id.et_search_contact);
         rvContacts = (RecyclerView) findViewById(R.id.rv_contacts);
 
-        log.returning(methodName);
-    }
-
-    public void getData(){
-        final String methodName =  "getData()";
-        log.justEntered(methodName);
-
-        contacts = ContactUtilSingleton.getInstance().getAllContacts(this);
-
-        log.returning(methodName);
-    }
-
-    public void process(){
-        final String methodName =  "process()";
-        log.justEntered(methodName);
-
+        permUtil = PermissionUtilSingleton.getInstance();
+        contactUtil = ContactUtilSingleton.getInstance();
         contactsAdapter = new RVNewThreadAdapter_Contacts(this, contacts, this);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         rvContacts.setLayoutManager(mLayoutManager);
@@ -68,6 +64,26 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
 
         log.returning(methodName);
     }
+
+    public void hideContacts(){
+        Toast.makeText(this, "Hide Contacts Here", Toast.LENGTH_SHORT).show();
+    }
+
+    public void showContacts(){
+
+        try {
+            contacts.clear();
+            ArrayList<Contact> temp = contactUtil.getAllContacts(this);
+            contacts.addAll(temp);
+            contactsAdapter.notifyDataSetChanged();
+        }
+        catch (ReadContactPermissionException ex){
+            ex.printStackTrace();
+        }
+
+    }
+
+
 
     public void onContactSelected(String phoneNo){
         final String methodName =  "onContactSelected()";
@@ -86,11 +102,16 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
         final String methodName =  "searchContacts()";
         log.justEntered(methodName);
 
-        ArrayList<Contact> contacts = ContactUtilSingleton.getInstance().searchContacts(this, searchStr);
-        this.contacts.clear();
-        this.contacts.addAll(contacts);
-        contactsAdapter.notifyDataSetChanged();
+        ArrayList<Contact> contacts = null;
+        try {
+            contacts = contactUtil.searchContacts(this, searchStr);
+            this.contacts.clear();
+            this.contacts.addAll(contacts);
+            contactsAdapter.notifyDataSetChanged();
 
+        } catch (ReadContactPermissionException e) {
+            e.printStackTrace();
+        }
         log.returning(methodName);
     }
 
@@ -98,7 +119,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
         final String methodName =  "addListeners()";
         log.justEntered(methodName);
 
-        /*etSearchContact.addTextChangedListener(new TextWatcher() {
+        etSearchContact.addTextChangedListener(new TextWatcher() {
             private LogUtil log = new LogUtil(this.getClass().getName());
 
             @Override
@@ -122,12 +143,12 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
                 final String methodName =  "afterTextChanged()";
                 log.justEntered(methodName);
 
-                *//*String searchStr = editable.toString();
-                searchContacts(searchStr);*//*
+                String searchStr = editable.toString();
+                searchContacts(searchStr);
 
                 log.returning(methodName);
             }
-        });*/
+        });
 
         log.returning(methodName);
     }
@@ -136,6 +157,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
     //--- AppCompatActivity Overrides Start ---
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         final String methodName =  "onCreate()";
         log.justEntered(methodName);
 
@@ -144,49 +166,59 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Set Action Bar Transparent
+        Window window = this.getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+
         init();
-        getData();
-        process();
         addListeners();
+        hideContacts();
 
         log.returning(methodName);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_newthread, menu);
+    protected void onStart() {
+        final String methodName =  "onStart()";
+        log.justEntered(methodName);
 
-        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                searchView.setIconified(true);
-                return false;
-            }
+        boolean hasContactPermission = permUtil.hasPermission(this, READ_CONTACTS);
+        if(hasContactPermission){
+            showContacts();
+        }
+        else{
+            permUtil.ask(this, READ_CONTACTS, REQUEST_CODE_ALL_PERMISSIONS);
+        }
 
-            @Override
-            public boolean onQueryTextChange(String s) {
-                searchContacts(s);
-                return false;
-            }
-        });
-        return true;
+        super.onStart();
+
+        log.returning(methodName);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.search) {
-            //onSearchRequested();
-            return true;
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        final String methodName =  "onRequestPermissionsResult()";
+        log.justEntered(methodName);
+
+        switch (requestCode) {
+            case REQUEST_CODE_ALL_PERMISSIONS:
+                boolean hasContactPermission = permUtil.hasPermission(this, READ_CONTACTS);
+                if(hasContactPermission){
+                    showContacts();
+                }
+                else{
+                    hideContacts();
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
 
-        return super.onOptionsItemSelected(item);
+        log.returning(methodName);
     }
-
-
-
     //--- AppCompatActivity Overrides Ends ---
 
 
@@ -206,8 +238,8 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
         final String methodName =  "needSearchString()";
         log.justEntered(methodName);
 
-        //String text = etSearchContact.getText().toString();
-        String text = searchView.getQuery().toString();
+        String text = etSearchContact.getText().toString();
+
         log.returning(methodName);
         return text;
     }

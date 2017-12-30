@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="4dp"
-        android:background="@drawable/bkg_newcontact"
-        android:layout_marginBottom="4dp">
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
+        app:cardElevation="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -28,42 +30,34 @@
                 android:layout_marginEnd="@dimen/circular_img_margin"
                 android:layout_marginTop="8dp"
                 android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
                 android:padding="1dp"
                 app:letterText="#"
                 app:letterColor="@color/white"
-                app:letterBackground="@color/blueA200Darker"
+                app:letterBackground="@color/red"
                 android:id="@+id/dpv_picture"/>
 
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_centerInParent="true"
-                android:layout_toEndOf="@id/dpv_picture">
+                android:textStyle="bold"
+                android:textColor="@color/red"
+                android:text="kvkvvbvk"
+                android:layout_toEndOf="@id/dpv_picture"
+                android:id="@+id/tv_display_name"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:alpha="0.8"
-                    android:text="Sagar Pawar"
-                    android:id="@+id/tv_display_name"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_display_name"
+                android:layout_toEndOf="@id/dpv_picture"
+                android:text="nakvkkb"
+                android:id="@+id/tv_phone_no"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:alpha="0.6"
-                    android:text="+91 8237324748"
-                    android:id="@+id/tv_phone_no"/>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/tv_contact_id"
-                    android:visibility="gone"/>
-            </LinearLayout>
-
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tv_contact_id"
+                android:visibility="gone"/>
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

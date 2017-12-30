@@ -15,22 +15,24 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
-            app:popupTheme="@style/AppTheme.PopupOverlay" >
-
-            <!--<AutoCompleteTextView
+            android:layout_gravity="center"
+            android:background="@drawable/grad"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+            <EditText
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/searchView"
-                android:visibility="gone"
-                android:textColor="@color/black"
-                android:hint="Search your app"
-                android:singleLine="true"
-                android:layout_centerHorizontal="true"
-                android:textColorHint="@color/black"
-                android:popupBackground="@android:color/transparent"
-                android:textCursorDrawable="@drawable/search_view_cursor"
-                android:background="@color/white" />-->
-
+                android:layout_height="wrap_content"
+                android:id="@+id/et_search_contact"
+                android:textSize="20dp"
+                android:padding="6dp"
+                android:paddingStart="20dp"
+                android:textColor="@color/white"
+                android:layout_marginRight="12dp"
+                android:layout_marginLeft="0dp"
+                android:hint="TO"
+                android:defaultFocusHighlightEnabled="true"
+                android:background="@drawable/color"
+                android:layout_marginTop="0dp"
+                />
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>

@@ -1,6 +1,7 @@
 package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     private InboxUtil inboxUtil;
 
     //Java Core
-    private ArrayList<SMS> smses;
+    private List<SMS> smses;
     private boolean isSelectionModeOn = false;
     private List<SMS> selectedSMSes = new ArrayList<>();
 
@@ -41,7 +42,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     private static final int TYPE_RECEIVED = 0;
     private static final int TYPE_SENT = 1;
 
-    public RVThreadAdapter(Context context, Callback callback, ArrayList<SMS> smses) {
+    public RVThreadAdapter(Context context, Callback callback, List<SMS> smses) {
         final String methodName =  "RVThreadAdapter()";
         log.debug(methodName, "Just Entered..");
 
@@ -61,7 +62,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         final String methodName =  "deleteSelections()";
         log.debug(methodName, "Just Entered..");
 
-        log.verbose(methodName, "This can be improved");
+        log.error(methodName, "This can be improved");
         log.info(methodName, "Selected SMS count: "+ selectedSMSes.size());
         for (SMS sms: selectedSMSes) {
             log.debug(methodName, "Deleting SMS: "+sms.getBody());
@@ -150,14 +151,21 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     @Override
     public int getItemViewType(int position) {
         SMS sms = smses.get(position);
-        boolean isType = sms.getType()==SMS.TYPE_SENT;
-        return  isType ? TYPE_RECEIVED: TYPE_SENT ;
+        boolean smsType = (sms.getType()==SMS.TYPE_SENT);
+
+        return  smsType ? TYPE_RECEIVED: TYPE_SENT ;
     }
 
     @Override
     public void onBindViewHolder(SMSViewHolder holder, int position) {
         final String methodName =  "onBindViewHolder()";
         log.debug(methodName, "Just Entered..");
+
+        //Adi changes Start
+        Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
+        holder.tvBody.setTypeface(myFont);
+        holder.tvTime.setTypeface(myFont);
+        //Adi changes End
 
         SMS sms = smses.get(position);
         String body = sms.getBody();
@@ -207,7 +215,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
     class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener{
         TextView tvBody, tvTime;
-        LinearLayout llParent;
+        View llParent;
         //Log Initiate
         LogUtil log = new LogUtil(this.getClass().getName());
 
@@ -216,7 +224,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             final String methodName =  "SMSViewHolder()";
             log.debug(methodName, "Just Entered..");
 
-            llParent = (LinearLayout)view;
+            llParent = view;
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
 
