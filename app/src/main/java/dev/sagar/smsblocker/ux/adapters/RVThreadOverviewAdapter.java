@@ -1,9 +1,11 @@
 package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
@@ -280,6 +283,26 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
             tvThreadId = view.findViewById(R.id.tv_thread_id);
             parent = view;
 
+            dpView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String contactID = null;
+                    try {
+                        String threadId = tvThreadId.getText().toString();
+                        Contact contact = ContactUtilSingleton.getInstance().getContact(context, threadId);
+                        contactID = contact.getId();
+                    } catch (ReadContactPermissionException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(contactID!=null) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contactID));
+                        intent.setData(uri);
+                        context.startActivity(intent);
+                    }
+                }
+            });
             view.setOnLongClickListener(this);
         }
 

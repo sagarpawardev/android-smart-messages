@@ -1,8 +1,11 @@
 package dev.sagar.smsblocker.ux.activities;
 
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +14,8 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -24,6 +29,7 @@ import java.util.List;
 
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.SMSReceiver;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
@@ -160,6 +166,23 @@ public class ThreadActivity extends AppCompatActivity implements
         log.returning(methodName);
     }
 
+    public void showContact(){
+        String contactID = null;
+        try {
+            Contact contact = ContactUtilSingleton.getInstance().getContact(this, threadId);
+            contactID = contact.getId();
+        } catch (ReadContactPermissionException e) {
+            e.printStackTrace();
+        }
+
+        if(contactID!=null) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(contactID));
+            intent.setData(uri);
+            startActivity(intent);
+        }
+    }
+
 
     private void init(){
         final String methodName =  "init()";
@@ -186,8 +209,6 @@ public class ThreadActivity extends AppCompatActivity implements
 
         log.returning(methodName);
     }
-
-
 
 
     private void addListeners(){
@@ -307,6 +328,38 @@ public class ThreadActivity extends AppCompatActivity implements
         super.onStop();
 
         log.debug(methodName, "Returning..");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_thread, menu);
+
+        String id = null;
+        //Hide Show contact option if contact not in contact
+        try {
+            Contact contact = ContactUtilSingleton.getInstance().getContact(this, threadId);
+            id = contact.getId();
+        } catch (ReadContactPermissionException e) {
+            e.printStackTrace();
+        }
+        if(id == null) {
+            MenuItem item = menu.findItem(R.id.showContact);
+            item.setVisible(false);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.showContact: showContact(); break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
     //--- Activity Overriders End ---
 

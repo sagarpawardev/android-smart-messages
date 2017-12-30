@@ -19,5 +19,6 @@
     <string name="thread_hint__send_message">Send Message..</string>
     <string name="hint_thread__send">Say Hi..</string>
     <string name="desc_dp">display picture</string>
+    <string name="title_thread__show_contact">Show Contact</string>
 
 </resources>
