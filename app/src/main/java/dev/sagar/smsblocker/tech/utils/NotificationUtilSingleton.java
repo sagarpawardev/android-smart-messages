@@ -63,7 +63,7 @@ public class NotificationUtilSingleton {
         String text = sms.getBody();
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notif)
                 .setContentTitle(fromName)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentText(text)

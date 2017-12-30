@@ -1,6 +1,7 @@
 package dev.sagar.smsblocker.ux.activities;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -17,12 +18,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceiver;
+import dev.sagar.smsblocker.tech.broadcastreceivers.SMSReceiver;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
@@ -31,7 +35,8 @@ import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.customviews.NotificationView;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
 
-public class ThreadOverviewActivity extends AppCompatActivity implements RVThreadOverviewAdapter.Callback{
+public class ThreadOverviewActivity extends AppCompatActivity
+        implements RVThreadOverviewAdapter.Callback, LocalSMSReceiver.Callback{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -45,6 +50,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     InboxUtil inboxUtil = null;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
     private PermissionUtilSingleton permUtil = PermissionUtilSingleton.getInstance();
+    private LocalSMSReceiver smsReceiver = null;
 
     //Java Android
     Map<String, SMS> smsMap = new LinkedHashMap<>();
@@ -66,6 +72,7 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         adapter = new RVThreadOverviewAdapter(this, smsMap, this);
         amCallback = new AMCallbackThreadOverview(adapter);
+        smsReceiver = new LocalSMSReceiver(this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -123,6 +130,67 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         startActivity(intent);
     }
 
+    public void registerSMSReceiver(){
+        final String methodName =  "registerSMSReceiver()";
+        log.debug(methodName, "Just Entered..");
+
+        registerReceiver(smsReceiver, new IntentFilter(SMSReceiver.LOCAL_SMS_RECEIVED));
+        smsReceiver.isRegistered = true;
+
+        log.debug(methodName, "Returning..");
+    }
+
+    public void unregisterSMSReceiver(){
+        final String methodName =  "unregisterSMSReceiver()";
+        log.justEntered(methodName);
+
+        if(smsReceiver.isRegistered)
+            unregisterReceiver(smsReceiver);
+        smsReceiver.isRegistered = false;
+
+        log.returning(methodName);
+    }
+
+    public void updateSMSinUI(SMS sms){
+        final String methodName =  "updateSMSinUI()";
+        log.justEntered(methodName);
+
+        String phoneNo = sms.getFrom();
+
+        SMS currLatest = smsMap.get(phoneNo);
+        Map<String, SMS> tempMap = new LinkedHashMap<>(smsMap);
+
+        log.error(methodName, "Improvement can be done here");
+        if(currLatest == null){
+            smsMap.clear();
+            smsMap.put(phoneNo, sms);
+            smsMap.putAll(tempMap);
+            adapter.notifyItemInserted(0); //Moved Item to First
+        }
+        else{
+            smsMap.clear();
+            smsMap.put(phoneNo, sms);
+            tempMap.remove(phoneNo);
+            smsMap.putAll(tempMap);
+            adapter.notifyDataSetChanged();
+        }
+
+        //If List is on top
+        if(listIsAtTop()){
+            recyclerView.scrollToPosition(0); //Scroll to first
+        }
+        else{
+            Toast.makeText(this, "New SMS", Toast.LENGTH_SHORT).show();
+        }
+
+        log.returning(methodName);
+    }
+
+    private boolean listIsAtTop()   {
+        if(recyclerView.getChildCount() == 0) return true;
+        return recyclerView.getChildAt(0).getTop() == 0;
+    }
+
 
     //--- AppCompatActivity Overrides Start ---
     @Override
@@ -150,6 +218,10 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        final String methodName =  "onCreate()";
+        log.justEntered(methodName);
+
         setContentView(R.layout.activity_threadoverview);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -164,6 +236,8 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
 
         //By default assume permission is Not given
         hideInboxView();
+
+        log.returning(methodName);
 
     }
 
@@ -188,6 +262,8 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
 
     @Override
     protected void onStart() {
+        final String methodName =  "onCreate()";
+        log.justEntered(methodName);
 
         boolean hasPermission = permUtil.hasPermission(this, READ_SMS);
         if(hasPermission) {
@@ -197,8 +273,18 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         else{
             permUtil.ask(this, ALL_PERMISSIONS, REQUEST_CODE_ALL_PERMISSIONS);
         }
+        registerSMSReceiver();
         super.onStart();
+
+        log.returning(methodName);
     }
+
+    @Override
+    protected void onStop() {
+        unregisterSMSReceiver();
+        super.onStop();
+    }
+
     //--- AppCompatActivity Overrides End ---
 
 
@@ -233,4 +319,17 @@ public class ThreadOverviewActivity extends AppCompatActivity implements RVThrea
         log.debug(methodName, "Returning..");
     }
     //--- RVThreadOverviewAdapter.Callback Overrides End ---
+
+    //--- LocalSMSReceiver.Callback Overriders Start ---
+    @Override
+    public void onSMSReceived(SMS sms) {
+        final String methodName = "onSMSReceived()";
+        log.info(methodName, "Just Entered..");
+
+        String from = sms.getFrom();
+        updateSMSinUI(sms);
+
+        log.info(methodName, "Returning");
+    }
+    //--- LocalSMSReceiver.Callback Overriders Start ---
 }

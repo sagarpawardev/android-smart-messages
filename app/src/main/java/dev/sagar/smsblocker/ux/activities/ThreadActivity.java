@@ -370,7 +370,10 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName = "onSMSReceived()";
         log.info(methodName, "Just Entered..");
 
-        updateSMSinUI(sms);
+        String from = sms.getFrom();
+        if(from.equals(threadId)) {
+            updateSMSinUI(sms);
+        }
 
         log.info(methodName, "Returning");
     }
