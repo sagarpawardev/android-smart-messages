@@ -16,6 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -36,7 +39,7 @@ import dev.sagar.smsblocker.ux.customviews.NotificationView;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
 
 public class ThreadOverviewActivity extends AppCompatActivity
-        implements RVThreadOverviewAdapter.Callback, LocalSMSReceiver.Callback{
+        implements RVThreadOverviewAdapter.Callback, LocalSMSReceiver.Callback, View.OnClickListener{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -45,6 +48,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
     RecyclerView recyclerView;
     FloatingActionButton fab;
     NotificationView notificationView;
+    View viewPlaceHolder;
 
     //Java Core
     InboxUtil inboxUtil = null;
@@ -68,6 +72,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         notificationView = (NotificationView) findViewById(R.id.notificationView);
         recyclerView = (RecyclerView) findViewById(R.id.lv_threads);
+        viewPlaceHolder = findViewById(R.id.holder_placeholder);
 
         if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         adapter = new RVThreadOverviewAdapter(this, smsMap, this);
@@ -81,17 +86,27 @@ public class ThreadOverviewActivity extends AppCompatActivity
     }
 
     private void showInboxView(){
+        viewPlaceHolder.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
+
         smsMap.clear();
         Map<String, SMS> map = inboxUtil.getMsgs();
         smsMap.putAll(map);
         adapter.notifyDataSetChanged();
         if(smsMap.size() == 0) {
-            Toast.makeText(this, "You have not recieved any SMS Yet!!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You have not received any SMS Yet!!", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void hideInboxView(){
-
+        recyclerView.setVisibility(View.GONE);
+        viewPlaceHolder.setVisibility(View.VISIBLE);
+        TextView tvPlaceholder = (TextView) findViewById(R.id.tv_placeholder);
+        tvPlaceholder.setText(R.string.text_placeholder__inbox_permission);
+        ImageView imgView = (ImageView) findViewById(R.id.iv_placeholder);
+        imgView.setImageResource(R.drawable.placeholder_permission__inbox2);
+        Button btn = (Button) findViewById(R.id.btn_placeholder);
+        btn.setOnClickListener(this);
     }
 
     private void addListeners(){
@@ -241,7 +256,6 @@ public class ThreadOverviewActivity extends AppCompatActivity
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -320,16 +334,33 @@ public class ThreadOverviewActivity extends AppCompatActivity
     }
     //--- RVThreadOverviewAdapter.Callback Overrides End ---
 
+
     //--- LocalSMSReceiver.Callback Overriders Start ---
     @Override
     public void onSMSReceived(SMS sms) {
         final String methodName = "onSMSReceived()";
-        log.info(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
-        String from = sms.getFrom();
         updateSMSinUI(sms);
 
-        log.info(methodName, "Returning");
+        log.returning(methodName);
     }
-    //--- LocalSMSReceiver.Callback Overriders Start ---
+    //--- LocalSMSReceiver.Callback Overriders Ends ---
+
+
+    //--- View.OnClickListener Overrides Starts ---
+    @Override
+    public void onClick(View view) {
+        final String methodName = "onSMSReceived()";
+        log.justEntered(methodName);
+
+        int id = view.getId();
+        switch (id){
+            case R.id.btn_placeholder:
+                permUtil.ask(this, READ_SMS, REQUEST_CODE_ALL_PERMISSIONS); break;
+        }
+
+        log.returning(methodName);
+    }
+    //--- View.OnClickListener Overrides Ends ---
 }

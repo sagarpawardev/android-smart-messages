@@ -9,9 +9,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -25,13 +28,15 @@ import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.RVNewThreadAdapter_Contacts;
 import dev.sagar.smsblocker.tech.beans.Contact;
 
-public class NewThreadActivity extends AppCompatActivity implements RVNewThreadAdapter_Contacts.Callback{
+public class NewThreadActivity extends AppCompatActivity
+        implements RVNewThreadAdapter_Contacts.Callback, View.OnClickListener{
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
 
     //View
     private EditText etSearchContact;
     private RecyclerView rvContacts;
+    private View viewPlaceholder;
 
     //Internal Objects
     private ArrayList<Contact> contacts = new ArrayList<>();
@@ -54,6 +59,7 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
 
         etSearchContact = (EditText) findViewById(R.id.et_search_contact);
         rvContacts = (RecyclerView) findViewById(R.id.rv_contacts);
+        viewPlaceholder = findViewById(R.id.holder_placeholder);
 
         permUtil = PermissionUtilSingleton.getInstance();
         contactUtil = ContactUtilSingleton.getInstance();
@@ -66,12 +72,20 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
     }
 
     public void hideContacts(){
-        Toast.makeText(this, "Hide Contacts Here", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Hide Contacts Here", Toast.LENGTH_SHORT).show();
+        rvContacts.setVisibility(View.GONE);
+        viewPlaceholder.setVisibility(View.VISIBLE);
+        TextView tvPlaceholder = (TextView) findViewById(R.id.tv_placeholder);
+        tvPlaceholder.setText(R.string.text_placeholder__contact_permission);
+        Button btn = (Button) findViewById(R.id.btn_placeholder);
+        btn.setOnClickListener(this);
     }
 
     public void showContacts(){
 
         try {
+            viewPlaceholder.setVisibility(View.GONE);
+            rvContacts.setVisibility(View.VISIBLE);
             contacts.clear();
             ArrayList<Contact> temp = contactUtil.getAllContacts(this);
             contacts.addAll(temp);
@@ -251,7 +265,23 @@ public class NewThreadActivity extends AppCompatActivity implements RVNewThreadA
 
         log.error(methodName, "Need to put Placeholder Here");
 
+
         log.returning(methodName);
     }
     //--- RVNewThreadAdapter_Contacts.Callback Override Ends---
+
+    //--- View.OnClickListener Override Starts
+    @Override
+    public void onClick(View v) {
+        final String methodName =  "onClick()";
+        log.justEntered(methodName);
+
+        switch (v.getId()) {
+            case R.id.btn_placeholder: permUtil.ask(this, READ_CONTACTS, REQUEST_CODE_ALL_PERMISSIONS);
+            break;
+        }
+
+        log.returning(methodName);
+    }
+    //--- View.OnClickListener Override Ends
 }
