@@ -18,5 +18,6 @@
     <string name="notif_default_app_desc">Setting app default helps Smart Messages to handle SMS smarter</string>
     <string name="thread_hint__send_message">Send Message..</string>
     <string name="hint_thread__send">Say Hi..</string>
+    <string name="desc_dp">display picture</string>
 
 </resources>

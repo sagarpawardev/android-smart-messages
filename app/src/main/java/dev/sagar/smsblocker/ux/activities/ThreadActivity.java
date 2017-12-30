@@ -26,6 +26,7 @@ import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.SMSReceiver;
+import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
@@ -86,11 +87,11 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "updateActionBar()";
         log.debug(methodName, "Just Entered..");
 
-        //If has permissions than Set Name otherwise Set number by default
-        boolean hasContactPermission = permUtil.hasPermission(this, READ_CONTACTS);
         String contact = threadId;
-        if(hasContactPermission){
+        try {
             contact = ContactUtilSingleton.getInstance().getContactName(this, threadId);
+        } catch (ReadContactPermissionException e) {
+            e.printStackTrace();
         }
         tvHeader.setText(contact);
 

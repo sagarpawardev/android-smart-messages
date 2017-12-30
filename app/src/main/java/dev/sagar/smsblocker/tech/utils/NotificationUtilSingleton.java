@@ -10,6 +10,7 @@ import android.support.v4.app.NotificationCompat;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.ux.activities.ThreadActivity;
 
 /**
@@ -52,8 +53,13 @@ public class NotificationUtilSingleton {
     public void createSMSNotification(Context context, SMS sms){
         final int NOTIFICATION_ID = 123;
 
-        String from = sms.getFrom();
-        String fromName = ContactUtilSingleton.getInstance().getContactName(context, from);
+        String fromNo = sms.getFrom();
+        String fromName = fromNo;
+        try {
+            fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNo);
+        } catch (ReadContactPermissionException e) {
+            e.printStackTrace();
+        }
         String text = sms.getBody();
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
@@ -78,7 +84,7 @@ public class NotificationUtilSingleton {
 
         Intent resultIntent = new Intent(context, ThreadActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(ThreadActivity.KEY_THREAD_ID, from);
+        bundle.putString(ThreadActivity.KEY_THREAD_ID, fromNo);
         resultIntent.putExtras(bundle);
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(

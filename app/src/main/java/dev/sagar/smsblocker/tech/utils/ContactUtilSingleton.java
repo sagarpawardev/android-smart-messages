@@ -12,8 +12,6 @@ import java.util.HashMap;
 
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.tech.beans.Contact;
-import dev.sagar.smsblocker.tech.exceptions.NoContactPictureException;
-import dev.sagar.smsblocker.tech.exceptions.NoSuchContactException;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 
 /**
@@ -35,8 +33,7 @@ public class ContactUtilSingleton {
 
     //Java Core
     private static ContactUtilSingleton instance = null;
-    private static HashMap<String, Uri> uriMap = new HashMap<>();
-    private static HashMap<String, String> nameMap = new HashMap<>();
+    private static HashMap<String, Contact> contactMap = new HashMap<>();
 
     /**
      * This method is part of Singleton Design pattern.
@@ -61,12 +58,23 @@ public class ContactUtilSingleton {
      * @param phoneNumber Contact's Phone Number
      * @return Name of Contact from Phone Number
      */
-    public String getContactName(Context context, String phoneNumber) {
+    public String getContactName(Context context, String phoneNumber) throws ReadContactPermissionException {
         final String methodName = "getContactName()";
         log.info(methodName, "Just Entered...");
 
-        //Caching
-        if(nameMap.containsKey(phoneNumber)) return nameMap.get(phoneNumber);
+        Contact contact =  getContact(context, phoneNumber);
+        String name = contact.getDisplayName();
+
+        if(name == null){
+            name = phoneNumber;
+        }
+
+
+        /*//Caching
+        if(contactMap.containsKey(phoneNumber)) {
+            String name = contactMap.get(phoneNumber).getDisplayName();
+            return name;
+        }
 
         //Check Permissions if donot have permission return behave like you don't have contact
         boolean hasContactPerm = PermissionUtilSingleton.getInstance().hasPermission(context, READ_CONTACTS);
@@ -74,26 +82,60 @@ public class ContactUtilSingleton {
             return phoneNumber;
         }
 
+        Contact contact = new Contact();
+
         //Actual Procedure
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
-        Cursor cursor = contentResolver.query(uri, new String[]{ ContactsContract.PhoneLookup.DISPLAY_NAME }, null, null, null);
+        String projection[] = {
+                ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.CommonDataKinds.Phone.PHOTO_URI
+        };
+        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
         if (cursor == null) {
-            log.error(methodName, "==> Nothing in Cursor for "+phoneNumber);
-            return null;
+            log.error(methodName, "Nothing in Cursor for "+phoneNumber);
+            contact.setDp(null);
+            contact.setDisplayName(null);
+            contact.setId(null);
+            contact.setNumber(phoneNumber);
         }
-        String contactName = phoneNumber;
-        if(cursor.moveToFirst()) {
-            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+        else {
+            String contactName = phoneNumber;
+
+            if (cursor.moveToFirst()) {
+                String name = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
+                String thumb_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+                contact.setNumber(number);
+                contact.setId(id);
+                contact.setDisplayName(contactName);
+                if(thumb_uri != null){
+                    Uri imgUri = Uri.parse(thumb_uri);
+                    contact.setDp(imgUri);
+                    log.info(methodName, "Found Profile ficture...");
+                }
+                else{
+                    log.info(methodName, "No picture for phone number: "+phoneNumber);
+                }
+            }
+
+            if (!cursor.isClosed()) {
+                cursor.close();
+            }
         }
 
-        if(!cursor.isClosed()) {
-            cursor.close();
-        }
+        contactMap.put(phoneNumber, contact);
+        String name = contact.getDisplayName();
+        if(name == null){
+            name = phoneNumber;
+        }*/
 
-        nameMap.put(phoneNumber, contactName);
-        log.info(methodName, "Returing...");
-        return contactName;
+        log.returning(methodName);
+        return name;
     }
 
 
@@ -165,7 +207,7 @@ public class ContactUtilSingleton {
         }
 
         if (!cursor.isClosed()) cursor.close();
-        log.info(methodName, "Returning..");
+        log.returning(methodName);
         return contacts;
     }
 
@@ -178,7 +220,7 @@ public class ContactUtilSingleton {
      */
     public ArrayList<Contact> searchContacts(Context context, String searchStr) throws ReadContactPermissionException{
         final String methodName = "searchContacts()";
-        log.info(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         //Checking Permission
         boolean hasReadContactPermission = PermissionUtilSingleton.getInstance().hasPermission(context, READ_CONTACTS);
@@ -247,66 +289,142 @@ public class ContactUtilSingleton {
      * @param phoneNo Contact's Phone Number
      * @return URI of Phone number
      */
-    public Uri getPictureUri(Context context, String phoneNo){
+    public Uri getPictureUri(Context context, String phoneNo) throws ReadContactPermissionException {
         final String methodName = "getPictureUri()";
-        log.info(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
+        Contact contact = getContact(context, phoneNo);
+
+        /*//Caching
+        if(contactMap.containsKey(phoneNo)){
+            contact = contactMap.get(phoneNo);
+        }else {
+
+            //Actual Procedure
+            Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNo));
+            ContentResolver contentResolver = context.getContentResolver();
+            String[] projection = {
+                    ContactsContract.PhoneLookup.DISPLAY_NAME,
+                    ContactsContract.PhoneLookup._ID,
+                    ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI,
+                    ContactsContract.CommonDataKinds.Phone.NUMBER
+            };
+
+            //String selection = ContactsContract.CommonDataKinds.Phone.NUMBER + "= ?";
+            String selection = "";
+            //String selectionArg[] = {phoneNo};
+            String selectionArg[] = {};
+            String mOrder = "";
+
+            Cursor cursor = null;
+            cursor = contentResolver.query(uri, projection, selection, selectionArg, mOrder);
+
+            //If Contact is Not Found
+            if (cursor == null || cursor.getCount() == 0) {
+                contact.setNumber(phoneNo);
+                contact.setId(null);
+                contact.setDisplayName(null);
+                contact.setDp(null);
+
+                log.info(methodName, "Contact Not Found: " + phoneNo);
+            }
+            //If contact is Found
+            else{
+                log.info(methodName, "Found Contacts: " + cursor.getCount());
+                cursor.moveToNext();
+
+                String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
+                String thumb_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+                String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+
+
+                contact.setNumber(number);
+                contact.setId(id);
+                contact.setDisplayName(contactName);
+                if(thumb_uri != null){
+                    Uri imgUri = Uri.parse(thumb_uri);
+                    contact.setDp(imgUri);
+                    log.info(methodName, "Found Profile ficture...");
+                }
+                else{
+                    log.info(methodName, "No picture for phone number: "+phoneNo);
+                }
+
+                if (!cursor.isClosed())
+                    cursor.close();
+            }
+
+        }
+
+        contactMap.put(phoneNo, contact);*/
+
+        log.returning(methodName);
+        return contact.getDp();
+    }
+
+
+    public Contact getContact(Context context, String phoneNumber) throws ReadContactPermissionException {
+        final String methodName = "getContact()";
+        log.justEntered(methodName);
+
+        Contact result = new Contact();
 
         //Caching
-        if(uriMap.containsKey(phoneNo)) return uriMap.get(phoneNo);
+        if(contactMap.containsKey(phoneNumber)) return contactMap.get(phoneNumber);
+
+        //Check Permissions if donot have permission return behave like you don't have contact
+        boolean hasContactPerm = PermissionUtilSingleton.getInstance().hasPermission(context, READ_CONTACTS);
+        if(!hasContactPerm){
+            throw new ReadContactPermissionException();
+        }
 
         //Actual Procedure
-        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNo));
         ContentResolver contentResolver = context.getContentResolver();
-        String projection[] = {
-                ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+        String[] projection = {
+                ContactsContract.PhoneLookup.DISPLAY_NAME,
+                ContactsContract.PhoneLookup._ID,
+                ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI,
         };
+        Cursor cursor = contentResolver.query(uri, projection, null, null, null);
+        if (cursor == null) {
+            log.error(methodName, "Nothing in Cursor for "+phoneNumber);
+            result.setDp(null);
+            result.setId(null);
+            result.setDisplayName(null);
+            result.setNumber(phoneNumber);
+        }
+        else{
+            if(cursor.moveToFirst()) {
+                String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
+                String thumb_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+                String number = phoneNumber;
 
-        String selection = ContactsContract.CommonDataKinds.Phone.NUMBER +"= ?";
-        String selectionArg[] = {phoneNo};
-        String mOrder = "";
+                result.setNumber(number);
+                result.setId(id);
+                result.setDisplayName(contactName);
+                if(thumb_uri != null){
+                    Uri imgUri = Uri.parse(thumb_uri);
+                    result.setDp(imgUri);
+                    log.info(methodName, "Found Profile ficture...");
+                }
+                else{
+                    log.info(methodName, "No picture for phone number: "+phoneNumber);
+                }
 
-        Cursor contactsCursor = null;
-        Uri imgUri = null;
-        try{
-            contactsCursor = contentResolver.query(uri, projection, selection, selectionArg, mOrder);
-
-            if(contactsCursor == null || contactsCursor.getCount()==0){
-                throw new NoSuchContactException(phoneNo);
             }
-
-            log.info(methodName, "Found Contacts: "+contactsCursor.getCount());
-            contactsCursor.moveToNext();
-
-            String image_uri = contactsCursor
-                    .getString(contactsCursor
-                            .getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
-
-            if(image_uri == null){
-                throw new NoContactPictureException(phoneNo);
+            if(!cursor.isClosed()) {
+                cursor.close();
             }
-
-            imgUri = Uri.parse(image_uri);
-            log.info(methodName, "Found Profile ficture...");
-
-        }
-        catch (NoSuchContactException ex){
-            log.error(methodName, phoneNo+" is not there in Contacts");
-        }
-        catch (NoContactPictureException ex){
-            log.error(methodName, phoneNo+" Does not have a Picture");
-        }
-        catch (Exception ex){
-            log.error(methodName, phoneNo+" got Some Unknown Exception with message: "+ex.getMessage());
-        }
-        finally {
-            if(contactsCursor!=null && !contactsCursor.isClosed())
-                contactsCursor.close();
         }
 
-        log.info(methodName, "Returning...");
-        uriMap.put(phoneNo, imgUri);
-        return imgUri;
+        //Cache Data
+        contactMap.put(phoneNumber, result);
+        log.returning(methodName);
+
+        return result;
     }
 
 }

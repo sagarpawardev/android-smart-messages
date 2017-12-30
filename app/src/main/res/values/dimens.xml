@@ -13,8 +13,8 @@
     <dimen name="msg_body_paddingtop">16dp</dimen>
     <dimen name="msg_body_paddingbottom">16dp</dimen>
     <dimen name="padding_row_threadoverview__horiz">10dp</dimen>
-    <dimen name="padding_row_threadoverview__vert">15dp</dimen>
-    <dimen name="circular_img">48dp</dimen>
+    <dimen name="padding_row_threadoverview__vert">5dp</dimen>
+    <dimen name="circular_img">46dp</dimen>
     <dimen name="circular_img_margin">14dp</dimen>
     <dimen name="dp_magin">14dp</dimen>
 
@@ -23,5 +23,6 @@
     <dimen name="margin_thread__msg">1dp</dimen>
     <dimen name="elevation_thread__msg">5dp</dimen>
     <dimen name="margin_thread__fullpage">6dp</dimen>
+    <dimen name="margin_vert__threadoverview">12dp</dimen>
 
 </resources>

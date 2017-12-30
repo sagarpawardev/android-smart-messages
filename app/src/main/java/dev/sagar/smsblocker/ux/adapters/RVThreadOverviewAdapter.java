@@ -19,6 +19,7 @@ import java.util.Set;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
@@ -147,7 +148,14 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         String thread = threads.get(position);
         SMS sms = smsMap.get(thread);
         String fromNumber = sms.getFrom();
-        String fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNumber);
+
+
+        String fromName = fromNumber;
+        try {
+            fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNumber);
+        } catch (ReadContactPermissionException e) {
+            e.printStackTrace();
+        }
 
         //If SMS is selected in Multiselect mode
         boolean isSelected = selectedThreads.contains(fromName);
@@ -185,7 +193,12 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         holder.tvThreadId.setText(sms.getFrom());
 
         //Setting User Image
-        Uri dpUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
+        Uri dpUri = null;
+        try {
+            dpUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
+        } catch (ReadContactPermissionException e) {
+            e.printStackTrace();
+        }
         if(dpUri != null) {
             holder.dpView.setPictureSrc(dpUri);
         }
