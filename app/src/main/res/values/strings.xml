@@ -21,4 +21,7 @@
     <string name="desc_dp">display picture</string>
     <string name="title_thread__show_contact">Show Contact</string>
 
+
+    <string name="format_thread__datetime">MMM d, E \nh:m a</string>
+
 </resources>

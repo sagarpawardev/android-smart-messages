@@ -2,6 +2,7 @@ package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,13 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.ocpsoft.prettytime.TimeFormat;
+import org.ocpsoft.prettytime.format.SimpleTimeFormat;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import dev.sagar.smsblocker.R;
@@ -218,6 +225,8 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         View llParent;
         //Log Initiate
         LogUtil log = new LogUtil(this.getClass().getName());
+        String format = context.getResources().getString(R.string.format_thread__datetime);
+        DateFormat dateFormat = new SimpleDateFormat(format);
 
         SMSViewHolder(View view) {
             super(view);
@@ -289,6 +298,12 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             }
             else{
                 log.info(methodName, "Clicked In Non-Selection Mode");
+                int position = getAdapterPosition();
+                long dateTime = smses.get(position).getDateTime();
+                Date date = new Date(dateTime);
+                String strDateTime = dateFormat.format(date);
+
+                tvTime.setText(strDateTime);
             }
         }
     }
