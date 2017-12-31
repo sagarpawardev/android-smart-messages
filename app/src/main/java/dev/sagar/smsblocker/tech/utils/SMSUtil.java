@@ -1,9 +1,13 @@
 package dev.sagar.smsblocker.tech.utils;
 
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.os.Build;
 import android.telephony.SmsManager;
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
 
 import java.util.ArrayList;
 
@@ -36,7 +40,7 @@ public class SMSUtil {
      */
     public SMS sendSMS(String phoneNo, String msg) {
         String methodName = "sendSMS()";
-        log.info(methodName, "Just Entered...");
+        log.justEntered(methodName);
 
         final int REQUEST_CODE = 0;
         SMS sms = null;
@@ -51,10 +55,7 @@ public class SMSUtil {
             ArrayList<PendingIntent> sentIntents = new ArrayList<>();
             ArrayList<PendingIntent> deliveryIntents = new ArrayList<>();
 
-            /*for (int i = 0; i < numParts; i++) {
-                sentIntents.add(PendingIntent.getBroadcast(context, REQUEST_CODE, null, 0));
-                deliveryIntents.add(PendingIntent.getBroadcast(context, REQUEST_CODE, null, 0));
-            }*/
+            log.error(methodName,"Need to add sentIntent and deliveryIntent Here");
 
             smsManager.sendMultipartTextMessage(phoneNo, null, parts, null, null);
 
@@ -80,8 +81,36 @@ public class SMSUtil {
             e.printStackTrace();
         }
 
-        log.info(methodName, "Returning..."+sms);
+        log.returning(methodName);
         return sms;
+    }
+
+    /**
+     * Returns SMSManager for specified sim
+     * @param simIndex Index of SIM 0 for Sim1 and 1 for Sim2
+     * @return SMSManager for specified index or Default if SDK < 22
+     */
+    private SmsManager getSMSManagerFor(int simIndex){
+        String methodName = "sendSMS()";
+        log.justEntered(methodName);
+
+        SmsManager smsManager = null;
+
+        if (Build.VERSION.SDK_INT >= 22) {
+            SubscriptionManager subscriptionManager = context.getSystemService(SubscriptionManager.class);
+            log.info(methodName, "Looking for SMS manager for simIndex: "+simIndex);
+            SubscriptionInfo subscriptionInfo=subscriptionManager.getActiveSubscriptionInfoForSimSlotIndex(simIndex);
+            int subscriptionId = subscriptionInfo.getSubscriptionId();
+            smsManager = SmsManager.getSmsManagerForSubscriptionId(subscriptionId);
+            log.info(methodName, "SIM found ");
+        }
+        else{
+            log.info(methodName, "SDK Lower than 22 so returning default SMSManager");
+            smsManager = SmsManager.getDefault();
+        }
+
+        log.justEntered(methodName);
+        return smsManager;
     }
 
 }
