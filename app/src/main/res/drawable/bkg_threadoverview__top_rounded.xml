@@ -28,7 +28,7 @@
         <!--<ripple
             android:color="#"
             tools:targetApi="lollipop">
-            <item android:id="@android:id/mask">
+            <item andrsubscriptionIdd:id="@andrsubscriptionIdd:id/mask">
                 <shape android:shape="rectangle">
                     <gradient
                         android:angle="45"

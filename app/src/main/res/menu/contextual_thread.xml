@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="dev.sagar.smsblocker.ux.activities.ThreadOverviewActivity">
     <!--<item
-        android:id="@+id/action_settings"
+        andridd:idid@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />-->

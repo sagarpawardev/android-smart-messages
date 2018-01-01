@@ -27,7 +27,7 @@
                 android:elevation="10dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
-                android:id="@+id/arrow_speak"
+                andridd:idid@+id/arrow_speak"
                 android:background="@drawable/img_speak_left"/>-->
 
 

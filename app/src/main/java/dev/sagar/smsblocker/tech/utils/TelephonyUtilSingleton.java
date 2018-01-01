@@ -5,12 +5,10 @@ import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import dev.sagar.smsblocker.tech.beans.SIM;
-import dev.sagar.smsblocker.tech.beans.SMS;
 
 /**
  * Created by sagarpawar on 01/01/18.
@@ -26,7 +24,9 @@ public class TelephonyUtilSingleton{
         return instance;
     }
 
-    private TelephonyUtilSingleton() {}
+    private TelephonyUtilSingleton() {
+
+    }
 
     public String getCurrentOperator(Context context){
         TelephonyManager tManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -61,7 +61,7 @@ public class TelephonyUtilSingleton{
                 int slot = info.getSimSlotIndex();
 
                 sim.setOperator(name);
-                sim.setId(id);
+                sim.setSubscriptionId(id);
                 sim.setSlotNo(slot);
 
                 sims.add(sim);
@@ -69,6 +69,53 @@ public class TelephonyUtilSingleton{
         }
 
         return sims;
+    }
+
+    public SIM getSim(Context context, int subscriptionId){
+        SIM sim = new SIM();
+        SubscriptionManager subscriptionManager=(SubscriptionManager)context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+
+        List<SubscriptionInfo> subscriptionInfoList=subscriptionManager.getActiveSubscriptionInfoList();
+
+        if(subscriptionInfoList!=null && subscriptionInfoList.size()>0){
+            for(SubscriptionInfo info:subscriptionInfoList){
+                int slot = info.getSimSlotIndex();
+                String name = info.getDisplayName().toString();
+                int subsId = info.getSubscriptionId();
+                if( subsId == subscriptionId){
+                    sim.setOperator(name);
+                    sim.setSubscriptionId(subsId);
+                    sim.setSlotNo(slot);
+                    break;
+                }
+            }
+        }
+
+        return sim;
+    }
+
+
+    public SIM getSIMAtSlot(Context context, int slotIndex){
+        SIM sim = new SIM();
+        SubscriptionManager subscriptionManager=(SubscriptionManager)context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+
+        List<SubscriptionInfo> subscriptionInfoList=subscriptionManager.getActiveSubscriptionInfoList();
+
+        if(subscriptionInfoList!=null && subscriptionInfoList.size()>0){
+            for(SubscriptionInfo info:subscriptionInfoList){
+                int slot = info.getSimSlotIndex();
+                String name = info.getDisplayName().toString();
+                int subsId = info.getSubscriptionId();
+                if( slot == slotIndex){
+                    sim.setOperator(name);
+                    sim.setSubscriptionId(subsId);
+                    sim.setSlotNo(slot);
+                    break;
+                }
+            }
+        }
+
+        return sim;
     }
 
 }

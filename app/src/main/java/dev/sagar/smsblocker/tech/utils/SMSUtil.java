@@ -20,7 +20,7 @@ import dev.sagar.smsblocker.tech.beans.SMS;
 public class SMSUtil {
 
     //Log Initiate
-    private static LogUtil log = new LogUtil( "ContactUtilSingleton" );
+    private LogUtil log = new LogUtil( this.getClass().getName() );
 
     //Java Android
     private Context context;
@@ -48,6 +48,7 @@ public class SMSUtil {
             //Send SMS
             log.info(methodName,"Trying to Send SMS");
             SmsManager smsManager = SmsManager.getDefault();
+            int subsId = smsManager.getSubscriptionId();
 
             ArrayList<String> parts =smsManager.divideMessage(msg);
             int numParts = parts.size();
@@ -64,17 +65,21 @@ public class SMSUtil {
             log.info(methodName, "==> SMS Sent");
 
             boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefault(context);
+            sms = new SMS();
+            sms.setRead(true);
+            sms.setType(SMS.TYPE_SENT);
+            sms.setDateTime(System.currentTimeMillis());
+            sms.setBody(msg);
+            sms.setFrom(phoneNo);
+            sms.setSubscription(subsId);
+
             if(isAppDefault) {
                 //Save in DataProvider
-                sms = new SMS();
-                sms.setRead(true);
-                sms.setType(SMS.TYPE_SENT);
-                sms.setDateTime(System.currentTimeMillis());
-                sms.setBody(msg);
-                sms.setFrom(phoneNo);
                 InboxUtil inboxUtil = new InboxUtil(context);
                 String id = inboxUtil.saveSMS(sms, InboxUtil.TYPE_SENT);
                 sms.setId(id);
+
+                log.info(methodName, "SMS Sent and id is: "+id);
             }
         } catch (Exception e) {
             log.error(methodName, "==> SMS Sending Failed");

@@ -31,7 +31,7 @@ public class TestMainActivity extends AppCompatActivity {
         List<SIM> sims = teleUtil.getAvailableSims(this );
         for(SIM sim:sims){
             Log.e("MY tag", "Operator Name: "+sim.getOperator());
-            Log.e("MY tag", "SIM id: "+sim.getId());
+            Log.e("MY tag", "SIM id: "+sim.getSubscriptionId());
             Log.e("MY tag", "SIM slot: "+sim.getSlotNo());
             Log.e("MY tag", "******************");
 

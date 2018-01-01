@@ -50,7 +50,7 @@ public class SMSReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         //Start Log
         final String methodName = "onReceive()";
-        log.info(methodName, "Just Entered..");
+        log.justEntered(methodName);
         log.info(methodName, "Action Name: "+intent.getAction());
 
         String event = intent.getAction();
@@ -59,7 +59,7 @@ public class SMSReceiver extends BroadcastReceiver {
             case SMS_DELIVERED: smsDelivered(context, intent); break;
         }
 
-        log.info(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     /**
@@ -70,11 +70,17 @@ public class SMSReceiver extends BroadcastReceiver {
     private void smsReceived(Context context, Intent intent){
         //Start Log
         final String methodName = "smsReceived()";
-        log.verbose(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             Object[] pdus = (Object[]) bundle.get("pdus");
+            int slot = bundle.getInt("slot", -1);
+            int subscription = bundle.getInt("subscription", -1);
+
+            log.info(methodName, "Slot: "+slot);
+            log.info(methodName, "Subscription: "+subscription);
+
             final SmsMessage[] messages = new SmsMessage[pdus.length];
             log.debug(methodName, String.format("message count = %s", messages.length));
 
@@ -95,6 +101,8 @@ public class SMSReceiver extends BroadcastReceiver {
             sms.setBody(msgBody);
             sms.setRead(false);
             sms.setType(SMS.TYPE_RECEIVED);
+            sms.setSubscription(subscription);
+            log.error(methodName, "Service Center: "+smsMessage.getServiceCenterAddress());
 
             log.info(methodName, "Received Message From: "+smsMessage.getDisplayOriginatingAddress());
 
@@ -117,6 +125,8 @@ public class SMSReceiver extends BroadcastReceiver {
             }
 
         }
+
+        log.returning(methodName);
     }
 
 

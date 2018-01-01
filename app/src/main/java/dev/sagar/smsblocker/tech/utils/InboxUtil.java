@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
-import dev.sagar.smsblocker.tech.exceptions.NotImplementedException;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -34,6 +33,7 @@ public class InboxUtil {
     private final String _id = Telephony.Sms._ID;
     private final String address = Telephony.Sms.ADDRESS;
     private final String body = Telephony.Sms.BODY;
+    private final String subscriptionId = Telephony.Sms.SUBSCRIPTION_ID;
     private final String read = Telephony.Sms.READ;
     private final String date = Telephony.Sms.DATE;
     private final String type = Telephony.Sms.TYPE;
@@ -56,15 +56,11 @@ public class InboxUtil {
      */
     public Map<String, SMS> getMsgs(){
         final String methodName =  "getMsgs()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         Uri uriSMSURI = Uri.parse("content://sms/");
-        String[] projection = {Telephony.Sms._ID,
-                Telephony.Sms.ADDRESS,
-                Telephony.Sms.BODY,
-                Telephony.Sms.READ,
-                Telephony.Sms.DATE,
-                Telephony.Sms.TYPE};
+        String[] projection = {_id, address, body,
+                read, date, subscriptionId, type};
         String selection = "";
         String[] selectionArgs = {};
         String sortOrder = Telephony.Sms.DATE +" desc";
@@ -80,12 +76,13 @@ public class InboxUtil {
         }
 
         while (c.moveToNext()) {
-            String id = c.getString(c.getColumnIndexOrThrow("_id"));
-            String from = c.getString(c.getColumnIndexOrThrow("address"));
-            String body = c.getString(c.getColumnIndexOrThrow("body"));
-            boolean readState = c.getInt(c.getColumnIndex("read")) == 1;
-            long time = c.getLong(c.getColumnIndexOrThrow("date"));
-            long type = c.getLong(c.getColumnIndexOrThrow("type"));
+            String id = c.getString(c.getColumnIndexOrThrow(this._id));
+            String from = c.getString(c.getColumnIndexOrThrow(this.address));
+            String body = c.getString(c.getColumnIndexOrThrow(this.body));
+            int serviceCenter = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
+            boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
+            long time = c.getLong(c.getColumnIndexOrThrow(this.date));
+            long type = c.getLong(c.getColumnIndexOrThrow(this.type));
 
             if(!smsMap.containsKey(from)) {
                 SMS sms = new SMS();
@@ -95,6 +92,7 @@ public class InboxUtil {
                 sms.setRead(readState);
                 sms.setDateTime(time);
                 sms.setType(type);
+                sms.setSubscription(serviceCenter);
 
                 smsMap.put(from, sms);
             }
@@ -103,7 +101,7 @@ public class InboxUtil {
         c.close();
 
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return smsMap;
     }
 
@@ -116,15 +114,11 @@ public class InboxUtil {
      */
     public ArrayList<SMS> getAllSMSFromTo(String contactNo, int sortingOrder){
         final String methodName =  "getAllSMSFromTo()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
-        String[] projection = {_id,
-                address,
-                body,
-                read,
-                date,
-                type};
+        String[] projection = {_id, address, body,
+                read, date, type, subscriptionId};
 
         String selection = address+" = ?";
         String[] selectionArgs = {contactNo};
@@ -139,7 +133,7 @@ public class InboxUtil {
                 .query(uriSmsURI, projection, selection, selectionArgs, mSortOrder);
 
         ArrayList<SMS> smses = new ArrayList<>();
-        Log.e("My TAG", "Reading Msg... ");
+        log.info(methodName, "Reading Msg... ");
 
         try {
             while (c.moveToNext()) {
@@ -147,6 +141,7 @@ public class InboxUtil {
                 String from = c.getString(c.getColumnIndexOrThrow(this.address));
                 String id = c.getString(c.getColumnIndexOrThrow(this._id));
                 String body = c.getString(c.getColumnIndexOrThrow(this.body));
+                int subscriptionId = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
                 boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
                 long time = c.getLong(c.getColumnIndexOrThrow(this.date));
                 long type = c.getLong(c.getColumnIndexOrThrow(this.type));
@@ -158,6 +153,7 @@ public class InboxUtil {
                 sms.setRead(readState);
                 sms.setDateTime(time);
                 sms.setType(type);
+                sms.setSubscription(subscriptionId);
 
                 smses.add(sms);
 
@@ -170,7 +166,7 @@ public class InboxUtil {
             if (c!=null) c.close();
         }
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return smses;
     }
 
@@ -182,11 +178,11 @@ public class InboxUtil {
      */
     public List<SMS> getAllSMSFromTo(String contactNo){
         final String methodName =  "getAllSMSFromTo()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         List<SMS> smses = getAllSMSFromTo(contactNo, SORT_DESC);;
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return smses;
     }
 
@@ -198,7 +194,7 @@ public class InboxUtil {
      */
     public int setStatusRead(String fromNumber){
         final String methodName = "setStatusRead()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         Uri uriSMSUri = Telephony.Sms.Inbox.CONTENT_URI;
         String selection = address+" = ?";
@@ -211,7 +207,7 @@ public class InboxUtil {
                 .update(uriSMSUri, values, selection, selectionArgs);
         log.info(methodName, "Update Count: "+updateCount);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return updateCount;
     }
 
@@ -229,7 +225,7 @@ public class InboxUtil {
         String body = sms.getBody();
         String date = String.valueOf(sms.getDateTime());
         String read = String.valueOf(sms.isRead());
-
+        int subscription = sms.getSubscription();
 
         ContentValues values = new ContentValues();
         values.put(this.address, from);
@@ -237,6 +233,7 @@ public class InboxUtil {
         values.put(this.read, sms.isRead());
         values.put(this.date, date);
         values.put(this.read, read);
+        values.put(this.subscriptionId, subscription);
 
         Uri createdDataUri = null;
         Uri folderUri = null;
@@ -258,7 +255,9 @@ public class InboxUtil {
         String result = null;
         if (createdDataUri != null)
             result = createdDataUri.toString().replace(SMS_URI.toString()+"/", "");
-        log.debug(methodName, "Returning.. :"+result);
+        log.info(methodName, "Result: "+result);
+
+        log.returning(methodName);
         return result;
     }
 
@@ -270,7 +269,7 @@ public class InboxUtil {
      */
     public boolean deleteSMS(SMS sms){
         final String methodName =  "deleteSMS()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         String id = sms.getId();
         ContentValues values = new ContentValues();
@@ -283,7 +282,7 @@ public class InboxUtil {
         int count = context.getContentResolver().delete(SMS_URI, selection, selectionArgs);
         log.info(methodName, "Deleted "+count+" Rows");
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return true;
     }
 

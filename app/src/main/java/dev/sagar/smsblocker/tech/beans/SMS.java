@@ -1,8 +1,5 @@
 package dev.sagar.smsblocker.tech.beans;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 /**
  * Created by sagarpawar on 15/10/17.
  */
@@ -15,6 +12,8 @@ public class SMS{
     private long dateTime,
             type;
     private boolean read;
+
+    private int subscription;
 
     public static final long TYPE_SENT = 2L;
     public static final long TYPE_RECEIVED = 1L;
@@ -44,7 +43,6 @@ public class SMS{
         this.body = body;
     }
 
-
     public long getDateTime() {
         return dateTime;
     }
@@ -67,5 +65,13 @@ public class SMS{
 
     public void setType(long type) {
         this.type = type;
+    }
+
+    public int getSubscription() {
+        return subscription;
+    }
+
+    public void setSubscription(int subscription) {
+        this.subscription = subscription;
     }
 }

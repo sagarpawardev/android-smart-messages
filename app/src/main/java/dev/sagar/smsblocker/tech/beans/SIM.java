@@ -6,7 +6,7 @@ package dev.sagar.smsblocker.tech.beans;
 
 public class SIM {
     private String operator;
-    private int id;
+    private int subscriptionId;
     private String number;
     private int slotNo;
 
@@ -18,12 +18,12 @@ public class SIM {
         this.operator = operator;
     }
 
-    public int getId() {
-        return id;
+    public int getSubscriptionId() {
+        return subscriptionId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setSubscriptionId(int subscriptionId) {
+        this.subscriptionId = subscriptionId;
     }
 
     public int getSlotNo() {

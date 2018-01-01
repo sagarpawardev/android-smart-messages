@@ -20,11 +20,13 @@ import java.util.Date;
 import java.util.List;
 
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.beans.SIM;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.SystemUtilSingleton;
+import dev.sagar.smsblocker.tech.utils.TelephonyUtilSingleton;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -44,6 +46,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     private List<SMS> smses;
     private boolean isSelectionModeOn = false;
     private List<SMS> selectedSMSes = new ArrayList<>();
+    private TelephonyUtilSingleton telephonyUtil;
 
     //Constants
     private static final int TYPE_RECEIVED = 0;
@@ -51,14 +54,15 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
     public RVThreadAdapter(Context context, Callback callback, List<SMS> smses) {
         final String methodName =  "RVThreadAdapter()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         this.context = context;
         this.callback = callback;
         this.smses = smses;
         inboxUtil = new InboxUtil(context);
+        telephonyUtil = TelephonyUtilSingleton.getInstance();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     public void logSelectedSize(){
@@ -67,7 +71,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
     public boolean deleteSelections(){
         final String methodName =  "deleteSelections()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         log.error(methodName, "This can be improved");
         log.info(methodName, "Selected SMS count: "+ selectedSMSes.size());
@@ -84,14 +88,14 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         }
         selectedSMSes.clear();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return true;
     }
 
 
     public boolean copySelection(){
         final String methodName="copySelection()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         if(selectedSMSes.size() != 1){
             log.error(methodName, "Selected SMS are either greater or less than 1");
@@ -102,34 +106,44 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         SystemUtilSingleton systemUtil = SystemUtilSingleton.getInstance();
         systemUtil.copy(context, sms);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return true;
     }
 
 
     public void setSelectionModeOn(boolean isModeOn){
         final String methodName =  "setSelectionModeOn()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         isSelectionModeOn = isModeOn;
         selectedSMSes.clear();
 
         if(!isModeOn) notifyDataSetChanged();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     private void setViewSelected(View view, boolean selected){
+        final String methodName =  "setViewSelected()";
+        log.justEntered(methodName);
+
         if(selected) {
             view.setSelected(true);
         }
         else{
             view.setSelected(false);
         }
+
+        log.returning(methodName);
     }
 
     private void setViewSelected(SMSViewHolder holder, boolean selected){
+        final String methodName =  "setViewSelected()";
+        log.justEntered(methodName);
+
         setViewSelected(holder.llParent, selected);
+
+        log.returning(methodName);
     }
 
 
@@ -137,7 +151,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     @Override
     public SMSViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final String methodName =  "onCreateViewHolder()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         View itemView = null;
 
@@ -151,7 +165,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             default: break;
         }
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return new SMSViewHolder(itemView);
     }
 
@@ -166,7 +180,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     @Override
     public void onBindViewHolder(SMSViewHolder holder, int position) {
         final String methodName =  "onBindViewHolder()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         //Adi changes Start
         Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
@@ -181,16 +195,6 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         boolean isRead = sms.isRead();
         String socialDate = DateUtilSingleton.getInstance().socialFormat(time);
 
-        //If SMS type is sent
-       /* if(type == SMS.TYPE_SENT) {
-            holder.llParent.setGravity(Gravity.END);
-            holder.tvBody.setBackgroundResource(R.drawable.sender);
-        }
-        else {
-            holder.llParent.setGravity(Gravity.START);
-            holder.tvBody.setBackgroundResource(R.drawable.msg_body_left);
-        }*/
-
         //If SMS is selected in RecyclerView
         boolean isSelected = selectedSMSes.contains(sms);
         setViewSelected(holder, isSelected);
@@ -198,15 +202,15 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         holder.tvBody.setText(body);
         holder.tvTime.setText(socialDate);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
     public int getItemCount() {
         final String methodName =  "getItemCount()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return smses.size();
     }
     //--- RecyclerView.Adapter Overrides End ---
@@ -246,7 +250,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         @Override
         public boolean onLongClick(View view) {
             final String methodName =  "onLongClick()";
-            log.debug(methodName, "Just Entered..");
+            log.justEntered(methodName);
             boolean result = false;
 
             if (!isSelectionModeOn) {
@@ -263,7 +267,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
                 result = true;
             }
 
-            log.debug(methodName, "Returning..");
+            log.returning(methodName);
             return result;
         }
 
@@ -299,11 +303,22 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             else{
                 log.info(methodName, "Clicked In Non-Selection Mode");
                 int position = getAdapterPosition();
-                long dateTime = smses.get(position).getDateTime();
+                SMS sms = smses.get(position);
+                long dateTime = sms.getDateTime();
                 Date date = new Date(dateTime);
                 String strDateTime = dateFormat.format(date);
 
-                tvTime.setText(strDateTime);
+                int subscriptionId = sms.getSubscription();
+                SIM sim = telephonyUtil.getSim(context, subscriptionId);
+                String operatorName = sim.getOperator();
+
+                StringBuilder sb = new StringBuilder(strDateTime);
+                if(operatorName != null){
+                    sb.append("\n• via "+operatorName);
+                }
+
+                String formattedStr = sb.toString();
+                tvTime.setText(formattedStr);
             }
         }
     }

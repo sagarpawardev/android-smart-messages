@@ -19,7 +19,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="6dp"
         app:srcCompat="@drawable/male"
-        android:id="@+id/iv_dp"/>
+        andridd:idid@+id/iv_dp"/>
 -->
     <!--<RelativeLayout
         android:layout_width="@dimen/circular_img"
@@ -29,7 +29,7 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/blue_color"
         android:layout_alignParentTop="true"
-        android:id="@+id/dp_holder">
+        andridd:idid@+id/dp_holder">
         <TextView
             android:layout_width="@dimen/circular_img"
             android:layout_height="@dimen/circular_img"
@@ -39,14 +39,14 @@
             android:textSize="30dp"
             android:text="A"
             android:textStyle="bold"
-            android:id="@+id/tv_icon"/>
+            andridd:idid@+id/tv_icon"/>
         <dev.sagar.smsblocker.ux.customviews.CircularImageView
             android:layout_width="@dimen/circular_img"
             android:layout_height="@dimen/circular_img"
             app:srcCompat="@drawable/blue_color"
             android:elevation="0dp"
             android:visibility="gone"
-            android:id="@+id/iv_dp" />
+            andridd:idid@+id/iv_dp" />
     </RelativeLayout>-->
 
 

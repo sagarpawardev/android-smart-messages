@@ -72,7 +72,7 @@
             android:name=".test.activities.TestMainActivity"
             android:label="@string/title_activity_test_main"
             android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <action android:name="android.intent.action.SENDTO" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -82,10 +82,10 @@
                 <data android:scheme="mms" />
                 <data android:scheme="mmsto" />
 
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <!--<action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />-->
 
-            </intent-filter>-->
+            </intent-filter>
         </activity>
 
         <service

@@ -98,7 +98,7 @@ public class ContactUtilSingleton {
             log.error(methodName, "Nothing in Cursor for "+phoneNumber);
             contact.setDp(null);
             contact.setDisplayName(null);
-            contact.setId(null);
+            contact.setSubscriptionId(null);
             contact.setNumber(phoneNumber);
         }
         else {
@@ -111,7 +111,7 @@ public class ContactUtilSingleton {
                 String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
                 contact.setNumber(number);
-                contact.setId(id);
+                contact.setSubscriptionId(id);
                 contact.setDisplayName(contactName);
                 if(thumb_uri != null){
                     Uri imgUri = Uri.parse(thumb_uri);
@@ -322,7 +322,7 @@ public class ContactUtilSingleton {
             //If Contact is Not Found
             if (cursor == null || cursor.getCount() == 0) {
                 contact.setNumber(phoneNo);
-                contact.setId(null);
+                contact.setSubscriptionId(null);
                 contact.setDisplayName(null);
                 contact.setDp(null);
 
@@ -340,7 +340,7 @@ public class ContactUtilSingleton {
 
 
                 contact.setNumber(number);
-                contact.setId(id);
+                contact.setSubscriptionId(id);
                 contact.setDisplayName(contactName);
                 if(thumb_uri != null){
                     Uri imgUri = Uri.parse(thumb_uri);
