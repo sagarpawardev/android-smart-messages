@@ -1,17 +1,23 @@
 package dev.sagar.smsblocker.tech.utils;
 
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
+import dev.sagar.smsblocker.tech.RequestCode;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.broadcastreceivers.SMSDeliveredReceiver;
+import dev.sagar.smsblocker.tech.broadcastreceivers.SMSSentReceiver;
 
 /**
  * Created by sagarpawar on 22/10/17.
@@ -24,14 +30,13 @@ public class SMSUtil {
 
     //Java Android
     private Context context;
+    private final Gson gson = new Gson();
 
     //Java Core
-
 
     public SMSUtil(Context context) {
         this.context = context;
     }
-
 
     /**
      * This method sends sms to specified contact number
@@ -42,47 +47,81 @@ public class SMSUtil {
         String methodName = "sendSMS()";
         log.justEntered(methodName);
 
-        final int REQUEST_CODE = 0;
         SMS sms = null;
         try {
-            //Send SMS
-            log.info(methodName,"Trying to Send SMS");
             SmsManager smsManager = SmsManager.getDefault();
             int subsId = smsManager.getSubscriptionId();
-
-            ArrayList<String> parts =smsManager.divideMessage(msg);
-            int numParts = parts.size();
-
-            ArrayList<PendingIntent> sentIntents = new ArrayList<>();
-            ArrayList<PendingIntent> deliveryIntents = new ArrayList<>();
-
-            log.error(methodName,"Need to add sentIntent and deliveryIntent Here");
-
-            smsManager.sendMultipartTextMessage(phoneNo, null, parts, null, null);
-
-
-            //smsManager.sendTextMessage(phoneNo, null, msg, null, null);
-            log.info(methodName, "==> SMS Sent");
 
             boolean isAppDefault = PermissionUtilSingleton.getInstance().isAppDefault(context);
             sms = new SMS();
             sms.setRead(true);
-            sms.setType(SMS.TYPE_SENT);
+            sms.setType(SMS.TYPE_QUEUED);
             sms.setDateTime(System.currentTimeMillis());
             sms.setBody(msg);
             sms.setFrom(phoneNo);
             sms.setSubscription(subsId);
 
+            ArrayList<String> parts =smsManager.divideMessage(msg);
+
+            ArrayList<PendingIntent> sentPIntents = null;
+            ArrayList<PendingIntent> deliverPIntents = null;
             if(isAppDefault) {
+                log.info(methodName, "Saving SMS in DB");
                 //Save in DataProvider
                 InboxUtil inboxUtil = new InboxUtil(context);
-                String id = inboxUtil.saveSMS(sms, InboxUtil.TYPE_SENT);
+                String id = inboxUtil.insertSMS(sms);
                 sms.setId(id);
+                log.info(methodName, "SMS Saved with id: "+id);
 
-                log.info(methodName, "SMS Sent and id is: "+id);
+
+                log.info(methodName, "Creating Delivery and Sent Receivers");
+                int numParts = parts.size();
+
+                sentPIntents = new ArrayList<>();
+                deliverPIntents = new ArrayList<>();
+                for(int i=0; i<numParts; i++){
+                    Intent sentIntent = new Intent(context, SMSSentReceiver.class);
+                    Bundle sendBasket = new Bundle();
+                    sendBasket.putInt(SMSSentReceiver.KEY_PART_INDEX, i);
+                    String strSms = gson.toJson(sms);
+                    sendBasket.putString(SMSSentReceiver.KEY_SMS, strSms);
+                    sendBasket.putInt(SMSSentReceiver.KEY_TOTAL_PARTS, numParts);
+                    log.error(methodName, "Sgr sending key: "+SMSSentReceiver.KEY_SMS);
+                    sentIntent.putExtras(sendBasket);
+                    sentIntent.setAction(ActionCode.SMS_SENT);
+                    PendingIntent sentPIntent = PendingIntent.getBroadcast(context, RequestCode.SMS_SENT, sentIntent, PendingIntent.FLAG_UPDATE_CURRENT );
+
+                    Intent deliverIntent = new Intent(context, SMSDeliveredReceiver.class);
+                    Bundle deliverBasket = new Bundle();
+                    deliverBasket.putSerializable(SMSDeliveredReceiver.KEY_PART_INDEX, i);
+                    deliverBasket.putSerializable(SMSDeliveredReceiver.KEY_SMS, sms);
+                    deliverBasket.putSerializable(SMSDeliveredReceiver.KEY_TOTAL_PARTS, numParts);
+                    deliverIntent.putExtras(deliverBasket);
+                    deliverIntent.setAction(ActionCode.SMS_DELIVERED);
+                    PendingIntent deliverPIntent = PendingIntent.getBroadcast(context, RequestCode.SMS_DELIVERED, deliverIntent, PendingIntent.FLAG_UPDATE_CURRENT );
+
+                    sentPIntents.add(sentPIntent);
+                    deliverPIntents.add(deliverPIntent);
+                }
+                log.info(methodName, "Delivery and Sent Receivers Created");
             }
+
+
+            //Send SMS
+            log.info(methodName,"Trying to Send SMS");
+
+            log.error(methodName,"Need to add sentIntent and deliveryIntent Here");
+
+            smsManager.sendMultipartTextMessage(phoneNo, null, parts, sentPIntents, deliverPIntents);
+
+
+            //smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+            log.info(methodName, "SMS Queued");
+
+
+
         } catch (Exception e) {
-            log.error(methodName, "==> SMS Sending Failed");
+            log.error(methodName, "Sending Failed");
             e.printStackTrace();
         }
 
@@ -96,7 +135,7 @@ public class SMSUtil {
      * @return SMSManager for specified index or Default if SDK < 22
      */
     private SmsManager getSMSManagerFor(int simIndex){
-        String methodName = "sendSMS()";
+        String methodName = "getSMSManagerFor()";
         log.justEntered(methodName);
 
         SmsManager smsManager = null;
@@ -117,5 +156,6 @@ public class SMSUtil {
         log.justEntered(methodName);
         return smsManager;
     }
+
 
 }

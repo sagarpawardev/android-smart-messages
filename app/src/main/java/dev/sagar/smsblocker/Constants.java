@@ -8,5 +8,4 @@ import android.Manifest;
 
 public class Constants {
 
-
 }

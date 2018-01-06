@@ -17,7 +17,7 @@ import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.NotificationUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 
-public class SMSReceiver extends BroadcastReceiver {
+public class SMSReceivedReceiver extends BroadcastReceiver {
 
     //Log Initiate
     LogUtil log = new LogUtil( this.getClass().getName() );
@@ -34,15 +34,17 @@ public class SMSReceiver extends BroadcastReceiver {
 
     //Constants
     private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
-    private static final String SMS_DELIVERED = "android.provider.Telephony.SMS_DELIVER";
+    private static final String SMS_DELIVERED = "android.provider.Telephony.SMS_DELIVERED";
+    private static final String SMS_SENT = "android.provider.Telephony.SMS_SENT";
     private static final String MSG_FORMAT = "3gpp";
-    public static final String LOCAL_SMS_RECEIVED = "smsblocker.event.LOCAL_SMS_RECEIVED";
-    public static final String KEY_SMS_RECEIVED = "key_sms_received";
+
+    private static final String LOCAL_SMS_RECEIVED = LocalSMSReceivedReceiver.class.getName();
+    //public static final String KEY_SMS_RECEIVED = "key_sms_received";
 
 
     /**
      * This Method is Called When SMS is Received. Note:- This will be used by internal architecture
-     * Instead use LocalSMSReceiver
+     * Instead use LocalSMSReceivedReceiver
      * @param context
      * @param intent
      */
@@ -112,7 +114,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 //Save SMS in DataProvider
                 log.info(methodName, "Saving SMS in DataProvider");
                 InboxUtil inboxUtil = new InboxUtil(context);
-                String id = inboxUtil.saveSMS(sms, InboxUtil.TYPE_INBOX);
+                String id = inboxUtil.insertSMS(sms);
                 log.info(methodName, "Received Created id: " + id);
                 sms.setId(id);
 
@@ -153,7 +155,7 @@ public class SMSReceiver extends BroadcastReceiver {
     private void broadcastLocalSMS(Context context, SMS sms){
         Bundle basket = new Bundle();
         String jsonSMS = gson.toJson(sms);
-        basket.putString(KEY_SMS_RECEIVED, jsonSMS);
+        basket.putString(LocalSMSReceivedReceiver.KEY_SMS, jsonSMS);
         broadcastUtil.broadcast(context, LOCAL_SMS_RECEIVED, basket);
     }
 }

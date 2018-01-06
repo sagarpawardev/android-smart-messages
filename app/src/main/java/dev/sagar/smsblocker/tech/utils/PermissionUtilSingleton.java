@@ -125,7 +125,7 @@ public class PermissionUtilSingleton {
         intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
         context.startActivity(intent);
 
-        log.info(methodName, "Returing...");
+        log.returning(methodName);
     }
 
 

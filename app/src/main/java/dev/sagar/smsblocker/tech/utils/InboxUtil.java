@@ -196,6 +196,8 @@ public class InboxUtil {
         final String methodName = "setStatusRead()";
         log.justEntered(methodName);
 
+        log.error(methodName, "Can be improved Here");
+
         Uri uriSMSUri = Telephony.Sms.Inbox.CONTENT_URI;
         String selection = address+" = ?";
         String[] selectionArgs = {fromNumber};
@@ -217,14 +219,15 @@ public class InboxUtil {
      * @param sms SMS to save
      * @return ID of newly created SMS and null if not created
      */
-    public String saveSMS(SMS sms, String messageType){
-        final String methodName = "saveSMS()";
-        log.debug(methodName, "Just Entered..");
+    public String insertSMS(SMS sms){
+        final String methodName = "insertSMS()";
+        log.justEntered(methodName);
 
         String from = sms.getFrom();
         String body = sms.getBody();
         String date = String.valueOf(sms.getDateTime());
         String read = String.valueOf(sms.isRead());
+        long type = sms.getType();
         int subscription = sms.getSubscription();
 
         ContentValues values = new ContentValues();
@@ -233,23 +236,14 @@ public class InboxUtil {
         values.put(this.read, sms.isRead());
         values.put(this.date, date);
         values.put(this.read, read);
+        values.put(this.type, type);
         values.put(this.subscriptionId, subscription);
 
         Uri createdDataUri = null;
-        Uri folderUri = null;
         log.info(methodName, "Trying to insert in DataProvider");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            folderUri = SENT_URI;
-            log.info(methodName, "Foldername: "+messageType);
-            if(messageType.equals(TYPE_INBOX)){
-                folderUri = INBOX_URI;
-            }
-            createdDataUri = context.getContentResolver().insert(folderUri, values);
-        }
-        else {
-            log.info(methodName, "OS in older than Kitkat");
-            createdDataUri = context.getContentResolver().insert(Uri.parse("content://sms/" + messageType), values);
-        }
+
+        createdDataUri = context.getContentResolver().insert(INBOX_URI, values);
+
         log.info(methodName, "URI After insertion: "+createdDataUri);
 
         String result = null;
@@ -296,8 +290,6 @@ public class InboxUtil {
         final String methodName =  "deleteThread()";
         log.justEntered(methodName);
 
-        Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
-        //phoneNo = Uri.encode(phoneNo);
 
         log.error(methodName, "Performance issues Temporarily adding. Need to remove later");
         ContentResolver contentResolver = context.getContentResolver();
@@ -305,7 +297,7 @@ public class InboxUtil {
         List<SMS> smses = getAllSMSFromTo(phoneNo);
         for(SMS sms: smses){
             String id = sms.getId();
-            Uri tempUri = Uri.withAppendedPath(Telephony.Sms.CONTENT_URI, Uri.encode(id));
+            Uri tempUri = Uri.withAppendedPath(SMS_URI, Uri.encode(id));
             int tempCount = contentResolver.delete(tempUri, null, null);
             log.debug(methodName,"Delete Count: "+tempCount);
             count += tempCount;
@@ -325,7 +317,9 @@ public class InboxUtil {
             e.printStackTrace();
         }*/
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return count;
     }
+
+
 }

@@ -172,9 +172,9 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     @Override
     public int getItemViewType(int position) {
         SMS sms = smses.get(position);
-        boolean smsType = (sms.getType()==SMS.TYPE_SENT);
+        boolean smsType = (sms.getType()==SMS.TYPE_RECEIVED);
 
-        return  smsType ? TYPE_RECEIVED: TYPE_SENT ;
+        return  smsType ? TYPE_SENT: TYPE_RECEIVED ;
     }
 
     @Override
@@ -194,6 +194,13 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         long type = sms.getType();
         boolean isRead = sms.isRead();
         String socialDate = DateUtilSingleton.getInstance().socialFormat(time);
+
+        if(type == SMS.TYPE_QUEUED) {
+            holder.tvSending.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.tvSending.setVisibility(View.GONE);
+        }
 
         //If SMS is selected in RecyclerView
         boolean isSelected = selectedSMSes.contains(sms);
@@ -225,7 +232,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
 
     class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener{
-        TextView tvBody, tvTime;
+        TextView tvBody, tvTime, tvSending;
         View llParent;
         //Log Initiate
         LogUtil log = new LogUtil(this.getClass().getName());
@@ -235,16 +242,17 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         SMSViewHolder(View view) {
             super(view);
             final String methodName =  "SMSViewHolder()";
-            log.debug(methodName, "Just Entered..");
+            log.justEntered(methodName);
 
             llParent = view;
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
+            tvSending = view.findViewById(R.id.tv_sending);
 
             view.setOnLongClickListener(this);
             view.setOnClickListener(this);
 
-            log.debug(methodName, "Returning..");
+            log.returning(methodName);
         }
 
         @Override

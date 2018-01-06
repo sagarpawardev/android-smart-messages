@@ -14,13 +14,14 @@ import dev.sagar.smsblocker.tech.utils.LogUtil;
  * Created by sagarpawar on 05/11/17.
  */
 
-public class LocalSMSReceiver extends BroadcastReceiver {
+public class LocalSMSDeliveredReceiver extends BroadcastReceiver {
 
     //Log Initiate
     LogUtil log = new LogUtil(this.getClass().getName());
 
     //Constant
-    private static final String SMS_RECEIVED = "smsblocker.event.LOCAL_SMS_RECEIVED";
+    public static final String EVENT_DELIVERED = LocalSMSDeliveredReceiver.class.getName();
+    public static final String KEY_SMS = "sms";
 
     //Java Android
     private Gson gson = new Gson();
@@ -31,7 +32,7 @@ public class LocalSMSReceiver extends BroadcastReceiver {
     public boolean isRegistered = false;
 
 
-    public LocalSMSReceiver(Callback callback){
+    public LocalSMSDeliveredReceiver(Callback callback){
         this.callback = callback;
     }
 
@@ -44,23 +45,20 @@ public class LocalSMSReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         final String methodName = "onReceive()";
-        log.verbose(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
-        //Receive SMS
-        if (intent.getAction().equals(SMS_RECEIVED)) {
-            Bundle bundle = intent.getExtras();
-            String jsonSMS = bundle.getString(SMSReceiver.KEY_SMS_RECEIVED);
-            SMS sms = gson.fromJson(jsonSMS, SMS.class);
+        Bundle basket = intent.getExtras();
+        String jsonSMS = basket.getString(KEY_SMS);
+        SMS sms = gson.fromJson(jsonSMS, SMS.class);
 
-            log.info(methodName, "Calling Callback");
-            callback.onSMSReceived(sms);
-        }
+        log.info(methodName, "Calling Callback");
+        callback.onSMSDelivered(sms);
 
-        log.info(methodName, "Returned..");
+        log.returning(methodName);
     }
 
 
     public interface Callback{
-        void onSMSReceived(SMS sms);
+        void onSMSDelivered(SMS sms);
     }
 }

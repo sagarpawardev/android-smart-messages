@@ -205,10 +205,7 @@ public class NotificationView extends RelativeLayout implements View.OnClickList
         log.returning(methodName);
     }
 
-
-    //--- View.OnClickListener Overrides Start ----
-    @Override
-    public void onClick(View view) {
+    public void close(){
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.notification_closebtn__default);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -227,6 +224,12 @@ public class NotificationView extends RelativeLayout implements View.OnClickList
             }
         });
         startAnimation(animation);
+    }
+
+    //--- View.OnClickListener Overrides Start ----
+    @Override
+    public void onClick(View view) {
+        close();
     }
     //--- View.OnClickListener Overrides End ----
 

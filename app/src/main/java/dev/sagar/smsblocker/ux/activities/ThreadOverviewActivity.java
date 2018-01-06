@@ -2,17 +2,14 @@ package dev.sagar.smsblocker.ux.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,15 +18,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
-import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceiver;
-import dev.sagar.smsblocker.tech.broadcastreceivers.SMSReceiver;
+import dev.sagar.smsblocker.tech.EventCode;
+import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceivedReceiver;
+import dev.sagar.smsblocker.tech.broadcastreceivers.SMSReceivedReceiver;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
@@ -39,7 +35,7 @@ import dev.sagar.smsblocker.ux.customviews.NotificationView;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
 
 public class ThreadOverviewActivity extends AppCompatActivity
-        implements RVThreadOverviewAdapter.Callback, LocalSMSReceiver.Callback, View.OnClickListener{
+        implements RVThreadOverviewAdapter.Callback, LocalSMSReceivedReceiver.Callback, View.OnClickListener{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -54,7 +50,8 @@ public class ThreadOverviewActivity extends AppCompatActivity
     InboxUtil inboxUtil = null;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
     private PermissionUtilSingleton permUtil = PermissionUtilSingleton.getInstance();
-    private LocalSMSReceiver smsReceiver = null;
+    private LocalSMSReceivedReceiver smsReceiver = null;
+    private boolean alreadyAsked = false;
 
     //Java Android
     Map<String, SMS> smsMap = new LinkedHashMap<>();
@@ -77,7 +74,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
         if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         adapter = new RVThreadOverviewAdapter(this, smsMap, this);
         amCallback = new AMCallbackThreadOverview(adapter);
-        smsReceiver = new LocalSMSReceiver(this);
+        smsReceiver = new LocalSMSReceivedReceiver(this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -130,7 +127,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
         log.justEntered(methodName);
 
         log.debug(methodName, "Checking if App is Default");
-        if(!permUtil.isAppDefault(this)){
+        if(!permUtil.isAppDefault(this) && !alreadyAsked){
             notificationView.setVisibility(View.VISIBLE);
         }
         else {
@@ -146,17 +143,17 @@ public class ThreadOverviewActivity extends AppCompatActivity
     }
 
     public void registerSMSReceiver(){
-        final String methodName =  "registerSMSReceiver()";
+        final String methodName =  "registerReceivers()";
         log.debug(methodName, "Just Entered..");
 
-        registerReceiver(smsReceiver, new IntentFilter(SMSReceiver.LOCAL_SMS_RECEIVED));
+        registerReceiver(smsReceiver, new IntentFilter(EventCode.LOCAL_SMS_RECEIVED));
         smsReceiver.isRegistered = true;
 
         log.debug(methodName, "Returning..");
     }
 
     public void unregisterSMSReceiver(){
-        final String methodName =  "unregisterSMSReceiver()";
+        final String methodName =  "unregisterReceivers()";
         log.justEntered(methodName);
 
         if(smsReceiver.isRegistered)
@@ -167,7 +164,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
     }
 
     public void updateSMSinUI(SMS sms){
-        final String methodName =  "updateSMSinUI()";
+        final String methodName =  "addSMSinUI()";
         log.justEntered(methodName);
 
         String phoneNo = sms.getFrom();
@@ -269,7 +266,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
 
     @Override
     protected void onStart() {
-        final String methodName =  "onCreate()";
+        final String methodName =  "onStart()";
         log.justEntered(methodName);
 
         boolean hasPermission = permUtil.hasPermission(this, READ_SMS);
@@ -290,6 +287,20 @@ public class ThreadOverviewActivity extends AppCompatActivity
     protected void onStop() {
         unregisterSMSReceiver();
         super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        final String methodName =  "onResume()";
+        log.justEntered(methodName);
+
+        boolean isAppDefault = permUtil.isAppDefault(this);
+        if(isAppDefault && notificationView.getVisibility() == View.VISIBLE){
+            notificationView.close();
+        }
+
+        super.onResume();
+        log.returning(methodName);
     }
 
     //--- AppCompatActivity Overrides End ---
@@ -328,7 +339,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
     //--- RVThreadOverviewAdapter.Callback Overrides End ---
 
 
-    //--- LocalSMSReceiver.Callback Overriders Start ---
+    //--- LocalSMSReceivedReceiver.Callback Overriders Start ---
     @Override
     public void onSMSReceived(SMS sms) {
         final String methodName = "onSMSReceived()";
@@ -338,7 +349,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
 
         log.returning(methodName);
     }
-    //--- LocalSMSReceiver.Callback Overriders Ends ---
+    //--- LocalSMSReceivedReceiver.Callback Overriders Ends ---
 
 
     //--- View.OnClickListener Overrides Starts ---

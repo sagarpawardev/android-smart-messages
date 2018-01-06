@@ -6,6 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/margin_thread__msg"
     android:layout_marginEnd="@dimen/margin_thread__fullpage"
+    android:layout_marginBottom="4dp"
+    android:gravity="end"
     android:background="@drawable/selector_thread"
     android:padding="0dp">
 
@@ -22,8 +24,10 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="4dp"
             app:cardElevation="@dimen/elevation_thread__msg"
-            android:background="@drawable/grad"
-            app:cardUseCompatPadding="true">
+            android:paddingTop="4dp"
+            android:paddingEnd="4dp"
+            android:paddingStart="4dp"
+            android:background="@drawable/grad">
 
 
             <TextView
@@ -58,5 +62,13 @@
         android:textSize="10dp"
         android:layout_toStartOf="@id/rl_bodycover"
         android:id="@+id/tv_time"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl_bodycover"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/tv_sending"
+        android:text="Sending..."/>
 
 </RelativeLayout>
