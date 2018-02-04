@@ -87,7 +87,6 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
             android:textColor="#000000"
             android:paddingStart="4dp"
             android:textSize="18dp"
@@ -102,7 +101,7 @@
             android:layout_below="@id/tv_from"
             android:ellipsize="end"
             android:maxLines="1"
-            android:alpha="0.8"
+            android:alpha="0.48"
             android:textSize="14sp"
             android:paddingStart="4dp"
             android:text="Hello!! This is body"

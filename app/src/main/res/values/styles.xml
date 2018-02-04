@@ -19,4 +19,10 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="ToolbarSubtitleAppearance" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle">
+        <item name="android:textSize">12dp</item>
+        <item name="android:alpha">0.43</item>
+        <!-- include other attributes you want to change: textColor, textStyle, etc -->
+    </style>
+
 </resources>

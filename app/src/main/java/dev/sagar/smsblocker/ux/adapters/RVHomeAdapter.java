@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import dev.sagar.smsblocker.ux.customviews.DisplayPictureView;
  * Created by sagarpawar on 15/10/17.
  */
 
-public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOverviewAdapter.SMSViewHolder>
+public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHolder>
         implements View.OnClickListener{
 
     //Log Initiate
@@ -50,7 +49,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
     private ArrayList<String> selectedThreads = new ArrayList<>(); //Better if Changed to Set
     private InboxUtil inboxUtil;
 
-    public RVThreadOverviewAdapter(Context context, Map<String, SMS> smsMap, Callback callback) {
+    public RVHomeAdapter(Context context, Map<String, SMS> smsMap, Callback callback) {
         this.context = context;
         this.smsMap = smsMap;
         this.callback = callback;
@@ -61,7 +60,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
 
     public void setSelectionModeOn(boolean isModeOn){
         final String methodName =  "setSelectionModeOn()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         isSelectionModeOn = isModeOn;
         selectedThreads.clear();
@@ -69,7 +68,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         //This Line Clears items when Action Mode is destroyed
         if(!isModeOn) notifyDataSetChanged();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     private void setViewSelected(View view, boolean selected){
@@ -120,7 +119,7 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         log.debug(methodName, "Just Entered..");
 
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_rv_threadoverview, parent, false);
+                .inflate(R.layout.row_rv_home, parent, false);
         itemView.setOnClickListener(this);
         SMSViewHolder holder = new SMSViewHolder(itemView);
 
@@ -181,7 +180,6 @@ public class RVThreadOverviewAdapter extends RecyclerView.Adapter<RVThreadOvervi
         }
         else{
             holder.tvFrom.setTypeface(myFont,Typeface.BOLD);
-            holder.tvBody.setTypeface(myFont,Typeface.BOLD);
             //holder.tvTime.setTypeface(null, Typeface.BOLD);
         }
 

@@ -8,11 +8,6 @@
     android:background="@drawable/selector_thread"
     android:padding="0dp">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/card">
 
         <android.support.v7.widget.CardView
             android:layout_width="wrap_content"
@@ -31,47 +26,48 @@
                 android:background="@drawable/img_speak_left"/>-->
 
 
-            <TextView
-                android:id="@+id/tv_body"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/msg_body_left"
-                android:textColor="@color/black"
+                android:orientation="vertical"
                 android:paddingStart="@dimen/msg_body_paddingstart"
-                android:paddingEnd="@dimen/msg_body_paddingstart"
-                android:paddingTop="@dimen/msg_body_paddingstart"
-                android:paddingBottom="@dimen/msg_body_paddingstart"
-                android:layout_alignParentBottom="true"
-                android:maxWidth="250dp"
-                android:autoLink="all"
-                android:layout_gravity="center"
-                android:textIsSelectable="true"
-                android:alpha="0.76"
-                android:text="shlslhs;s;s/sn/slsnl/san;sn/lslsnvlsnvlns;nnnsvns" />
+                android:paddingEnd="@dimen/msg_body_paddingend"
+                android:paddingTop="@dimen/msg_body_paddingtop"
+                android:paddingBottom="@dimen/msg_body_paddingbottom">
+
+                <TextView
+                    android:id="@+id/tv_body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoLink="all"
+                    android:maxWidth="250dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="5dp"
+                    android:layout_gravity="start"
+                    android:textIsSelectable="true"
+                    android:text="shlslhs;s;s/sn/slsnl/san;sn/lslsnvlsnvl"/>
+
+                <TextView
+                    android:text="1646646463466"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elevation="1dp"
+                    android:paddingBottom="2dp"
+                    android:layout_gravity="end"
+                    android:textSize="10sp"
+                    android:id="@+id/tv_time"/>
+            </LinearLayout>
 
         </android.support.v7.widget.CardView>
 
         <TextView
-            android:id="@+id/tv_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/cardView"
-            android:elevation="1dp"
-            android:padding="4dp"
-            android:text="1646646463466"
-            android:textSize="10dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/rl_bodycover"
             android:layout_alignParentEnd="true"
             android:id="@+id/tv_sending"
             android:visibility="gone"
             android:text="Sending..."/>
 
-    </RelativeLayout>
 
 
 

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import dev.sagar.smsblocker.Permission;
+import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 
@@ -362,7 +363,6 @@ public class ContactUtilSingleton {
         log.returning(methodName);
         return contact.getDp();
     }
-
 
     public Contact getContact(Context context, String phoneNumber) throws ReadContactPermissionException {
         final String methodName = "getContact()";

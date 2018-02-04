@@ -2,6 +2,7 @@ package dev.sagar.smsblocker.ux.activities;
 
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -22,6 +23,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +72,7 @@ public class ThreadActivity extends AppCompatActivity implements
     //Java Android
     private RVThreadAdapter adapter;
     private AMCallbackThread amCallback;
+    private Toolbar toolbar;
 
     //Java Core
     private List<SMS> smses = new ArrayList<>();
@@ -80,6 +84,7 @@ public class ThreadActivity extends AppCompatActivity implements
     private LocalSMSReceivedReceiver smsReceivedReceiver = null;
     private LocalSMSDeliveredReceiver smsDeliveredReceiver = null;
     private LocalSMSSentReceiver smsSentReceiver = null;
+    private ContactUtilSingleton contactUtil = ContactUtilSingleton.getInstance();
 
 
     private void showMsgs(){
@@ -98,13 +103,24 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "updateActionBar()";
         log.justEntered(methodName);
 
-        String contact = threadId;
+        String contact = null;
         try {
-            contact = ContactUtilSingleton.getInstance().getContactName(this, threadId);
+            contact = contactUtil.getContactName(this, threadId);
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
+            contact = threadId;
         }
-        tvHeader.setText(contact);
+
+        log.debug(methodName, "Setting Contact: "+contact);
+        toolbar.setTitle(contact);
+
+
+        if(!contact.equals(threadId)) {
+            toolbar.setSubtitle(threadId);
+        }
+        else
+            toolbar.setSubtitle(null);
+
 
         log.returning(methodName);
     }
@@ -212,7 +228,6 @@ public class ThreadActivity extends AppCompatActivity implements
         recyclerView = (RecyclerView) findViewById(R.id.lv_sms);
         btnSend = (ImageButton) findViewById(R.id.btn_send);
         etMsg = (EditText) findViewById(R.id.et_msg);
-        tvHeader = (TextView) findViewById(R.id.tv_header);
 
         if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         smsUtil = new SMSUtil(this);
@@ -268,7 +283,8 @@ public class ThreadActivity extends AppCompatActivity implements
 
         setContentView(R.layout.activity_thread);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(""); //Without this title was not updating after setting action bar
         setSupportActionBar(toolbar);
 
         //Set Action Bar Transparent

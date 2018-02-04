@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Telephony;
+import android.support.constraint.solver.Cache;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.threads.DBHelperThread;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -54,8 +56,8 @@ public class InboxUtil {
      * Helps in getting most recent SMSes from all contacts
      * @return key-value pair of contact_number and most_recent_message <Contact Number, Most Recent Message>
      */
-    public Map<String, SMS> getMsgs(){
-        final String methodName =  "getMsgs()";
+    public Map<String, SMS> getLatestMsgs(){
+        final String methodName =  "getLatestMsgs()";
         log.justEntered(methodName);
 
         Uri uriSMSURI = Uri.parse("content://sms/");
@@ -192,11 +194,11 @@ public class InboxUtil {
      * @param fromNumber Phone Number to set Read status as true
      * @return Number of Fields updated
      */
-    public int setStatusRead(String fromNumber){
+    public void setStatusRead(String fromNumber){
         final String methodName = "setStatusRead()";
         log.justEntered(methodName);
 
-        log.error(methodName, "Can be improved Here");
+        /*log.error(methodName, "Can be improved Here");
 
         Uri uriSMSUri = Telephony.Sms.Inbox.CONTENT_URI;
         String selection = address+" = ?";
@@ -207,10 +209,11 @@ public class InboxUtil {
         int updateCount = context
                 .getContentResolver()
                 .update(uriSMSUri, values, selection, selectionArgs);
-        log.info(methodName, "Update Count: "+updateCount);
+        log.info(methodName, "Update Count: "+updateCount);*/
+
+        new DBHelperThread(context).execute(fromNumber);
 
         log.returning(methodName);
-        return updateCount;
     }
 
 

@@ -25,17 +25,16 @@ import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.EventCode;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceivedReceiver;
-import dev.sagar.smsblocker.tech.broadcastreceivers.SMSReceivedReceiver;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
-import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
+import dev.sagar.smsblocker.ux.adapters.RVHomeAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.customviews.NotificationView;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
 
-public class ThreadOverviewActivity extends AppCompatActivity
-        implements RVThreadOverviewAdapter.Callback, LocalSMSReceivedReceiver.Callback, View.OnClickListener{
+public class HomeActivity extends AppCompatActivity
+        implements RVHomeAdapter.Callback, LocalSMSReceivedReceiver.Callback, View.OnClickListener{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -55,7 +54,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
 
     //Java Android
     Map<String, SMS> smsMap = new LinkedHashMap<>();
-    RVThreadOverviewAdapter adapter;
+    RVHomeAdapter adapter;
     private AMCallbackThreadOverview amCallback;
 
     //Constants
@@ -72,7 +71,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
         viewPlaceHolder = findViewById(R.id.holder_placeholder);
 
         if(inboxUtil == null) inboxUtil = new InboxUtil(this);
-        adapter = new RVThreadOverviewAdapter(this, smsMap, this);
+        adapter = new RVHomeAdapter(this, smsMap, this);
         amCallback = new AMCallbackThreadOverview(adapter);
         smsReceiver = new LocalSMSReceivedReceiver(this);
 
@@ -87,7 +86,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
         recyclerView.setVisibility(View.VISIBLE);
 
         smsMap.clear();
-        Map<String, SMS> map = inboxUtil.getMsgs();
+        Map<String, SMS> map = inboxUtil.getLatestMsgs();
         smsMap.putAll(map);
         adapter.notifyDataSetChanged();
         if(smsMap.size() == 0) {
@@ -116,7 +115,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
         notificationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                permUtil.askToMakeAppDefault(ThreadOverviewActivity.this);
+                permUtil.askToMakeAppDefault(HomeActivity.this);
             }
         });
     }
@@ -234,7 +233,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
         final String methodName =  "onCreate()";
         log.justEntered(methodName);
 
-        setContentView(R.layout.activity_threadoverview);
+        setContentView(R.layout.activity_home);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -306,7 +305,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
     //--- AppCompatActivity Overrides End ---
 
 
-    //--- RVThreadOverviewAdapter.Callback Overrides Start ---
+    //--- RVHomeAdapter.Callback Overrides Start ---
     @Override
     public void onItemClicked(String threadId) {
         Intent intent = new Intent(this, ThreadActivity.class);
@@ -336,7 +335,7 @@ public class ThreadOverviewActivity extends AppCompatActivity
 
         log.debug(methodName, "Returning..");
     }
-    //--- RVThreadOverviewAdapter.Callback Overrides End ---
+    //--- RVHomeAdapter.Callback Overrides End ---
 
 
     //--- LocalSMSReceivedReceiver.Callback Overriders Start ---

@@ -7,8 +7,7 @@ import android.view.MenuItem;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
-import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
-import dev.sagar.smsblocker.ux.adapters.RVThreadOverviewAdapter;
+import dev.sagar.smsblocker.ux.adapters.RVHomeAdapter;
 
 /**
  * Created by sagarpawar on 24/11/17.
@@ -20,8 +19,8 @@ public class AMCallbackThreadOverview implements ActionMode.Callback{
     private LogUtil log = new LogUtil(this.getClass().getName());
     private ActionMode actionMode = null;
 
-    private RVThreadOverviewAdapter adapter;
-    public AMCallbackThreadOverview(RVThreadOverviewAdapter adapter){
+    private RVHomeAdapter adapter;
+    public AMCallbackThreadOverview(RVHomeAdapter adapter){
         this.adapter = adapter;
     }
 
