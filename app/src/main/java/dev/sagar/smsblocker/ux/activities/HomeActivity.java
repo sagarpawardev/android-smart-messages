@@ -18,23 +18,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.EventCode;
+import dev.sagar.smsblocker.tech.beans.Conversation;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceivedReceiver;
+import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
+import dev.sagar.smsblocker.tech.datastructures.PositionLog;
+import dev.sagar.smsblocker.tech.utils.ConversationUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.adapters.RVHomeAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
-import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.customviews.NotificationView;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
 
 public class HomeActivity extends AppCompatActivity
-        implements RVHomeAdapter.Callback, LocalSMSReceivedReceiver.Callback, View.OnClickListener{
+        implements RVHomeAdapter.Callback, LocalSMSReceivedReceiver.Callback, ConversationUtil.Callback,
+        View.OnClickListener{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -46,14 +47,15 @@ public class HomeActivity extends AppCompatActivity
     View viewPlaceHolder;
 
     //Java Core
-    InboxUtil inboxUtil = null;
+    //InboxUtil inboxUtil = null;
+    ConversationUtil conversationUtil = null;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
     private PermissionUtilSingleton permUtil = PermissionUtilSingleton.getInstance();
     private LocalSMSReceivedReceiver smsReceiver = null;
     private boolean alreadyAsked = false;
 
     //Java Android
-    Map<String, SMS> smsMap = new LinkedHashMap<>();
+    IndexedHashMap<String, Conversation> conversationMap = new IndexedHashMap<>();
     RVHomeAdapter adapter;
     private AMCallbackThreadOverview amCallback;
 
@@ -70,8 +72,9 @@ public class HomeActivity extends AppCompatActivity
         recyclerView = (RecyclerView) findViewById(R.id.lv_threads);
         viewPlaceHolder = findViewById(R.id.holder_placeholder);
 
-        if(inboxUtil == null) inboxUtil = new InboxUtil(this);
-        adapter = new RVHomeAdapter(this, smsMap, this);
+        //if(inboxUtil == null) inboxUtil = new InboxUtil(this);
+        if(conversationUtil == null) conversationUtil = new ConversationUtil(this, this);
+        adapter = new RVHomeAdapter(this, conversationMap, this);
         amCallback = new AMCallbackThreadOverview(adapter);
         smsReceiver = new LocalSMSReceivedReceiver(this);
 
@@ -85,11 +88,9 @@ public class HomeActivity extends AppCompatActivity
         viewPlaceHolder.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
 
-        smsMap.clear();
-        Map<String, SMS> map = inboxUtil.getLatestMsgs();
-        smsMap.putAll(map);
-        adapter.notifyDataSetChanged();
-        if(smsMap.size() == 0) {
+        conversationUtil.getLatestMsgs();
+
+        if(conversationMap.size() == 0) {
             Toast.makeText(this, "You have not received any SMS Yet!!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -167,23 +168,17 @@ public class HomeActivity extends AppCompatActivity
         log.justEntered(methodName);
 
         String phoneNo = sms.getFrom();
-
-        SMS currLatest = smsMap.get(phoneNo);
-        Map<String, SMS> tempMap = new LinkedHashMap<>(smsMap);
+        Conversation conversation = new Conversation(getApplicationContext(), sms);
 
         log.error(methodName, "Improvement can be done here");
-        if(currLatest == null){
-            smsMap.clear();
-            smsMap.put(phoneNo, sms);
-            smsMap.putAll(tempMap);
+        PositionLog mPositionLog = conversationMap.put(phoneNo, conversation);
+        int oldPosition = mPositionLog.getOldPosition();
+        int newPosition = mPositionLog.getNewPosition();
+        if(oldPosition == -1) { //Item Newly Added
             adapter.notifyItemInserted(0); //Moved Item to First
         }
         else{
-            smsMap.clear();
-            smsMap.put(phoneNo, sms);
-            tempMap.remove(phoneNo);
-            smsMap.putAll(tempMap);
-            adapter.notifyDataSetChanged();
+            adapter.notifyItemMoved(oldPosition, newPosition);
         }
 
         //If List is on top
@@ -277,6 +272,9 @@ public class HomeActivity extends AppCompatActivity
             permUtil.ask(this, ALL_PERMISSIONS, REQUEST_CODE_ALL_PERMISSIONS);
         }
         registerSMSReceiver();
+
+        log.info(methodName, "Refreshinng local DB...");
+        conversationUtil.refreshDB();
         super.onStart();
 
         log.returning(methodName);
@@ -366,4 +364,31 @@ public class HomeActivity extends AppCompatActivity
         log.returning(methodName);
     }
     //--- View.OnClickListener Overrides Ends ---
+
+
+    //--- ConversationUtil.Callback Overrides Starts ---
+    @Override
+    public void onDBRefreshed(int count) {
+        final String methodName =  "onDBRefreshed()";
+        log.justEntered(methodName);
+
+        log.info(methodName, "DB Refreshed :D...");
+        log.info(methodName, "Now retrieving latest list");
+        conversationUtil.getLatestMsgs();
+
+        log.returning(methodName);
+    }
+
+    @Override
+    public void onLatestMsgsFetched(IndexedHashMap<String, Conversation> map) {
+        final String methodName =  "onDBRefreshed()";
+        log.justEntered(methodName);
+
+        conversationMap.update(map);
+        adapter.notifyDataSetChanged();
+
+        log.returning(methodName);
+    }
+
+    //--- ConversationUtil.Callback Overrides Ends ---
 }

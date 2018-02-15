@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.tech.threads;
+package dev.sagar.smsblocker.tech.handlers;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,13 +6,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.Telephony;
 
+import dev.sagar.smsblocker.tech.service.DBServiceSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
  * Created by sagarpawar on 05/02/18.
  */
 
-public class DBHelperThread extends AsyncTask<String, Void, Void> {
+public class ReadStatusHandler extends AsyncTask<String, Void, Void> {
     //Log Initiate
     private LogUtil log = new LogUtil( this.getClass().getName() );
 
@@ -24,7 +25,7 @@ public class DBHelperThread extends AsyncTask<String, Void, Void> {
     private final String read = Telephony.Sms.READ;
 
 
-    public DBHelperThread(Context context){
+    public ReadStatusHandler(Context context){
         this.context = context;
     }
 
@@ -37,14 +38,14 @@ public class DBHelperThread extends AsyncTask<String, Void, Void> {
         log.error(methodName, "Can be improved Here");
 
         Uri uriSMSUri = Telephony.Sms.Inbox.CONTENT_URI;
-        String selection = address+" = ?";
+        String selection = address+" = ? ";
         String[] selectionArgs = {fromNumber};
         ContentValues values = new ContentValues();
         values.put(read, true);
 
-        int updateCount = context
-                .getContentResolver()
-                .update(uriSMSUri, values, selection, selectionArgs);
+        DBServiceSingleton dbService = DBServiceSingleton.getInstance();
+        int updateCount = dbService.update(context, uriSMSUri, values, selection, selectionArgs);
+
         log.info(methodName, "Update Count: "+updateCount);
 
         log.returning(methodName);

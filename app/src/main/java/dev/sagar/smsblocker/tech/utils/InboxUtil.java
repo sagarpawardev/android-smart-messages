@@ -5,18 +5,15 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.Telephony;
-import android.support.constraint.solver.Cache;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
-import dev.sagar.smsblocker.tech.threads.DBHelperThread;
+import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
+import dev.sagar.smsblocker.tech.service.DBServiceSingleton;
+import dev.sagar.smsblocker.tech.handlers.ReadStatusHandler;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -30,10 +27,12 @@ public class InboxUtil {
     //Java Android References
     private Context context;
     private InboxUtil reader = null;
+    private DBServiceSingleton dbService = DBServiceSingleton.getInstance();
 
     //Java Core References
     private final String _id = Telephony.Sms._ID;
     private final String address = Telephony.Sms.ADDRESS;
+    private final String threadId = Telephony.Sms.THREAD_ID;
     private final String body = Telephony.Sms.BODY;
     private final String subscriptionId = Telephony.Sms.SUBSCRIPTION_ID;
     private final String read = Telephony.Sms.READ;
@@ -56,52 +55,98 @@ public class InboxUtil {
      * Helps in getting most recent SMSes from all contacts
      * @return key-value pair of contact_number and most_recent_message <Contact Number, Most Recent Message>
      */
-    public Map<String, SMS> getLatestMsgs(){
+    public IndexedHashMap<String, SMS> getLatestMsgs(){
         final String methodName =  "getLatestMsgs()";
         log.justEntered(methodName);
 
-        Uri uriSMSURI = Uri.parse("content://sms/");
-        String[] projection = {_id, address, body,
-                read, date, subscriptionId, type};
-        String selection = "";
-        String[] selectionArgs = {};
-        String sortOrder = Telephony.Sms.DATE +" desc";
+        final String m_threadid = Telephony.Sms.Conversations.THREAD_ID;
+        final String mSnippet = Telephony.Sms.Conversations.SNIPPET;
+        final String mMessageCount = Telephony.Sms.Conversations.MESSAGE_COUNT;
+        final String mDate = Telephony.Sms.Conversations.DATE;
 
-        Cursor c = context.getContentResolver()
-                .query(uriSMSURI, projection, selection, selectionArgs, sortOrder);
-        LinkedHashMap<String, SMS> smsMap = new LinkedHashMap<>();
+        ContentResolver mContentResolver = context.getContentResolver();
+        Uri mConversationUri = Telephony.Sms.Conversations.CONTENT_URI;
+        IndexedHashMap<String, SMS> smsMap=new IndexedHashMap<>();
+
+
+        String[] mProjection = {m_threadid, mSnippet, mMessageCount};
+        String mSelection = "";
+        String[] mSelectionArgs = {};
+        String mSortOrder = mDate +" DESC";
+
+        Cursor mConversation = dbService.query(mContentResolver,
+                mConversationUri, mProjection, mSelection, mSelectionArgs, mSortOrder);
 
         log.info(methodName, "Reading Messages..");
-        if(c==null){
-            log.info(methodName, "Query returned null cursor");
+        if (mConversation == null) {
+            log.info(methodName, "Conversation Query returned null cursor");
             return smsMap;
         }
 
-        while (c.moveToNext()) {
-            String id = c.getString(c.getColumnIndexOrThrow(this._id));
-            String from = c.getString(c.getColumnIndexOrThrow(this.address));
-            String body = c.getString(c.getColumnIndexOrThrow(this.body));
-            int serviceCenter = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
-            boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
-            long time = c.getLong(c.getColumnIndexOrThrow(this.date));
-            long type = c.getLong(c.getColumnIndexOrThrow(this.type));
+        log.info(methodName, "Conversation Count: "+mConversation.getCount());
 
-            if(!smsMap.containsKey(from)) {
-                SMS sms = new SMS();
-                sms.setId(id);
-                sms.setFrom(from);
-                sms.setBody(body);
-                sms.setRead(readState);
-                sms.setDateTime(time);
-                sms.setType(type);
-                sms.setSubscription(serviceCenter);
+        //Collecting ThreadId from Conversation Starts
+        String[] conversations = new String[mConversation.getCount()];
 
-                smsMap.put(from, sms);
+        int count = 0;
+        while (mConversation.moveToNext()){
+            conversations[count++] = mConversation.getString(mConversation.getColumnIndexOrThrow(m_threadid));
+        }
+
+        Uri mLatestSmsUri = Telephony.Sms.CONTENT_URI;
+        String[] mLatestSmsProjection = {_id, address, body,
+                read, date, subscriptionId, type};
+
+        StringBuilder sb = new StringBuilder(threadId+" IN (");
+        for(int i=0; i<conversations.length; i++){
+            sb.append("?");
+            if(i!=conversations.length-1) { //If not last index
+                sb.append(",");
+            }
+        }
+        sb.append(")");
+
+        String mLatestSmsSelection = sb.toString();
+        String[] mLatestSmsSelectionArgs = conversations;
+        String mLatestSmsSortOrder = this.date +" desc";
+        //-- Collecting ThreadId from Conversation Ends
+
+        Cursor mLatestSmsCursor = mContentResolver
+                .query(mLatestSmsUri, mLatestSmsProjection, mLatestSmsSelection, mLatestSmsSelectionArgs, mLatestSmsSortOrder);
+        if (mLatestSmsCursor == null) {
+            log.info(methodName, "Latest SMS Query returned null cursor");
+            return smsMap;
+        }
+        while (mLatestSmsCursor.moveToNext()){
+
+            String id = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndexOrThrow(this._id));
+            String from = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndexOrThrow(this.address));
+            String body = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndexOrThrow(this.body));
+            int serviceCenter = mLatestSmsCursor.getInt(mLatestSmsCursor.getColumnIndexOrThrow(this.subscriptionId));
+            boolean readState = mLatestSmsCursor.getInt(mLatestSmsCursor.getColumnIndex(this.read)) == 1;
+            long time = mLatestSmsCursor.getLong(mLatestSmsCursor.getColumnIndexOrThrow(this.date));
+            long type = mLatestSmsCursor.getLong(mLatestSmsCursor.getColumnIndexOrThrow(this.type));
+
+            if(smsMap.containsKey(from)){
+                continue;
             }
 
-        }
-        c.close();
+            SMS sms = new SMS();
+            sms.setId(id);
+            sms.setFrom(from);
+            sms.setBody(body);
+            sms.setRead(readState);
+            sms.setDateTime(time);
+            sms.setType(type);
+            sms.setSubscription(serviceCenter);
 
+            log.debug(methodName, from+"\t"+body+"\t"+id);
+
+            smsMap.put(from, sms);
+        }
+
+        mLatestSmsCursor.close();
+        mConversation.close();
 
         log.returning(methodName);
         return smsMap;
@@ -131,8 +176,9 @@ public class InboxUtil {
             default: mSortOrder="";
         }
 
-        Cursor c = context.getContentResolver()
-                .query(uriSmsURI, projection, selection, selectionArgs, mSortOrder);
+        ContentResolver mContentResolver = context.getContentResolver();
+        Cursor c = dbService
+                .query(mContentResolver, uriSmsURI, projection, selection, selectionArgs, mSortOrder);
 
         ArrayList<SMS> smses = new ArrayList<>();
         log.info(methodName, "Reading Msg... ");
@@ -211,7 +257,7 @@ public class InboxUtil {
                 .update(uriSMSUri, values, selection, selectionArgs);
         log.info(methodName, "Update Count: "+updateCount);*/
 
-        new DBHelperThread(context).execute(fromNumber);
+        new ReadStatusHandler(context).execute(fromNumber);
 
         log.returning(methodName);
     }
@@ -245,7 +291,7 @@ public class InboxUtil {
         Uri createdDataUri = null;
         log.info(methodName, "Trying to insert in DataProvider");
 
-        createdDataUri = context.getContentResolver().insert(INBOX_URI, values);
+        createdDataUri =  dbService.insert(context, INBOX_URI, values);
 
         log.info(methodName, "URI After insertion: "+createdDataUri);
 
@@ -276,7 +322,7 @@ public class InboxUtil {
 
         String selection = _id+"= ?";
         String selectionArgs[] = {id};
-        int count = context.getContentResolver().delete(SMS_URI, selection, selectionArgs);
+        int count = dbService.delete(context, SMS_URI, selection, selectionArgs);
         log.info(methodName, "Deleted "+count+" Rows");
 
         log.returning(methodName);
@@ -323,6 +369,5 @@ public class InboxUtil {
         log.returning(methodName);
         return count;
     }
-
 
 }

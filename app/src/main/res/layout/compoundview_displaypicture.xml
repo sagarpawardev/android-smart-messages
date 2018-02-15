@@ -35,7 +35,6 @@
             android:textSize="30sp"
             android:elevation="2dp"
             android:text="B"
-            android:textStyle="bold"
             android:shape="ring"
             android:id="@+id/tv_letter"/>
     </android.support.v7.widget.CardView>

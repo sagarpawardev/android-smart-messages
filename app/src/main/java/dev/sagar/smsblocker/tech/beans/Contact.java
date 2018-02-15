@@ -12,7 +12,7 @@ public class Contact {
     displayName,
     number;
 
-    private Uri dp;
+    private Uri photoThumbnail, photo;
 
     public String getId() {
         return id;
@@ -38,11 +38,19 @@ public class Contact {
         this.number = number;
     }
 
-    public Uri getDp() {
-        return dp;
+    public Uri getPhotoThumbnail() {
+        return photoThumbnail;
     }
 
-    public void setDp(Uri dp) {
-        this.dp = dp;
+    public void setPhotoThumbnail(Uri photoThumbnail) {
+        this.photoThumbnail = photoThumbnail;
+    }
+
+    public Uri getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Uri photo) {
+        this.photo = photo;
     }
 }

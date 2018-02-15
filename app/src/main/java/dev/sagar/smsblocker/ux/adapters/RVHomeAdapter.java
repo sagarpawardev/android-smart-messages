@@ -14,13 +14,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
-import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.beans.Conversation;
+import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
@@ -42,19 +40,18 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
     private Context context;
 
     //Java Core
-    private Map<String, SMS> smsMap;
+    private IndexedHashMap<String, Conversation> conversationMap;
     private Callback callback;
-    private List<String> threads;
     private boolean isSelectionModeOn=false;
     private ArrayList<String> selectedThreads = new ArrayList<>(); //Better if Changed to Set
     private InboxUtil inboxUtil;
 
-    public RVHomeAdapter(Context context, Map<String, SMS> smsMap, Callback callback) {
+    public RVHomeAdapter(Context context, IndexedHashMap<String, Conversation> conversationMap, Callback callback) {
         this.context = context;
-        this.smsMap = smsMap;
+        this.conversationMap = conversationMap;
         this.callback = callback;
 
-        threads = new ArrayList<>();
+        log.debug("Constructor", "Conversation Map count: "+ conversationMap.size());
         inboxUtil = new InboxUtil(context);
     }
 
@@ -101,8 +98,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
             if(deleteCount>0) {
                 notifyItemRemoved(position);
-                threads.remove(thread);
-                smsMap.remove(thread);
+                conversationMap.remove(thread);
             }
             log.debug(methodName, "Deleted "+deleteCount+ " in this Thread but Total: "+count);
         }
@@ -134,11 +130,6 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
         /* This part need to change later it is a performance issue though solved Bug #30*/
         log.error(methodName, "This part Reduces performance. Need to change later");
-        //Section start
-        Set<String> keys = smsMap.keySet();
-        threads.clear();
-        threads.addAll(keys);
-        //Section End
 
         //Adi changes Start
         Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
@@ -147,17 +138,10 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         holder.tvTime.setTypeface(myFont);
         //Adi changes End
 
-        String thread = threads.get(position);
-        SMS sms = smsMap.get(thread);
-        String fromNumber = sms.getFrom();
+        Conversation conversation = conversationMap.get(position);
+        String address = conversation.getAddress();
 
-
-        String fromName = fromNumber;
-        try {
-            fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNumber);
-        } catch (ReadContactPermissionException e) {
-            e.printStackTrace();
-        }
+        String fromName = conversation.getContactName();
 
         //If SMS is selected in Multiselect mode
         boolean isSelected = selectedThreads.contains(fromName);
@@ -173,7 +157,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         }
 
         //If SMS is read
-        if(sms.isRead()) {
+        if(conversation.isRead()) {
             holder.tvFrom.setTypeface(myFont, Typeface.NORMAL);
             holder.tvBody.setTypeface(myFont, Typeface.NORMAL);
             holder.tvTime.setTypeface(myFont, Typeface.NORMAL);
@@ -184,27 +168,23 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         }
 
         if(fromName == null)
-            fromName = fromNumber;
+            fromName = address;
 
-        long tm = sms.getDateTime();
+        long tm = conversation.getDateTime();
         String socialDate = DateUtilSingleton.getInstance().socialFormat(tm);
         holder.tvTime.setText(socialDate);
         holder.tvFrom.setText(fromName);
-        holder.tvBody.setText(sms.getBody());
-        holder.tvThreadId.setText(sms.getFrom());
+        holder.tvBody.setText(conversation.getBody());
+        holder.tvAddress.setText(conversation.getAddress());
 
         //Setting User Image
-        Uri dpUri = null;
-        try {
-            dpUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
-        } catch (ReadContactPermissionException e) {
-            e.printStackTrace();
-        }
+        Uri dpUri = conversation.getPhotoThumbnailUri();
+
         if(dpUri != null) {
             holder.dpView.setPictureSrc(dpUri);
         }
         else {
-            if(!fromName.equals(fromNumber)) {
+            if(!fromName.equals(address)) {
                 String c = String.valueOf(fromName.charAt(0));
                 holder.dpView.setLetterText(c);
             }
@@ -222,7 +202,8 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         final String methodName =  "getItemCount()";
         log.debug(methodName, "Just Entered..");
 
-        int size = smsMap.size();
+        int size = conversationMap.size();
+        log.debug(methodName, "List Size: "+size);
 
         log.debug(methodName, "Returning..");
         return size;
@@ -268,7 +249,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
 
     protected class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
-        TextView tvFrom, tvBody, tvTime, tvThreadId;
+        TextView tvFrom, tvBody, tvTime, tvAddress;
         DisplayPictureView dpView;
         View parent;
 
@@ -278,7 +259,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
             dpView = view.findViewById(R.id.dpv_picture);
-            tvThreadId = view.findViewById(R.id.tv_thread_id);
+            tvAddress = view.findViewById(R.id.tv_thread_id);
             parent = view;
 
             dpView.setOnClickListener(new View.OnClickListener() {
@@ -286,7 +267,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
                 public void onClick(View view) {
                     String contactID = null;
                     try {
-                        String threadId = tvThreadId.getText().toString();
+                        String threadId = tvAddress.getText().toString();
                         Contact contact = ContactUtilSingleton.getInstance().getContact(context, threadId);
                         contactID = contact.getId();
                     } catch (ReadContactPermissionException e) {
@@ -315,8 +296,8 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
                 //Add Long Pressed Item in Selected List
                 int position = getAdapterPosition();
-                String thread = threads.get(position);
-                selectedThreads.add(thread);
+                Conversation tSms = conversationMap.get(position);
+                selectedThreads.add(tSms.getAddress());
                 setViewSelected(view, true);
 
                 return true;

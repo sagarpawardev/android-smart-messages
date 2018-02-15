@@ -5,13 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import dev.sagar.smsblocker.Permission;
-import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 
@@ -97,7 +95,7 @@ public class ContactUtilSingleton {
         Cursor cursor = contentResolver.query(uri, projection, null, null, null);
         if (cursor == null) {
             log.error(methodName, "Nothing in Cursor for "+phoneNumber);
-            contact.setDp(null);
+            contact.setPhotoThumbnail(null);
             contact.setDisplayName(null);
             contact.setSubscriptionId(null);
             contact.setNumber(phoneNumber);
@@ -116,7 +114,7 @@ public class ContactUtilSingleton {
                 contact.setDisplayName(contactName);
                 if(thumb_uri != null){
                     Uri imgUri = Uri.parse(thumb_uri);
-                    contact.setDp(imgUri);
+                    contact.setPhotoThumbnail(imgUri);
                     log.info(methodName, "Found Profile ficture...");
                 }
                 else{
@@ -197,7 +195,7 @@ public class ContactUtilSingleton {
             String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
             if(image_uri != null){
                 Uri dpUri = Uri.parse(image_uri);
-                contact.setDp(dpUri);
+                contact.setPhotoThumbnail(dpUri);
             }
             else {
                 log.info(methodName, number+" Does Not have picture");
@@ -269,7 +267,7 @@ public class ContactUtilSingleton {
             String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
             if(image_uri != null){
                 Uri dpUri = Uri.parse(image_uri);
-                contact.setDp(dpUri);
+                contact.setPhotoThumbnail(dpUri);
             }
             else {
                 log.info(methodName, number+" Does Not have picture");
@@ -325,7 +323,7 @@ public class ContactUtilSingleton {
                 contact.setNumber(phoneNo);
                 contact.setSubscriptionId(null);
                 contact.setDisplayName(null);
-                contact.setDp(null);
+                contact.setPhotoThumbnail(null);
 
                 log.info(methodName, "Contact Not Found: " + phoneNo);
             }
@@ -345,7 +343,7 @@ public class ContactUtilSingleton {
                 contact.setDisplayName(contactName);
                 if(thumb_uri != null){
                     Uri imgUri = Uri.parse(thumb_uri);
-                    contact.setDp(imgUri);
+                    contact.setPhotoThumbnail(imgUri);
                     log.info(methodName, "Found Profile ficture...");
                 }
                 else{
@@ -361,7 +359,7 @@ public class ContactUtilSingleton {
         contactMap.put(phoneNo, contact);*/
 
         log.returning(methodName);
-        return contact.getDp();
+        return contact.getPhotoThumbnail();
     }
 
     public Contact getContact(Context context, String phoneNumber) throws ReadContactPermissionException {
@@ -386,11 +384,12 @@ public class ContactUtilSingleton {
                 ContactsContract.PhoneLookup.DISPLAY_NAME,
                 ContactsContract.PhoneLookup._ID,
                 ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI,
+                ContactsContract.PhoneLookup.PHOTO_URI,
         };
         Cursor cursor = contentResolver.query(uri, projection, null, null, null);
         if (cursor == null) {
             log.error(methodName, "Nothing in Cursor for "+phoneNumber);
-            result.setDp(null);
+            result.setPhotoThumbnail(null);
             result.setId(null);
             result.setDisplayName(null);
             result.setNumber(phoneNumber);
@@ -400,6 +399,7 @@ public class ContactUtilSingleton {
                 String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
                 String id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
                 String thumb_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+                String photo_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI));
                 String number = phoneNumber;
 
                 result.setNumber(number);
@@ -407,13 +407,21 @@ public class ContactUtilSingleton {
                 result.setDisplayName(contactName);
                 if(thumb_uri != null){
                     Uri imgUri = Uri.parse(thumb_uri);
-                    result.setDp(imgUri);
-                    log.info(methodName, "Found Profile ficture...");
+                    result.setPhotoThumbnail(imgUri);
+                    log.info(methodName, "Found Profile picture...");
                 }
                 else{
                     log.info(methodName, "No picture for phone number: "+phoneNumber);
                 }
 
+                if(photo_uri != null){
+                    Uri imgUri = Uri.parse(photo_uri);
+                    result.setPhoto(imgUri);
+                    log.info(methodName, "Found Profile picture thumbnail...");
+                }
+                else{
+                    log.info(methodName, "No Thumbnail picture for phone number: "+phoneNumber);
+                }
             }
             if(!cursor.isClosed()) {
                 cursor.close();

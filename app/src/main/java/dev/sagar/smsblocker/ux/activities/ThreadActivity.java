@@ -111,9 +111,8 @@ public class ThreadActivity extends AppCompatActivity implements
             contact = threadId;
         }
 
-        log.debug(methodName, "Setting Contact: "+contact);
+        log.info(methodName, contact);
         toolbar.setTitle(contact);
-
 
         if(!contact.equals(threadId)) {
             toolbar.setSubtitle(threadId);
@@ -284,7 +283,6 @@ public class ThreadActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_thread);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(""); //Without this title was not updating after setting action bar
         setSupportActionBar(toolbar);
 
         //Set Action Bar Transparent
