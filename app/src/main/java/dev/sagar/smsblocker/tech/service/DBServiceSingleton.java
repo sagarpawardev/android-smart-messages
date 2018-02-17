@@ -162,7 +162,7 @@ public class DBServiceSingleton {
         SMSLocalDBHelper dbHelper = new SMSLocalDBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if(values.containsKey(read)){ //Converting fields of different column names to Local Database column name
-            String value = values.getAsString(read);
+            String value = values.getAsBoolean(read) ? "1" : "0";
             values.remove(read);
             values.put(read_local, value);
         }
@@ -371,9 +371,7 @@ public class DBServiceSingleton {
             String[] whereArgs = {contact.address};
             writableDB.update(SMSLocal.TABLE_NAME, values, whereClause, whereArgs);
         }
-
         //-- Update Photo in Database Ends
-
 
         //TODO: Delete Condition when conversation is removed from main database but exists in Local Database
 
