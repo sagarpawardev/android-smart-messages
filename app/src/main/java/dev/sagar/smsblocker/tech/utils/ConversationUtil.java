@@ -10,8 +10,6 @@ import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.handlers.LatestMsgHandler;
 import dev.sagar.smsblocker.tech.handlers.RefreshDBHandler;
 import dev.sagar.smsblocker.tech.service.DBServiceSingleton;
-import dev.sagar.smsblocker.tech.service.helper.SMSLocalContract.SMSLocal;
-import dev.sagar.smsblocker.tech.service.helper.SMSLocalDBHelper;
 
 /**
  * Created by sagarpawar on 10/02/18.

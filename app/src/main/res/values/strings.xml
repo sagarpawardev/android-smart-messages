@@ -27,5 +27,10 @@
     <string name="text_placeholder__permission_btn">Give Permission</string>
     <string name="desc_placeholder__content_desc">Placeholder Image</string>
     <string name="hint_newthread__searchcontacts">TO</string>
+    <string name="title_activity_test2_acitvity">Test2Acitvity</string>
+
+    <string name="label_reply">Reply</string>
+    <string name="notif_content_sent">SMS Sent</string>
+    <string name="notif_sending_failed">Sending Failed</string>
 
 </resources>

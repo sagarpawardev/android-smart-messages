@@ -4,7 +4,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.ContactsContract;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.TelephonyManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -368,6 +371,7 @@ public class ContactUtilSingleton {
 
         Contact result = new Contact();
 
+        phoneNumber = PhoneUtilsSingleton.getInstance().formatNumber(context, phoneNumber);
         //Caching
         if(contactMap.containsKey(phoneNumber)) return contactMap.get(phoneNumber);
 

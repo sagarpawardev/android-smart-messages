@@ -117,6 +117,26 @@
         <receiver
             android:name=".tech.broadcastreceivers.SMSSentReceiver"
             android:enabled="true"
+            android:exported="false" />
+
+        <activity
+            android:name=".test.activities.Test2Acitvity"
+            android:label="@string/title_activity_test2_acitvity"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
+        </activity>
+        <activity android:name=".ux.activities.SilentSMSSenderActivity" />
+
+        <receiver
+            android:name=".tech.broadcastreceivers.NotificationBroadcastReceiver"
+            android:enabled="true"
             android:exported="false"/>
     </application>
 
