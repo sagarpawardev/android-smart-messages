@@ -283,6 +283,7 @@ public class ThreadActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_thread);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(""); //This is required otherwise title will not be populated
         setSupportActionBar(toolbar);
 
         //Set Action Bar Transparent
