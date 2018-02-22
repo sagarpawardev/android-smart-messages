@@ -343,6 +343,12 @@ public class ThreadActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.transition_slide_in_back, R.anim.transition_slide_out_back);
+    }
+
+    @Override
     protected void onPause() {
         final String methodName =  "onPause()";
         log.justEntered(methodName);
