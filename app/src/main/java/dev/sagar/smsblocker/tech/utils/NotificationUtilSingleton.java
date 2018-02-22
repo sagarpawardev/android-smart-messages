@@ -112,6 +112,7 @@ public class NotificationUtilSingleton {
 
         int notifId = getNotificationId();
         String address = sms.getFrom();
+        String text = sms.getBody();
         String fromName = null;
         try {
             fromName = ContactUtilSingleton.getInstance().getContactName(context, address);
@@ -125,9 +126,29 @@ public class NotificationUtilSingleton {
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_notif)
                 .setContentTitle(fromName)
-                .setContentText(sms.getBody())
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setWhen(sms.getDateTime())
+                .setContentText(text)
                 .setShowWhen(true)
                 .addAction(action); // reply action from step b above
+
+        // Open Activity onClick Ends
+        Intent resultIntent = new Intent(context, ThreadActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(ThreadActivity.KEY_THREAD_ID, address);
+        resultIntent.putExtras(bundle);
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        context,
+                        0,
+                        resultIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent)
+                .setAutoCancel(true);
+        // Open Activity onClick Ends
 
         NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
         mNotificationManager.notify(notifId, mBuilder.build());

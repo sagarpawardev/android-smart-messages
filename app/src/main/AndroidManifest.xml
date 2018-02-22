@@ -37,6 +37,8 @@
             android:name=".ux.activities.ThreadActivity"
             android:label="@string/title_activity_thread"
             android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode= "singleInstance"
+            android:parentActivityName=".ux.activities.HomeActivity"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ux.activities.NewThreadActivity"
