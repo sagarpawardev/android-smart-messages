@@ -19,7 +19,7 @@ public class SMSLocalDBHelper extends SQLiteOpenHelper{
                     SMSLocal.COLUMN_NAME_PERSON + " TEXT," +
                     SMSLocal.COLUMN_NAME_DATE + " TEXT," +
                     SMSLocal.COLUMN_NAME_PROTOCOL + " TEXT," +
-                    SMSLocal.COLUMN_NAME_READ + " TEXT," +
+                    SMSLocal.COLUMN_NAME_READ + " INTEGER," +
                     SMSLocal.COLUMN_NAME_STATUS + " TEXT," +
                     SMSLocal.COLUMN_NAME_TYPE + " TEXT," +
                     SMSLocal.COLUMN_NAME_REPLY_PATH_PRESENT + " TEXT," +
@@ -29,6 +29,8 @@ public class SMSLocalDBHelper extends SQLiteOpenHelper{
                     SMSLocal.COLUMN_NAME_LOCKED + " TEXT," +
                     SMSLocal.COLUMN_NAME_ERROR_CODE + " TEXT," +
                     SMSLocal.COLUMN_NAME_SUBSCRIPTION_ID + " TEXT," +
+
+                    SMSLocal.COLUMN_NAME_UNREAD_COUNT+ " INTEGER," +
 
                     SMSLocal.COLUMN_NAME_PHOTO_URI + " TEXT," +
                     SMSLocal.COLUMN_NAME_PHOTO_THUMBNAIL + " TEXT," +

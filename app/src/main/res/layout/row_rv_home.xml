@@ -96,9 +96,24 @@
             android:id="@+id/tv_from"/>
 
         <TextView
+            android:id="@+id/tv_badge"
+            android:layout_width="16dip"
+            android:layout_height="16dip"
+            android:text="5"
+            android:alpha="0.6"
+            android:textSize="10dp"
+            android:textColor="@color/white"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:background="@drawable/bkg_badge__circle"
+            android:layout_gravity="center" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_from"
+            android:layout_toStartOf="@id/tv_badge"
             android:ellipsize="end"
             android:maxLines="1"
             android:alpha="0.48"
@@ -107,6 +122,7 @@
             android:text="Hello!! This is body"
             android:textColor="#000000"
             android:id="@+id/tv_body"/>
+
     </RelativeLayout>
 
     <TextView

@@ -156,15 +156,17 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             holder.parent.setBackground(drawable);
         }
 
+        int unreadCount = conversation.getUnreadCount();
+        log.debug(methodName, "Unread Count of Conversation: "+unreadCount+" for address: "+address);
+
         //If SMS is read
-        if(conversation.isRead()) {
-            holder.tvFrom.setTypeface(myFont, Typeface.NORMAL);
-            holder.tvBody.setTypeface(myFont, Typeface.NORMAL);
-            holder.tvTime.setTypeface(myFont, Typeface.NORMAL);
+        if(unreadCount == 0) {
+            holder.tvBadge.setVisibility(View.INVISIBLE);
         }
         else{
-            holder.tvFrom.setTypeface(myFont,Typeface.BOLD);
-            //holder.tvTime.setTypeface(null, Typeface.BOLD);
+            holder.tvBadge.setVisibility(View.VISIBLE);
+            String strUnreadCount = String.valueOf(unreadCount);
+            holder.tvBadge.setText(strUnreadCount);
         }
 
         if(fromName == null)
@@ -252,6 +254,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         TextView tvFrom, tvBody, tvTime, tvAddress;
         DisplayPictureView dpView;
         View parent;
+        TextView tvBadge;
 
         SMSViewHolder(View view) {
             super(view);
@@ -260,6 +263,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             tvTime = view.findViewById(R.id.tv_time);
             dpView = view.findViewById(R.id.dpv_picture);
             tvAddress = view.findViewById(R.id.tv_thread_id);
+            tvBadge = view.findViewById(R.id.tv_badge);
             parent = view;
 
             dpView.setOnClickListener(new View.OnClickListener() {

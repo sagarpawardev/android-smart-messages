@@ -36,6 +36,7 @@ public final class SMSLocalContract {
         public static final String COLUMN_NAME_PHOTO_URI = "photo_uri";
         public static final String COLUMN_NAME_PHOTO_THUMBNAIL = "photo_thumbnail_url";
         public static final String COLUMN_NAME_CONTACT_NAME = "display_name";
+        public static final String COLUMN_NAME_UNREAD_COUNT = "unread_count";
 
     }
 }

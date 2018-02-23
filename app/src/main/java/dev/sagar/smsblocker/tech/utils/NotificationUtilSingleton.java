@@ -121,6 +121,7 @@ public class NotificationUtilSingleton {
         }
 
 
+        int notifColor = context.getResources().getColor(R.color.colorPrimaryDark, null);
         NotificationCompat.Action action = getDirectReplyAction(context, sms, notifId);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
@@ -130,6 +131,7 @@ public class NotificationUtilSingleton {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setWhen(sms.getDateTime())
+                .setColor(notifColor)
                 .setContentText(text)
                 .setShowWhen(true)
                 .addAction(action); // reply action from step b above

@@ -20,6 +20,7 @@ public class Conversation {
     private int subscriptionId;
     private boolean readState;
     private Uri photoUri, photoThumbnailUri;
+    private int unreadCount = 0;
 
     public Conversation(Context context, SMS sms){
         setAddress(sms.getFrom());
@@ -161,5 +162,13 @@ public class Conversation {
 
     public boolean isRead(){
         return readState;
+    }
+
+    public int getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(int unreadCount) {
+        this.unreadCount = unreadCount;
     }
 }

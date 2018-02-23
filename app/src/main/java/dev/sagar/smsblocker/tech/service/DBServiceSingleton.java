@@ -72,6 +72,7 @@ public class DBServiceSingleton {
     private final String photoUri_local = SMSLocal.COLUMN_NAME_PHOTO_URI;
     private final String photoUriThumbnail_local = SMSLocal.COLUMN_NAME_PHOTO_THUMBNAIL;
     private final String contactName_local = SMSLocal.COLUMN_NAME_CONTACT_NAME;
+    private final String unreadCount_local = SMSLocal.COLUMN_NAME_UNREAD_COUNT;
 
 
     public static DBServiceSingleton getInstance(){
@@ -165,6 +166,7 @@ public class DBServiceSingleton {
             String value = values.getAsBoolean(read) ? "1" : "0";
             values.remove(read);
             values.put(read_local, value);
+            values.put(unreadCount_local, 0);
         }
 
         if(values.containsKey(date)){ //Converting fields of different column names to Local Database column name
@@ -228,7 +230,7 @@ public class DBServiceSingleton {
             mOldCursor.close();
         }
         else{
-            log.error(methodName, "OLD Coversation Query returned null cursor");
+            log.error(methodName, "OLD Conversation Query returned null cursor");
         }
         //-- Read Old Conversation DB Rows Ends
 
@@ -240,6 +242,8 @@ public class DBServiceSingleton {
         String mSortOrder = this.date +" DESC";
 
         HashMap<String, Long> newMap = new HashMap<>();
+        HashMap<String, Integer> unreadCountMap = new HashMap<>();
+
         SQLiteDatabase  writableDB = mDBHelper.getWritableDatabase();
 
         Cursor mLatestSmsCursor = contentResolver
@@ -273,6 +277,7 @@ public class DBServiceSingleton {
 
                 log.info(methodName, "Reading SMS from contactNumber: "+address+" ");
 
+
                 ContentValues values = new ContentValues();
                 values.put(this._id_local, id);
                 values.put(this.address_local, address);
@@ -289,6 +294,19 @@ public class DBServiceSingleton {
                 values.put(this.subject_local, subject);
                 values.put(this.locked_local, locked);
                 values.put(this.errorCode_local, errorCode);
+
+                //If unread increment count
+                log.info(methodName, "Raw Unread value: "+read+" for address: "+address);
+                boolean bUnread = (read.equals("0") || read.equalsIgnoreCase("false")); //If object is saved as integer or boolean
+                if(bUnread){
+                    Integer unreadCount = unreadCountMap.get(address);
+                    int count = unreadCount==null ? 0 : unreadCount;
+                    count++;
+                    unreadCountMap.put(address, count); //Increment count here
+                    values.put(this.unreadCount_local, count);
+                    log.info(methodName, "Adding unread count: "+count+" for address: "+address);
+                }
+
 
                 if(newMap.containsKey(address)) continue; //If value is already in Map then go to next value
                 long oldDate = oldMap.get(address)==null ? 0 : oldMap.get(address);

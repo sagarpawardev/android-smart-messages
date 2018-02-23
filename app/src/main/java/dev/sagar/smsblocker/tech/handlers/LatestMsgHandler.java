@@ -33,6 +33,7 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
     private final static String photo = SMSLocal.COLUMN_NAME_PHOTO_URI;
     private final static String photothumb = SMSLocal.COLUMN_NAME_PHOTO_THUMBNAIL;
     private final static String contactName = SMSLocal.COLUMN_NAME_CONTACT_NAME;
+    private final static String unreadCount = SMSLocal.COLUMN_NAME_UNREAD_COUNT;
 
     public static final String TYPE_INBOX = "inbox";
     public static final String TYPE_SENT = "sent";
@@ -57,8 +58,7 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
         SMSLocalDBHelper dbHelper = new SMSLocalDBHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String[] projection = {_id, address, body,
-                read, date, type, subscriptionId, photo, photothumb, contactName};
+        String[] projection = {"*"};
 
         String selection = null;
         String[] selectionArgs = null;
@@ -82,6 +82,7 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
             String strPhotoUri = c.getString(c.getColumnIndexOrThrow(this.photo));
             String strPhotoThumbUri = c.getString(c.getColumnIndexOrThrow(this.photothumb));
             String contactName = c.getString(c.getColumnIndexOrThrow(this.contactName));
+            int unreadCount = c.getInt(c.getColumnIndexOrThrow(this.unreadCount));
 
             Uri uriPhoto = null;
             if(strPhotoUri!=null){
@@ -104,6 +105,7 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
             conversation.setPhotoUri(uriPhoto);
             conversation.setPhotoThumbnailUri(uriPhotoThumb);
             conversation.setContactName(contactName);
+            conversation.setUnreadCount(unreadCount);
 
             convMap.put(address, conversation);
 

@@ -39,6 +39,7 @@ import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSSentReceiver;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.tech.utils.PictureUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
@@ -76,7 +77,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
     //Java Core
     private List<SMS> smses = new ArrayList<>();
-    private String threadId;
+    private String address;
     private InboxUtil inboxUtil = null;
     private SMSUtil smsUtil;
     private final int REQUEST_CODE_ALL_PERMISSIONS = RequestCode.ALL_PERMISSIONS;
@@ -89,7 +90,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
     private void showMsgs(){
         smses.clear();
-        List<SMS> tmp = inboxUtil.getAllSMSFromTo(threadId);
+        List<SMS> tmp = inboxUtil.getAllSMSFromTo(address);
         smses.addAll(tmp);
         adapter.notifyDataSetChanged();
     }
@@ -104,21 +105,33 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         String contact = null;
+        Uri dpUri = null;
         try {
-            contact = contactUtil.getContactName(this, threadId);
+            contact = contactUtil.getContactName(this, address);
+            dpUri = contactUtil.getPictureUri(this, address);
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
-            contact = threadId;
+            contact = address;
         }
 
-        log.info(methodName, contact);
+        log.info(methodName, "Setting contactName: "+contact);
         toolbar.setTitle(contact);
-
-        if(!contact.equals(threadId)) {
-            toolbar.setSubtitle(threadId);
+        if(contact!=null && !contact.equals(address)) {
+            toolbar.setSubtitle(address);
         }
         else
             toolbar.setSubtitle(null);
+
+
+        try {
+            log.info(methodName, "Setting Contact picture in action bar");
+            Drawable drawable = PictureUtilSingleton.getInstance().getPictureThumbDrawable(this, dpUri);
+            log.info(methodName, "Received picture: "+drawable);
+            getSupportActionBar().setLogo(drawable);
+
+        } catch (NullPointerException e){
+            log.info(methodName, "No picture for Contact..");
+        }
 
 
         log.returning(methodName);
@@ -130,7 +143,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Just Entered..");
 
         String msg = etMsg.getText().toString();
-        String phoneNo = threadId;
+        String phoneNo = address;
         SMS newSMS = smsUtil.sendSMS(phoneNo, msg);
 
         log.debug(methodName, "Returning..");
@@ -205,7 +218,7 @@ public class ThreadActivity extends AppCompatActivity implements
     public void showContact(){
         String contactID = null;
         try {
-            Contact contact = ContactUtilSingleton.getInstance().getContact(this, threadId);
+            Contact contact = ContactUtilSingleton.getInstance().getContact(this, address);
             contactID = contact.getId();
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
@@ -236,7 +249,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
         //From Previous Activity
         Bundle basket = getIntent().getExtras();
-        threadId = basket.getString(KEY_THREAD_ID);
+        address = basket.getString(KEY_THREAD_ID);
         adapter = new RVThreadAdapter(this, this, smses);
         amCallback = new AMCallbackThread(this, adapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -355,7 +368,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         //setStatusRead
-        inboxUtil.setStatusRead(threadId);
+        inboxUtil.setStatusRead(address);
 
         super.onPause();
 
@@ -382,7 +395,7 @@ public class ThreadActivity extends AppCompatActivity implements
         String id = null;
         //Hide Show contact option if contact not in contact
         try {
-            Contact contact = ContactUtilSingleton.getInstance().getContact(this, threadId);
+            Contact contact = ContactUtilSingleton.getInstance().getContact(this, address);
             id = contact.getId();
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
@@ -415,7 +428,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         String from = sms.getFrom();
-        if(from.equals(threadId)) {
+        if(from.equals(address)) {
             addSMSinUI(sms);
         }
 
@@ -431,7 +444,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         log.error(methodName, "Can be improved Here");
-        List<SMS> temp = inboxUtil.getAllSMSFromTo(threadId);
+        List<SMS> temp = inboxUtil.getAllSMSFromTo(address);
         smses.clear();
         smses.addAll(temp);
         adapter.notifyDataSetChanged();
