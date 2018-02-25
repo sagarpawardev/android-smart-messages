@@ -4,12 +4,14 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.telephony.PhoneNumberUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -390,6 +392,41 @@ public class DBServiceSingleton {
             writableDB.update(SMSLocal.TABLE_NAME, values, whereClause, whereArgs);
         }
         //-- Update Photo in Database Ends
+
+        // Update unread_count in Conversation Starts
+        StringBuilder sbRawQuery = new StringBuilder();
+        sbRawQuery.append(" UPDATE ");
+        sbRawQuery.append(SMSLocal.TABLE_NAME);
+        sbRawQuery.append(" SET "+SMSLocal.COLUMN_NAME_UNREAD_COUNT+"= CASE "+SMSLocal.COLUMN_NAME_ADDRESS);
+
+        ArrayList<Integer> alValues = new ArrayList<>();
+        Set<String> addresses = unreadCountMap.keySet();
+        for(String mAddress: addresses){
+            Integer iUnreadCount = unreadCountMap.get(mAddress);
+            int unreadCount = iUnreadCount==null ? 0 : iUnreadCount;
+            sbRawQuery.append(" WHEN '"+mAddress+"' THEN "+unreadCount);
+            alValues.add(unreadCount);
+        }
+        sbRawQuery.append(" END WHERE ");
+        sbRawQuery.append(SMSLocal.COLUMN_NAME_ADDRESS);
+        sbRawQuery.append(" IN (");
+        for(String mAddress: addresses){
+            sbRawQuery.append("'"+mAddress+"',");
+        }
+        sbRawQuery.deleteCharAt(sbRawQuery.length()-1); //Deleting , at end
+        sbRawQuery.append(")");
+
+        String[] strArgs = null;
+                //alValues.toArray(new Integer[0]);
+
+        String rawQuery = sbRawQuery.toString();
+        log.debug(methodName, "Formed Query: "+rawQuery);
+        Cursor c = writableDB.rawQuery(rawQuery, strArgs);
+
+        log.info(methodName, "Updated rows: "+c.getCount());
+        c.close(); //Query won't update unless moveToFirst() or close() is called
+
+        //-- Update unread_count in Conversation Starts
 
         //TODO: Delete Condition when conversation is removed from main database but exists in Local Database
 
