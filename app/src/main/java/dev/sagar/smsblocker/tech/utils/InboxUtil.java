@@ -339,7 +339,7 @@ public class InboxUtil {
         final String methodName =  "deleteThread()";
         log.justEntered(methodName);
 
-
+        //TODO: Instead od delete messages one by one delete all message at once. Also provide methods to delete from multipleThreads
         log.error(methodName, "Performance issues Temporarily adding. Need to remove later");
         ContentResolver contentResolver = context.getContentResolver();
         int count=0;

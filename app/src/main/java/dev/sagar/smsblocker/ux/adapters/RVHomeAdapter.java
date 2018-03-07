@@ -11,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -25,22 +27,25 @@ import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.customviews.DisplayPictureView;
+import dev.sagar.smsblocker.ux.filterable.ConversationMapFilter;
 
 /**
  * Created by sagarpawar on 15/10/17.
  */
 
 public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHolder>
-        implements View.OnClickListener{
+        implements View.OnClickListener, Filterable, ConversationMapFilter.Callback{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
 
     //Java Android
     private Context context;
+    private ConversationMapFilter convFilter;
 
     //Java Core
     private IndexedHashMap<String, Conversation> conversationMap;
+    private IndexedHashMap<String, Conversation> filteredConvMap;
     private Callback callback;
     private boolean isSelectionModeOn=false;
     private ArrayList<String> selectedThreads = new ArrayList<>(); //Better if Changed to Set
@@ -50,6 +55,9 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         this.context = context;
         this.conversationMap = conversationMap;
         this.callback = callback;
+
+        this.convFilter = new ConversationMapFilter(context, conversationMap, this);
+        this.filteredConvMap = conversationMap;
 
         log.debug("Constructor", "Conversation Map count: "+ conversationMap.size());
         inboxUtil = new InboxUtil(context);
@@ -98,6 +106,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
             if(deleteCount>0) {
                 notifyItemRemoved(position);
+                filteredConvMap.remove(thread);
                 conversationMap.remove(thread);
             }
             log.debug(methodName, "Deleted "+deleteCount+ " in this Thread but Total: "+count);
@@ -126,7 +135,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
     @Override
     public void onBindViewHolder(SMSViewHolder holder, int position) {
         final String methodName =  "onBindViewHolder()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         /* This part need to change later it is a performance issue though solved Bug #30*/
         log.error(methodName, "This part Reduces performance. Need to change later");
@@ -138,7 +147,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         holder.tvTime.setTypeface(myFont);
         //Adi changes End
 
-        Conversation conversation = conversationMap.get(position);
+        Conversation conversation = filteredConvMap.get(position);
         String address = conversation.getAddress();
 
         String fromName = conversation.getContactName();
@@ -196,18 +205,18 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             }
         }
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
     public int getItemCount() {
         final String methodName =  "getItemCount()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
-        int size = conversationMap.size();
+        int size = filteredConvMap.size();
         log.debug(methodName, "List Size: "+size);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return size;
     }
     //--- RecyclerView.Adapter Overrides Ends ---
@@ -248,6 +257,24 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         log.returning(methodName);
     }
     //--- View.OnClickListener Overrides End ---
+
+
+    //--- Filterable Overrides Starts ---
+    @Override
+    public Filter getFilter() {
+        return convFilter;
+    }
+
+    //--- Filterable Overrides Ends ---
+
+
+    //--- ConversationMapFilter.Callback Overrides Ends ---
+    @Override
+    public void onResultsFiltered(IndexedHashMap<String, Conversation> filteredConvMap) {
+        this.filteredConvMap = filteredConvMap;
+        notifyDataSetChanged();
+    }
+    //--- ConversationMapFilter.Callback Overrides Ends ---
 
 
     protected class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
@@ -300,7 +327,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
                 //Add Long Pressed Item in Selected List
                 int position = getAdapterPosition();
-                Conversation tSms = conversationMap.get(position);
+                Conversation tSms = filteredConvMap.get(position);
                 selectedThreads.add(tSms.getAddress());
                 setViewSelected(view, true);
 

@@ -44,8 +44,11 @@ public class IndexedHashMap<K,V>{
     }
 
     public void update(IndexedHashMap<K, V> newMap){
-        map = newMap.getMap();
-        list = newMap.getArrayList();
+        Map<K, V> oldMap = newMap.getMap();
+        map = new LinkedHashMap<>(oldMap);
+
+        ArrayList<V> oldList = newMap.getArrayList();
+        list = new ArrayList<>(oldList);
     }
 
     public void remove(K key){

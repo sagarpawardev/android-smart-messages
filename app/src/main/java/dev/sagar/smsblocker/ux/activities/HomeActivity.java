@@ -1,5 +1,7 @@
 package dev.sagar.smsblocker.ux.activities;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -8,7 +10,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.MenuItem;
 import android.view.Window;
@@ -251,11 +256,50 @@ public class HomeActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        // Inflate menu to add items to action bar if it is present.
+        inflater.inflate(R.menu.menu_home, menu);
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            //Log Initiate
+            private LogUtil log = new LogUtil(this.getClass().getName());
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                final String methodName =  "onQueryTextSubmit()";
+                log.justEntered(methodName);
+
+                log.returning(methodName);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                final String methodName =  "onQueryTextChange()";
+                log.justEntered(methodName);
+
+                //It is just standard procedure to check length before firing query
+                log.info(methodName, "Filtering List with Query: "+newText);
+                adapter.getFilter().filter(newText);
+
+                log.returning(methodName);
+                return true;
+            }
+        });
+
+        return true;
     }
 
     @Override
