@@ -19,5 +19,8 @@
     <color name="text_msg">#FFFFFF</color>
     <color name="blueA200_2">#448AFF</color>
     <color name="transparent">#10FFFFFF</color>
+    <color name="card_recv_msg">#FFFFFF</color>
+    <color name="card_send_msg">#FF5252</color>
+
 
 </resources>

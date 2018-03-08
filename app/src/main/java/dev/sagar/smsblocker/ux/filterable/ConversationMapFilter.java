@@ -37,11 +37,15 @@ public class ConversationMapFilter extends Filter {
         } else {
             for (int i=0 ;i<conversationMap.size(); i++) {
                 Conversation conv = conversationMap.get(i);
-                String addr = conv.getAddress();
+                String addr = conv.getAddress().toLowerCase();
                 String displayName = conv.getContactName();
+                String body = conv.getBody();
                 if(displayName != null)
                     displayName = displayName.toLowerCase();
-                if(addr.contains(searchStr) || (displayName!=null && displayName.contains(searchStr))){
+                if(addr.contains(searchStr) ||
+                        (displayName!=null && displayName.contains(searchStr)) ||
+                        body.contains(searchStr)
+                        ){
                     filteredConvMap.put(addr, conv);
                 }
             }

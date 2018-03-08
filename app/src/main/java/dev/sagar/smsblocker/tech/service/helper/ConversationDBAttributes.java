@@ -8,9 +8,9 @@ import android.provider.Telephony;
  * Created by sagarpawar on 08/02/18.
  */
 
-public final class SMSLocalContract {
+public final class ConversationDBAttributes {
 
-    private SMSLocalContract() {}
+    private ConversationDBAttributes() {}
 
     /* Inner class that defines the table contents */
     public static class SMSLocal implements BaseColumns {

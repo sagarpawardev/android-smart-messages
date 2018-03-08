@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/card_recv_msg"/>
+    <stroke android:width="0.5dp" android:color="#E0E0E0" />
+    <corners android:topLeftRadius="8dp"
+        android:topRightRadius="0dp"
+        android:bottomRightRadius="8dp"
+        android:bottomLeftRadius="0dp"/>
+    <!--<padding
+        android:left="10dp"
+        android:top="1dp"
+        android:right="1dp"
+        android:bottom="1dp" />-->
+</shape>

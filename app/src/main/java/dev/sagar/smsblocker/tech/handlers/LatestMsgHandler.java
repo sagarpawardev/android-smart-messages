@@ -8,8 +8,8 @@ import android.os.AsyncTask;
 
 import dev.sagar.smsblocker.tech.beans.Conversation;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
-import dev.sagar.smsblocker.tech.service.helper.SMSLocalContract.SMSLocal;
-import dev.sagar.smsblocker.tech.service.helper.SMSLocalDBHelper;
+import dev.sagar.smsblocker.tech.service.helper.ConversationDBAttributes.SMSLocal;
+import dev.sagar.smsblocker.tech.service.helper.ConversationDBHelper;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
@@ -55,7 +55,7 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
         Context context = contexts[0];
         IndexedHashMap<String, Conversation> convMap = new IndexedHashMap<>();
 
-        SMSLocalDBHelper dbHelper = new SMSLocalDBHelper(context);
+        ConversationDBHelper dbHelper = new ConversationDBHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String[] projection = {"*"};

@@ -21,7 +21,7 @@
     <string name="desc_dp">display picture</string>
     <string name="title_thread__show_contact">Show Contact</string>
 
-    <string name="format_thread__datetime">MMM d, E \nh:m a</string>
+    <string name="format_thread__datetime">d MMM, h:mm a</string>
     <string name="text_placeholder__contact_permission">Sorry. It seems you have not given us permission to Read your Contact</string>
     <string name="text_placeholder__inbox_permission">Sorry. It seems you have not given us permission to Read your SMS</string>
     <string name="text_placeholder__permission_btn">Give Permission</string>

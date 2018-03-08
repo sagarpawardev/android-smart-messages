@@ -29,6 +29,8 @@ dependencies {
     compile 'com.android.support:cardview-v7:26.+'
     compile 'com.android.support:design:26.+'
     compile 'com.google.code.gson:gson:2.8.2'
+    compile 'com.miguelcatalan:materialsearchview:1.4.0'
     testCompile 'junit:junit:4.12'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
+    implementation project(':libs:likebutton')
 }

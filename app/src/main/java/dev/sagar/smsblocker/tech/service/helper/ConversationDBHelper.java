@@ -3,13 +3,13 @@ package dev.sagar.smsblocker.tech.service.helper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import dev.sagar.smsblocker.tech.service.helper.SMSLocalContract.SMSLocal;
+import dev.sagar.smsblocker.tech.service.helper.ConversationDBAttributes.SMSLocal;
 
 /**
  * Created by sagarpawar on 08/02/18.
  */
 
-public class SMSLocalDBHelper extends SQLiteOpenHelper{
+public class ConversationDBHelper extends SQLiteOpenHelper{
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + SMSLocal.TABLE_NAME + " (" +
@@ -42,8 +42,8 @@ public class SMSLocalDBHelper extends SQLiteOpenHelper{
             "DROP TABLE IF EXISTS " + SMSLocal.TABLE_NAME;
 
 
-    public SMSLocalDBHelper(Context context){
-        super(context, SMSLocalDBConstants.DATABASE_NAME, null, SMSLocalDBConstants.DATABASE_VERSION);
+    public ConversationDBHelper(Context context){
+        super(context, ConversationDBConstants.DATABASE_NAME, null, ConversationDBConstants.DATABASE_VERSION);
     }
 
     @Override

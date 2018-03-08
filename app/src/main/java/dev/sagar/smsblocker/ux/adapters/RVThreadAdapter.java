@@ -320,10 +320,11 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
                 SIM sim = telephonyUtil.getSim(context, subscriptionId);
                 String operatorName = sim.getOperator();
 
-                StringBuilder sb = new StringBuilder(strDateTime);
+                StringBuilder sb = new StringBuilder();
                 if(operatorName != null){
-                    sb.append("\n• via "+operatorName);
+                    sb.append(operatorName+"  |  ");
                 }
+                sb.append(strDateTime);
 
                 String formattedStr = sb.toString();
                 tvTime.setText(formattedStr);

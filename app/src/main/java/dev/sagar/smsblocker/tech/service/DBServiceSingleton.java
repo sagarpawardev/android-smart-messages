@@ -4,21 +4,18 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
-import android.telephony.PhoneNumberUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import dev.sagar.smsblocker.tech.beans.Contact;
-import dev.sagar.smsblocker.tech.service.helper.SMSLocalContract.SMSLocal;
-import dev.sagar.smsblocker.tech.service.helper.SMSLocalDBHelper;
+import dev.sagar.smsblocker.tech.service.helper.ConversationDBAttributes.SMSLocal;
+import dev.sagar.smsblocker.tech.service.helper.ConversationDBHelper;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
@@ -162,7 +159,7 @@ public class DBServiceSingleton {
         log.info(methodName, "SMS DB Updated with count: "+count);
 
         log.info(methodName, "Updating Conversation Database...");
-        SMSLocalDBHelper dbHelper = new SMSLocalDBHelper(context);
+        ConversationDBHelper dbHelper = new ConversationDBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if(values.containsKey(read)){ //Converting fields of different column names to Local Database column name
             String value = values.getAsBoolean(read) ? "1" : "0";
@@ -198,7 +195,7 @@ public class DBServiceSingleton {
 
         int result = 0;
 
-        SMSLocalDBHelper mDBHelper = new SMSLocalDBHelper(context);
+        ConversationDBHelper mDBHelper = new ConversationDBHelper(context);
 
         //Content MAP
         ContentResolver contentResolver = context.getContentResolver();
