@@ -39,7 +39,7 @@ public class ConversationMapFilter extends Filter {
                 Conversation conv = conversationMap.get(i);
                 String addr = conv.getAddress().toLowerCase();
                 String displayName = conv.getContactName();
-                String body = conv.getBody();
+                String body = conv.getBody().toLowerCase();
                 if(displayName != null)
                     displayName = displayName.toLowerCase();
                 if(addr.contains(searchStr) ||
