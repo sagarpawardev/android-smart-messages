@@ -47,6 +47,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     private boolean isSelectionModeOn = false;
     private List<SMS> selectedSMSes = new ArrayList<>();
     private TelephonyUtilSingleton telephonyUtil;
+    private boolean replyNotSupportedTold = false;
 
     //Constants
     private static final int TYPE_RECEIVED = 0;
@@ -194,6 +195,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         long type = sms.getType();
         boolean isRead = sms.isRead();
         String socialDate = DateUtilSingleton.getInstance().socialFormat(time);
+        boolean isReplySupported = sms.isReplySupported();
 
         if(type == SMS.TYPE_QUEUED) {
             holder.tvSending.setVisibility(View.VISIBLE);
@@ -208,6 +210,10 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
         holder.tvBody.setText(body);
         holder.tvTime.setText(socialDate);
+
+        if(!replyNotSupportedTold && !isReplySupported){
+            callback.onReplyNotSupported();
+        }
 
         log.returning(methodName);
     }
@@ -228,6 +234,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         void singleSelectionMode();
         void multiSelectionMode();
         void allDeselected();
+        void onReplyNotSupported();
     }
 
 

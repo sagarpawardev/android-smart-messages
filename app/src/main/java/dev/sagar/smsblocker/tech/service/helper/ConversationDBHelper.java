@@ -13,7 +13,9 @@ public class ConversationDBHelper extends SQLiteOpenHelper{
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + SMSLocal.TABLE_NAME + " (" +
-                    SMSLocal.COLUMN_NAME_ID + " TEXT PRIMARY KEY," +
+                    SMSLocal.COLUMN_NAME_ID + " TEXT " +
+                    //"PRIMARY KEY"  //If some other sms app is handling db and it keps duplicate id then App wil keep on failing
+                    "," +
                     SMSLocal.COLUMN_NAME_THREAD_ID + " TEXT," +
                     SMSLocal.COLUMN_NAME_ADDRESS + " TEXT UNIQUE," +
                     SMSLocal.COLUMN_NAME_PERSON + " TEXT," +

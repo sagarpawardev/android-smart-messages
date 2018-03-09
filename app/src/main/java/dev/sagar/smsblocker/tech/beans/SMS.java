@@ -16,6 +16,7 @@ public class SMS implements Serializable{
     private long dateTime,
             type;
     private boolean read;
+    private boolean replySupported;
 
     private int subscription;
 
@@ -80,5 +81,13 @@ public class SMS implements Serializable{
 
     public void setSubscription(int subscription) {
         this.subscription = subscription;
+    }
+
+    public boolean isReplySupported() {
+        return replySupported;
+    }
+
+    public void setReplySupported(boolean replySupported) {
+        this.replySupported = replySupported;
     }
 }

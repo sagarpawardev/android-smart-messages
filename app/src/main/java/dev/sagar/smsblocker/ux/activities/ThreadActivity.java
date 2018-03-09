@@ -23,8 +23,6 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +67,8 @@ public class ThreadActivity extends AppCompatActivity implements
     private ImageButton btnSend;
     private EditText etMsg;
     private TextView tvHeader;
+    private View holderBodyET;
+    private View tvReplyNotSupported;
 
     //Java Android
     private RVThreadAdapter adapter;
@@ -240,6 +240,8 @@ public class ThreadActivity extends AppCompatActivity implements
         recyclerView = (RecyclerView) findViewById(R.id.lv_sms);
         btnSend = (ImageButton) findViewById(R.id.btn_send);
         etMsg = (EditText) findViewById(R.id.et_msg);
+        holderBodyET = findViewById(R.id.holder_sms_et);
+        tvReplyNotSupported = findViewById(R.id.tv_reply_not_supported);
 
         if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         smsUtil = new SMSUtil(this);
@@ -500,11 +502,22 @@ public class ThreadActivity extends AppCompatActivity implements
     @Override
     public void allDeselected() {
         final String methodName =  "allDeselected()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         amCallback.finish();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
+    }
+
+    @Override
+    public void onReplyNotSupported() {
+        final String methodName =  "onReplyNotSupported()";
+        log.justEntered(methodName);
+
+        tvReplyNotSupported.setVisibility(View.VISIBLE);
+        holderBodyET.setVisibility(View.INVISIBLE);
+
+        log.returning(methodName);
     }
     //--- RVThreadAdapter.Callback Ends ---
 

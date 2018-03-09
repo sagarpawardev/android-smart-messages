@@ -38,6 +38,7 @@ public class InboxUtil {
     private final String read = Telephony.Sms.READ;
     private final String date = Telephony.Sms.DATE;
     private final String type = Telephony.Sms.TYPE;
+    private final String replySupported = Telephony.Sms.REPLY_PATH_PRESENT;
     private final Uri INBOX_URI = Telephony.Sms.Inbox.CONTENT_URI;
     private final Uri SENT_URI = Telephony.Sms.Sent.CONTENT_URI;
     private final Uri SMS_URI = Telephony.Sms.CONTENT_URI;
@@ -164,8 +165,7 @@ public class InboxUtil {
         log.justEntered(methodName);
 
         Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
-        String[] projection = {_id, address, body,
-                read, date, type, subscriptionId};
+        String[] projection = {"*"};
 
         String selection = address+" = ?";
         String[] selectionArgs = {contactNo};
@@ -193,6 +193,7 @@ public class InboxUtil {
                 boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
                 long time = c.getLong(c.getColumnIndexOrThrow(this.date));
                 long type = c.getLong(c.getColumnIndexOrThrow(this.type));
+                boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
 
                 SMS sms = new SMS();
                 sms.setId(id);
@@ -202,8 +203,11 @@ public class InboxUtil {
                 sms.setDateTime(time);
                 sms.setType(type);
                 sms.setSubscription(subscriptionId);
+                sms.setReplySupported(replySupported);
 
                 smses.add(sms);
+
+                log.debug(methodName, "Address: "+from+" ReplySupported: "+c.getString(c.getColumnIndex(this.replySupported)));
 
             }
         }

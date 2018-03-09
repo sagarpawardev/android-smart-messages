@@ -11,6 +11,9 @@ import android.telephony.TelephonyManager;
 
 public class PhoneUtilsSingleton {
 
+    //Log Initiate
+    private LogUtil log = new LogUtil( this.getClass().getName() );
+
     private static PhoneUtilsSingleton instance = new PhoneUtilsSingleton();
 
     private PhoneUtilsSingleton(){
@@ -35,5 +38,18 @@ public class PhoneUtilsSingleton {
             formattedNumber = unformattedNumber.replaceAll("[-,+]","");
         }
         return formattedNumber;
+    }
+
+    public boolean isReplySupported(String address){
+        final String methodName =  "isReplySupported()";
+        log.justEntered(methodName);
+
+        //TODO Change Logic Here
+        address = address.toUpperCase();
+        boolean result = !(address.charAt(0)<='Z' && address.charAt(0)>='A');
+        log.error(methodName, "This Logic is valid only in India");
+
+        log.returning(methodName);
+        return result;
     }
 }

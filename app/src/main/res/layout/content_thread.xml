@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:id="@+id/linearLayout"
+        android:id="@+id/holder_sms_et"
         android:padding="0dp"
         android:background="@android:color/transparent"
         android:layout_marginRight="2dp"
@@ -63,11 +63,24 @@
 
     </LinearLayout>
 
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_reply_not_supported"
+        android:gravity="center"
+        android:alpha="0.54"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:text="@string/label_reply_not_supported"/>
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/lv_sms"
         android:layout_marginBottom="0dp"
-        android:layout_above="@id/linearLayout"/>
+        android:layout_above="@id/holder_sms_et"/>
 
 </RelativeLayout>

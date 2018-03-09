@@ -33,5 +33,6 @@
     <string name="notif_content_sent">SMS Sent</string>
     <string name="notif_sending_failed">Sending Failed</string>
     <string name="search_hint">Search</string>
+    <string name="label_reply_not_supported">Sender does not support reply</string>
 
 </resources>

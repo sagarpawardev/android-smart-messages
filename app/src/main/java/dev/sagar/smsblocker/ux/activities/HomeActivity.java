@@ -134,6 +134,7 @@ public class HomeActivity extends AppCompatActivity
         log.debug(methodName, "Checking if App is Default");
         if(!permUtil.isAppDefault(this) && !alreadyAsked){
             notificationView.setVisibility(View.VISIBLE);
+            alreadyAsked = true;
         }
         else {
             notificationView.setVisibility(View.GONE);

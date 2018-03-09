@@ -310,7 +310,7 @@ public class DBServiceSingleton {
                 if(newMap.containsKey(address)) continue; //If value is already in Map then go to next value
                 long oldDate = oldMap.get(address)==null ? 0 : oldMap.get(address);
                 if(oldDate >= date) continue; //If oldDate is greater than or equals current date ignore message
-
+                log.error(methodName, "Olddate: "+oldDate+" newdate:"+date+" address:"+address+" type:"+type);
                 if(oldMap.containsKey(address)) {
                     String whereClause = this.address_local + " = ?";
                     String[] whereArgs = {address};

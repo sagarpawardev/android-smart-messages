@@ -75,6 +75,7 @@ public class TelephonyUtilSingleton{
         SIM sim = new SIM();
         SubscriptionManager subscriptionManager=(SubscriptionManager)context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
 
+        //TODO Check android.permission.READ_PHONE_STATE here
         List<SubscriptionInfo> subscriptionInfoList=subscriptionManager.getActiveSubscriptionInfoList();
 
         if(subscriptionInfoList!=null && subscriptionInfoList.size()>0){
