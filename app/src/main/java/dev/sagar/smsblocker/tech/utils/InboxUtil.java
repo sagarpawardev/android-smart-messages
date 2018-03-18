@@ -4,16 +4,24 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.Telephony;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
+import dev.sagar.smsblocker.tech.service.DBConstants;
 import dev.sagar.smsblocker.tech.service.DBServiceSingleton;
 import dev.sagar.smsblocker.tech.handlers.ReadStatusHandler;
+import dev.sagar.smsblocker.tech.service.helper.DBHelper;
+import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -26,7 +34,6 @@ public class InboxUtil {
 
     //Java Android References
     private Context context;
-    private InboxUtil reader = null;
     private DBServiceSingleton dbService = DBServiceSingleton.getInstance();
 
     //Java Core References
@@ -46,6 +53,10 @@ public class InboxUtil {
     public static final String TYPE_SENT = "sent";
     public static final int SORT_DESC = 0;
     public static final int SORT_ASC = 1;
+
+    //Reference for Starred_SMS
+    private final String starredsms_id = SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ID;
+    private final String starredsms_address = SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ADDRESS;
 
     public InboxUtil(Context context) {
         this.context = context;
@@ -134,7 +145,7 @@ public class InboxUtil {
 
             SMS sms = new SMS();
             sms.setId(id);
-            sms.setFrom(from);
+            sms.setAddress(from);
             sms.setBody(body);
             sms.setRead(readState);
             sms.setDateTime(time);
@@ -164,12 +175,42 @@ public class InboxUtil {
         final String methodName =  "getAllSMSFromTo()";
         log.justEntered(methodName);
 
-        Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
-        String[] projection = {"*"};
-
+        //Reading Saved SMSes
         String selection = address+" = ?";
+        String[] projection = {starredsms_id};
+        String tableName = DBConstants.TABLE_SAVEDSMS;
         String[] selectionArgs = {contactNo};
-        String mSortOrder;
+
+        DBHelper helper = new DBHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        DBServiceSingleton dbService = DBServiceSingleton.getInstance();
+        Cursor cursor = dbService.query(db, tableName, projection, selection, selectionArgs, null);
+        log.debug(methodName, "Saved SMS Returned Row Count: "+cursor.getCount()+" Selection: "+selection+" Args: "+selectionArgs[0]);
+        HashSet<String> set = new HashSet<>();
+        try{
+            while(cursor.moveToNext()){
+                String id = cursor.getString(cursor.getColumnIndexOrThrow(this.starredsms_id));
+                set.add(id);
+            }
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        finally {
+            if (cursor!=null) cursor.close();
+            db.close();
+            helper.close();
+        }
+        log.debug(methodName, "Saved SMS Set size: "+set.size());
+
+
+        //Reading SMSes from database
+        Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
+
+        selection = address+" = ?";
+        projection = new String[]{"*"};
+        selectionArgs = new String[]{contactNo};
+        String mSortOrder = null;
         switch (sortingOrder) {
             case SORT_DESC: mSortOrder = date+" DESC"; break;
             case SORT_ASC: mSortOrder = date+" ASC"; break;
@@ -181,7 +222,7 @@ public class InboxUtil {
                 .query(mContentResolver, uriSmsURI, projection, selection, selectionArgs, mSortOrder);
 
         ArrayList<SMS> smses = new ArrayList<>();
-        log.info(methodName, "Reading Msg... ");
+        log.info(methodName, "Reading SMSes... ");
 
         try {
             while (c.moveToNext()) {
@@ -197,13 +238,16 @@ public class InboxUtil {
 
                 SMS sms = new SMS();
                 sms.setId(id);
-                sms.setFrom(from);
+                sms.setAddress(from);
                 sms.setBody(body);
                 sms.setRead(readState);
                 sms.setDateTime(time);
                 sms.setType(type);
                 sms.setSubscription(subscriptionId);
                 sms.setReplySupported(replySupported);
+
+                if(set.contains(id))
+                    sms.setSaved(true);
 
                 smses.add(sms);
 
@@ -276,7 +320,7 @@ public class InboxUtil {
         final String methodName = "insertSMS()";
         log.justEntered(methodName);
 
-        String from = sms.getFrom();
+        String from = sms.getAddress();
         String body = sms.getBody();
         String date = String.valueOf(sms.getDateTime());
         String read = String.valueOf(sms.isRead());
@@ -369,6 +413,83 @@ public class InboxUtil {
         catch (NotImplementedException e){
             e.printStackTrace();
         }*/
+
+        log.returning(methodName);
+        return count;
+    }
+
+
+    /**
+     * This method will mark star in DB
+     * @param sms SMS to Star
+     * @return true if starred else false
+     */
+    public boolean starSMS(SMS sms){
+        final String methodName =  "starSMS(SMS)";
+        log.justEntered(methodName);
+
+        String id = sms.getId();
+        String address = PhoneUtilsSingleton.getInstance().formatNumber(context, sms.getAddress());
+        ContentValues values = new ContentValues();
+        values.put(this.starredsms_id, id);
+        values.put(this.starredsms_address, address);
+
+        log.info(methodName, "Starring SMS into database Address: "+address+" Id: "+id);
+
+        boolean result= dbService.insert(context, DBConstants.TABLE_SAVEDSMS, values);
+        log.info(methodName, "Received insert() result: "+result);
+
+        log.returning(methodName);
+        return true;
+    }
+
+    /**
+     * This method will unstar SMSes in DB
+     * @param smses List of SMSes to unstar
+     * @return number of smses unstared in DB
+     */
+    public int unstarSMSes(List<SMS> smses){
+        final String methodName =  "unstarSMSes(List<SMS>)";
+        log.justEntered(methodName);
+
+        int count = -1;
+
+        if(smses.size()>0) {
+            String whereClause = "";
+            StringBuilder sbWhereClause = new StringBuilder(whereClause);
+            String[] whereArgs = new String[2*smses.size()]; //(address, id) pair
+
+            /*sbWhereClause.append("(");
+            sbWhereClause.append(starredsms_address);
+            sbWhereClause.append(",");
+            sbWhereClause.append(starredsms_id);
+            sbWhereClause.append(")");
+
+            sbWhereClause.append(" IN (");*/
+            for (int i = 0; i < smses.size(); i++) {
+                SMS sms = smses.get(i);
+                sbWhereClause.append("(");
+                sbWhereClause.append(starredsms_address+" = ? AND ");
+                sbWhereClause.append(starredsms_id+" = ? ");
+                sbWhereClause.append(")");
+
+                if (i < smses.size() - 1) { //Last ? does not contain ,
+                    sbWhereClause.append(" OR ");
+                }
+                whereArgs[2*i] = sms.getAddress();
+                whereArgs[2*i + 1] = sms.getId();
+                log.debug(methodName, "Unstarring SMS address: " + whereArgs[2*i] +" id: "+whereArgs[2*i + 1]);
+            }
+            /*sbWhereClause.append(")");*/
+
+            whereClause = sbWhereClause.toString();
+            log.info(methodName, "Query built for deletion: " + whereClause);
+
+            count = dbService.delete(context, DBConstants.TABLE_SAVEDSMS, whereClause, whereArgs);
+        }
+        else{
+            //Nothing
+        }
 
         log.returning(methodName);
         return count;

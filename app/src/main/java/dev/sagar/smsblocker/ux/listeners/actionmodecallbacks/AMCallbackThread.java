@@ -1,9 +1,6 @@
 package dev.sagar.smsblocker.ux.listeners.actionmodecallbacks;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -11,7 +8,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import dev.sagar.smsblocker.R;
-import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
 
@@ -36,7 +32,7 @@ public class AMCallbackThread implements ActionMode.Callback{
 
     public void enableCopy(boolean isEnable){
         final String methodName =  "enableCopy()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         if(actionMode != null) {
             log.debug(methodName, "Enabling copy: "+isEnable);
@@ -44,12 +40,12 @@ public class AMCallbackThread implements ActionMode.Callback{
             item.setVisible(!isEnable);
         }
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     private void delete(){
-        final String methodName =  "onActionItemClicked()";
-        log.debug(methodName, "Just Entered..");
+        final String methodName =  "delete()";
+        log.justEntered(methodName);
 
         boolean isDeleted = adapter.deleteSelections();
         if(isDeleted) {
@@ -57,12 +53,25 @@ public class AMCallbackThread implements ActionMode.Callback{
             Toast.makeText(context, txtDeleted, Toast.LENGTH_SHORT).show();
         }
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
+    }
+
+    private void starSMS(){
+        final String methodName =  "starSMS()";
+        log.justEntered(methodName);
+
+        boolean isStarred = adapter.startSelections();
+        if(isStarred) {
+            String txtSMSSaved = context.getResources().getString(R.string.txt_thread__starred);
+            Toast.makeText(context, txtSMSSaved, Toast.LENGTH_SHORT).show();
+        }
+
+        log.returning(methodName);
     }
 
     private void copy(){
         final String methodName =  "onActionItemClicked()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         boolean isCopied = adapter.copySelection();
         if(isCopied){
@@ -70,17 +79,17 @@ public class AMCallbackThread implements ActionMode.Callback{
             Toast.makeText(context, txtDeleted, Toast.LENGTH_SHORT).show();
         }
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     public void finish(){
         final String methodName =  "onActionItemClicked()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         if(actionMode!=null)
             actionMode.finish();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     /*
@@ -119,31 +128,33 @@ public class AMCallbackThread implements ActionMode.Callback{
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         final String methodName =  "onActionItemClicked()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         switch (item.getItemId()){
             case R.id.action_delete: delete(); break;
+            case R.id.action_star_sms: starSMS(); break;
             case R.id.action_copy: copy(); break;
+
         }
         mode.finish();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return false;
     }
 
     @Override
     public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
         final String methodName =  "onPrepareActionMode()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return false;
     }
 
     @Override
     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
         final String methodName =  "onCreateActionMode()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         adapter.setSelectionModeOn(true);
 
@@ -151,19 +162,19 @@ public class AMCallbackThread implements ActionMode.Callback{
         inflater.inflate( R.menu.contextual_thread, menu );
         this.actionMode = actionMode;
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return true;
     }
 
     @Override
     public void onDestroyActionMode(ActionMode actionMode) {
         final String methodName =  "onDestroyActionMode()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         adapter.setSelectionModeOn(false);
         this.actionMode = null;
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
     //--- ActionMode.Callback Overrides End ---
 

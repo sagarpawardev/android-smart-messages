@@ -58,7 +58,7 @@ public class SMSUtil {
             sms.setType(SMS.TYPE_QUEUED);
             sms.setDateTime(System.currentTimeMillis());
             sms.setBody(msg);
-            sms.setFrom(phoneNo);
+            sms.setAddress(phoneNo);
             sms.setSubscription(subsId);
 
             ArrayList<String> parts =smsManager.divideMessage(msg);

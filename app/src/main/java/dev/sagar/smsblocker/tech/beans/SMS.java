@@ -11,12 +11,13 @@ import java.io.Serializable;
 public class SMS implements Serializable{
 
     private String id,
-            from,
+            address,
             body;
     private long dateTime,
             type;
     private boolean read;
     private boolean replySupported;
+    private boolean saved = false;
 
     private int subscription;
 
@@ -35,12 +36,12 @@ public class SMS implements Serializable{
         this.id = id;
     }
 
-    public String getFrom() {
-        return from;
+    public String getAddress() {
+        return address;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getBody() {
@@ -89,5 +90,13 @@ public class SMS implements Serializable{
 
     public void setReplySupported(boolean replySupported) {
         this.replySupported = replySupported;
+    }
+
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
     }
 }

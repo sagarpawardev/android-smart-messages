@@ -35,7 +35,8 @@ public class PhoneUtilsSingleton {
             formattedNumber = PhoneNumberUtils.formatNumber(unformattedNumber, countryCode);
         }
         if(formattedNumber == null){
-            formattedNumber = unformattedNumber.replaceAll("[-,+]","");
+            //formattedNumber = unformattedNumber.replaceAll("[-,+]","");
+            formattedNumber = unformattedNumber.replaceAll("[+]","");
         }
         return formattedNumber;
     }

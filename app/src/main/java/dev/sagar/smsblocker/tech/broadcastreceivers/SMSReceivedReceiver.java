@@ -98,7 +98,7 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
             String msgBody = sbMessage.toString();
             SmsMessage smsMessage = SmsMessage.createFromPdu((byte[])pdus[0], MSG_FORMAT);
             SMS sms = new SMS();
-            sms.setFrom(smsMessage.getOriginatingAddress());
+            sms.setAddress(smsMessage.getOriginatingAddress());
             sms.setDateTime(smsMessage.getTimestampMillis());
             sms.setBody(msgBody);
             sms.setRead(false);

@@ -22,13 +22,11 @@
         android:icon="@drawable/ic_delete_white_24dp"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_star_sms"
+        android:orderInCategory="100"
+        android:title="@string/action_star_sms"
+        android:icon="@drawable/ic_star_white_24dp"
+        app:showAsAction="collapseActionView|ifRoom" />
 
-    <item android:id="@+id/star_button"
-        android:title="@string/search_hint"
-        android:icon="@drawable/ic_search_white_24dp"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:icon_type="star"
-        app:icon_size="16dp"
-        app:actionViewClass="com.like.LikeButton" />
 
 </menu>

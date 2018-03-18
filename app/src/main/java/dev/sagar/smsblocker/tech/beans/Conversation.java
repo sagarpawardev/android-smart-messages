@@ -23,17 +23,17 @@ public class Conversation {
     private int unreadCount = 0;
 
     public Conversation(Context context, SMS sms){
-        setAddress(sms.getFrom());
-        setThreadId(sms.getFrom());
+        setAddress(sms.getAddress());
+        setThreadId(sms.getAddress());
         setMsgCount(-1);
         setDateTime(sms.getDateTime());
         setBody(sms.getBody());
         setType(sms.getType());
         setSmsId(sms.getId());
 
-        String contactName = sms.getFrom();
+        String contactName = sms.getAddress();
         try {
-            contactName = ContactUtilSingleton.getInstance().getContactName(context, sms.getFrom());
+            contactName = ContactUtilSingleton.getInstance().getContactName(context, sms.getAddress());
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
         }
@@ -46,7 +46,7 @@ public class Conversation {
 
         Uri photoUri = null;
         try {
-            photoUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
+            photoUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getAddress());
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
         }
@@ -54,7 +54,7 @@ public class Conversation {
 
         Uri photoThumbUri = null;
         try {
-            photoThumbUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getFrom());
+            photoThumbUri = ContactUtilSingleton.getInstance().getPictureUri(context, sms.getAddress());
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
         }

@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
@@ -14,8 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import dev.sagar.smsblocker.tech.service.helper.ConversationDBAttributes.SMSLocal;
-import dev.sagar.smsblocker.tech.service.helper.ConversationDBHelper;
+import dev.sagar.smsblocker.tech.service.helper.conversation.ConversationDBAttributes.Converesation;
+import dev.sagar.smsblocker.tech.service.helper.DBHelper;
+import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
@@ -52,32 +54,53 @@ public class DBServiceSingleton {
     private final String photoUriThumbnail = ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI;
     private final String contactName = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME;
 
-    private final String _id_local = SMSLocal.COLUMN_NAME_ID;
-    private final String threadId_local = SMSLocal.COLUMN_NAME_THREAD_ID;
-    private final String address_local = SMSLocal.COLUMN_NAME_ADDRESS;
-    private final String person_local = SMSLocal.COLUMN_NAME_PERSON;
-    private final String date_local = SMSLocal.COLUMN_NAME_DATE;
-    private final String protocol_local = SMSLocal.COLUMN_NAME_PROTOCOL;
-    private final String read_local = SMSLocal.COLUMN_NAME_READ;
-    private final String status_local = SMSLocal.COLUMN_NAME_STATUS;
-    private final String type_local = SMSLocal.COLUMN_NAME_TYPE;
-    private final String reply_path_present_local = SMSLocal.COLUMN_NAME_TYPE;
-    private final String subject_local = SMSLocal.COLUMN_NAME_SUBJECT;
-    private final String body_local = SMSLocal.COLUMN_NAME_BODY;
-    private final String serviceCenter_local = SMSLocal.COLUMN_NAME_SERVICE_CENTER;
-    private final String subscriptionId_local = SMSLocal.COLUMN_NAME_SUBSCRIPTION_ID;
-    private final String locked_local = SMSLocal.COLUMN_NAME_LOCKED;
-    private final String errorCode_local = SMSLocal.COLUMN_NAME_ERROR_CODE;
-    private final String photoUri_local = SMSLocal.COLUMN_NAME_PHOTO_URI;
-    private final String photoUriThumbnail_local = SMSLocal.COLUMN_NAME_PHOTO_THUMBNAIL;
-    private final String contactName_local = SMSLocal.COLUMN_NAME_CONTACT_NAME;
-    private final String unreadCount_local = SMSLocal.COLUMN_NAME_UNREAD_COUNT;
+    private final String _id_local = Converesation.COLUMN_NAME_ID;
+    private final String threadId_local = Converesation.COLUMN_NAME_THREAD_ID;
+    private final String address_local = Converesation.COLUMN_NAME_ADDRESS;
+    private final String person_local = Converesation.COLUMN_NAME_PERSON;
+    private final String date_local = Converesation.COLUMN_NAME_DATE;
+    private final String protocol_local = Converesation.COLUMN_NAME_PROTOCOL;
+    private final String read_local = Converesation.COLUMN_NAME_READ;
+    private final String status_local = Converesation.COLUMN_NAME_STATUS;
+    private final String type_local = Converesation.COLUMN_NAME_TYPE;
+    private final String reply_path_present_local = Converesation.COLUMN_NAME_TYPE;
+    private final String subject_local = Converesation.COLUMN_NAME_SUBJECT;
+    private final String body_local = Converesation.COLUMN_NAME_BODY;
+    private final String serviceCenter_local = Converesation.COLUMN_NAME_SERVICE_CENTER;
+    private final String subscriptionId_local = Converesation.COLUMN_NAME_SUBSCRIPTION_ID;
+    private final String locked_local = Converesation.COLUMN_NAME_LOCKED;
+    private final String errorCode_local = Converesation.COLUMN_NAME_ERROR_CODE;
+    private final String photoUri_local = Converesation.COLUMN_NAME_PHOTO_URI;
+    private final String photoUriThumbnail_local = Converesation.COLUMN_NAME_PHOTO_THUMBNAIL;
+    private final String contactName_local = Converesation.COLUMN_NAME_CONTACT_NAME;
+    private final String unreadCount_local = Converesation.COLUMN_NAME_UNREAD_COUNT;
+
+    public static final String TABLE_STARSMS = SavedSMSDBAttributes.SavedSMS.TABLE_NAME;
 
 
     public static DBServiceSingleton getInstance(){
         if(instance == null)
             instance = new DBServiceSingleton();
         return instance;
+    }
+
+    /***
+     * Provides Database service related to query
+     * @param tableName Name of table
+     * @param mProjection Query Projections
+     * @param mSelection Query Selections
+     * @param mSelectionArgs Query Selection Arguments
+     * @param mSortOrder Query Sorting Order
+     * @return Cursor for Query
+     */
+    public Cursor query(SQLiteDatabase db, String tableName, String[] mProjection, String mSelection, String[] mSelectionArgs, String mSortOrder){
+        String methodName ="query()";
+        log.justEntered(methodName);
+
+        Cursor mCursor = db.query(tableName, mProjection, mSelection, mSelectionArgs, null, null, mSortOrder);
+
+        log.returning(methodName);
+        return mCursor;
     }
 
     /***
@@ -120,12 +143,59 @@ public class DBServiceSingleton {
     }
 
     /***
+     * Provides Database service related to insert
+     * @param context Context
+     * @param tableName Table to insert
+     * @param mContentValues Query Content Values
+     * @return the row ID of the newly inserted row, or -1 if an error occurred
+     */
+    public boolean insert(Context context, String tableName, ContentValues mContentValues){
+        String methodName ="insert()";
+        log.justEntered(methodName);
+
+        boolean result = false;
+        SQLiteOpenHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long rowId = db.insert(tableName, null, mContentValues);
+        db.close();
+        dbHelper.close();
+        log.debug(methodName, "Got Received row_id: "+rowId);
+        if(rowId != -1)
+            result = true;
+
+        log.returning(methodName);
+        return result;
+    }
+
+    /***
      * Providers Database service for deleting
      * @param context Context
-     * @param uri URI of Table
-     * @param selection Query Selection values
-     * @param selectionArgs Query Selection arguments
+     * @param tableName name of the table
+     * @param whereClause Where Clause parameter
+     * @param whereArgs Where Clause Arguments
      * @return Count of deleted rows
+     */
+    public int delete(Context context, String tableName, String whereClause, String[] whereArgs){
+        String methodName ="delete(Context, String, String, String[])";
+        log.justEntered(methodName);
+
+        SQLiteOpenHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int count = db.delete(tableName, whereClause, whereArgs);
+        db.close();
+        dbHelper.close();
+
+        log.returning(methodName);
+        return count;
+    }
+
+    /**
+     * Proved Delete Service in data base
+     * @param context
+     * @param uri
+     * @param selection
+     * @param selectionArgs
+     * @return
      */
     public int delete(Context context, Uri uri, String selection, String[] selectionArgs){
         String methodName ="delete()";
@@ -159,7 +229,7 @@ public class DBServiceSingleton {
         log.info(methodName, "SMS DB Updated with count: "+count);
 
         log.info(methodName, "Updating Conversation Database...");
-        ConversationDBHelper dbHelper = new ConversationDBHelper(context);
+        DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         if(values.containsKey(read)){ //Converting fields of different column names to Local Database column name
             String value = values.getAsBoolean(read) ? "1" : "0";
@@ -174,7 +244,7 @@ public class DBServiceSingleton {
             values.put(date_local, value);
         }
 
-        count = db.update(SMSLocal.TABLE_NAME, values, where, selectionArgs);
+        count = db.update(Converesation.TABLE_NAME, values, where, selectionArgs);
         log.info(methodName, "Conversation DB Updated count: "+count);
         db.close();
         dbHelper.close();
@@ -182,7 +252,6 @@ public class DBServiceSingleton {
         log.returning(methodName);
         return count;
     }
-
 
     /***
      * Refreshes Conversation Shadow Database
@@ -195,7 +264,7 @@ public class DBServiceSingleton {
 
         int result = 0;
 
-        ConversationDBHelper mDBHelper = new ConversationDBHelper(context);
+        DBHelper mDBHelper = new DBHelper(context);
 
         //Content MAP
         ContentResolver contentResolver = context.getContentResolver();
@@ -209,7 +278,7 @@ public class DBServiceSingleton {
                 this.date_local
         };
         SQLiteDatabase readDB = mDBHelper.getReadableDatabase();
-        Cursor mOldCursor = readDB.query(SMSLocal.TABLE_NAME,
+        Cursor mOldCursor = readDB.query(Converesation.TABLE_NAME,
                 mOldProjection, null, null, null, null, null);
         HashMap<String, Long> oldMap = new HashMap<>();
         if(mOldCursor!=null){
@@ -314,10 +383,10 @@ public class DBServiceSingleton {
                 if(oldMap.containsKey(address)) {
                     String whereClause = this.address_local + " = ?";
                     String[] whereArgs = {address};
-                    writableDB.update(SMSLocal.TABLE_NAME, values, whereClause, whereArgs);
+                    writableDB.update(Converesation.TABLE_NAME, values, whereClause, whereArgs);
                 }
                 else{
-                    writableDB.insert(SMSLocal.TABLE_NAME, null, values);
+                    writableDB.insert(Converesation.TABLE_NAME, null, values);
                 }
                 newMap.put(address, date);
                 result++;
@@ -386,15 +455,15 @@ public class DBServiceSingleton {
 
             String whereClause = this.address_local + " = ?";
             String[] whereArgs = {contact.address};
-            writableDB.update(SMSLocal.TABLE_NAME, values, whereClause, whereArgs);
+            writableDB.update(Converesation.TABLE_NAME, values, whereClause, whereArgs);
         }
         //-- Update Photo in Database Ends
 
         // Update unread_count in Conversation Starts
         StringBuilder sbRawQuery = new StringBuilder();
         sbRawQuery.append(" UPDATE ");
-        sbRawQuery.append(SMSLocal.TABLE_NAME);
-        sbRawQuery.append(" SET "+SMSLocal.COLUMN_NAME_UNREAD_COUNT+"= CASE "+SMSLocal.COLUMN_NAME_ADDRESS);
+        sbRawQuery.append(Converesation.TABLE_NAME);
+        sbRawQuery.append(" SET "+ Converesation.COLUMN_NAME_UNREAD_COUNT+"= CASE "+ Converesation.COLUMN_NAME_ADDRESS);
 
         ArrayList<Integer> alValues = new ArrayList<>();
         Set<String> addresses = unreadCountMap.keySet();
@@ -405,7 +474,7 @@ public class DBServiceSingleton {
             alValues.add(unreadCount);
         }
         sbRawQuery.append(" END WHERE ");
-        sbRawQuery.append(SMSLocal.COLUMN_NAME_ADDRESS);
+        sbRawQuery.append(Converesation.COLUMN_NAME_ADDRESS);
         sbRawQuery.append(" IN (");
         for(String mAddress: addresses){
             sbRawQuery.append("'"+mAddress+"',");

@@ -173,7 +173,7 @@ public class HomeActivity extends AppCompatActivity
         final String methodName =  "addSMSinUI()";
         log.justEntered(methodName);
 
-        String phoneNo = sms.getFrom();
+        String phoneNo = sms.getAddress();
         Conversation conversation = new Conversation(getApplicationContext(), sms);
 
         log.error(methodName, "Improvement can be done here");

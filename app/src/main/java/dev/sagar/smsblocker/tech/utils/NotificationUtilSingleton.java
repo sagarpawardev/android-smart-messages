@@ -1,11 +1,8 @@
 package dev.sagar.smsblocker.tech.utils;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
@@ -63,7 +60,7 @@ public class NotificationUtilSingleton {
         final String methodName = "createSMSNotification()";
         log.justEntered(methodName);
 
-        /*String fromNo = sms.getFrom();
+        /*String fromNo = sms.getAddress();
         String fromName = fromNo;
         try {
             fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNo);
@@ -111,7 +108,7 @@ public class NotificationUtilSingleton {
         setSummaryNotification(context, sms);*/
 
         int notifId = getNotificationId();
-        String address = sms.getFrom();
+        String address = sms.getAddress();
         String text = sms.getBody();
         String fromName = null;
         try {
@@ -164,7 +161,7 @@ public class NotificationUtilSingleton {
     }
 
     /*private void setSummaryNotification(Context context, SMS sms) {
-        String fromNo = sms.getFrom();
+        String fromNo = sms.getAddress();
         String fromName = fromNo;
         try {
             fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNo);
@@ -195,7 +192,7 @@ public class NotificationUtilSingleton {
     }*/
 
     /*private void generateSingleNotification(Context context, SMS sms) {
-        String fromNo = sms.getFrom();
+        String fromNo = sms.getAddress();
         String fromName = fromNo;
         try {
             fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNo);
@@ -261,7 +258,7 @@ public class NotificationUtilSingleton {
         final String methodName = "getReplyPendingIntent()";
         log.justEntered(methodName);
 
-        String address = sms.getFrom();
+        String address = sms.getAddress();
 
         Intent intent;
         PendingIntent pIntent;

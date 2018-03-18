@@ -99,7 +99,6 @@ public class ThreadActivity extends AppCompatActivity implements
 
     }
 
-
     private void updateActionBar(){
         final String methodName =  "updateActionBar()";
         log.justEntered(methodName);
@@ -137,7 +136,6 @@ public class ThreadActivity extends AppCompatActivity implements
         log.returning(methodName);
     }
 
-
     private SMS sendMsg(){
         final String methodName =  "sendMsg()";
         log.debug(methodName, "Just Entered..");
@@ -149,7 +147,6 @@ public class ThreadActivity extends AppCompatActivity implements
         log.debug(methodName, "Returning..");
         return newSMS;
     }
-
 
     public void registerReceivers(){
         final String methodName =  "registerReceivers()";
@@ -164,7 +161,6 @@ public class ThreadActivity extends AppCompatActivity implements
 
         log.returning(methodName);
     }
-
 
     public void unregisterReceivers(){
         final String methodName =  "unregisterReceivers()";
@@ -188,7 +184,6 @@ public class ThreadActivity extends AppCompatActivity implements
 
         log.returning(methodName);
     }
-
 
     public void smsSendUpdate(SMS newSMS) {
         final String methodName =  "smsSendUpdate()";
@@ -232,7 +227,6 @@ public class ThreadActivity extends AppCompatActivity implements
         }
     }
 
-
     private void init(){
         final String methodName =  "init()";
         log.debug(methodName, "Just Entered..");
@@ -261,7 +255,6 @@ public class ThreadActivity extends AppCompatActivity implements
 
         log.returning(methodName);
     }
-
 
     private void addListeners(){
         final String methodName =  "addListeners()";
@@ -383,6 +376,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         unregisterReceivers();
+        adapter.unstarSelections();
 
         super.onStop();
 
@@ -429,7 +423,7 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName = "onSMSReceived()";
         log.justEntered(methodName);
 
-        String from = sms.getFrom();
+        String from = sms.getAddress();
         if(from.equals(address)) {
             addSMSinUI(sms);
         }

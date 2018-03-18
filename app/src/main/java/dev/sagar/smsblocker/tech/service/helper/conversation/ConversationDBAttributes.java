@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.tech.service.helper;
+package dev.sagar.smsblocker.tech.service.helper.conversation;
 
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
@@ -13,7 +13,7 @@ public final class ConversationDBAttributes {
     private ConversationDBAttributes() {}
 
     /* Inner class that defines the table contents */
-    public static class SMSLocal implements BaseColumns {
+    public static class Converesation implements BaseColumns {
         public static final String TABLE_NAME = "CONVERSATION";
 
         public static final String COLUMN_NAME_ID = "_id";

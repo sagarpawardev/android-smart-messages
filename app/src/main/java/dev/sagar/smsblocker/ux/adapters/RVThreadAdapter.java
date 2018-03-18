@@ -9,6 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 
 import org.ocpsoft.prettytime.TimeFormat;
 import org.ocpsoft.prettytime.format.SimpleTimeFormat;
@@ -17,7 +21,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SIM;
@@ -48,6 +54,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     private List<SMS> selectedSMSes = new ArrayList<>();
     private TelephonyUtilSingleton telephonyUtil;
     private boolean replyNotSupportedTold = false;
+    private Set<Integer> markedForUnstar;
 
     //Constants
     private static final int TYPE_RECEIVED = 0;
@@ -62,6 +69,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         this.smses = smses;
         inboxUtil = new InboxUtil(context);
         telephonyUtil = TelephonyUtilSingleton.getInstance();
+        markedForUnstar = new HashSet<>();
 
         log.returning(methodName);
     }
@@ -111,6 +119,49 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         return true;
     }
 
+    public boolean startSelections(){
+        final String methodName =  "startSelections()";
+        log.justEntered(methodName);
+
+        log.error(methodName, "This can be improved");
+        log.info(methodName, "Selected SMS count: "+ selectedSMSes.size());
+        for (SMS sms: selectedSMSes) {
+            log.debug(methodName, "Starring SMS id: "+sms.getId());
+
+            //Starred SMS to database
+            inboxUtil.starSMS(sms);
+            sms.setSaved(true);
+
+            //Starred SMS to UI
+            int position = selectedSMSes.indexOf(sms);
+            notifyItemChanged(position);
+        }
+        selectedSMSes.clear();
+
+        log.returning(methodName);
+        return true;
+    }
+
+    public boolean unstarSelections(){
+        final String methodName =  "unstarSelections()";
+        log.justEntered(methodName);
+
+        List<SMS> unstarredSelections = new ArrayList<>();
+        for(int position: markedForUnstar){
+            SMS sms = smses.get(position);
+            unstarredSelections.add(sms);
+        }
+
+        log.info(methodName, "Unstarring SMSes");
+        int count = inboxUtil.unstarSMSes(unstarredSelections);
+        log.info(methodName, "Requested count: "+unstarredSelections.size()+" Deleted count: "+count);
+        markedForUnstar.clear();
+        if(count>0)
+            Toast.makeText(context, "SMS Unsaved", Toast.LENGTH_SHORT).show();
+
+        log.returning(methodName);
+        return true;
+    }
 
     public void setSelectionModeOn(boolean isModeOn){
         final String methodName =  "setSelectionModeOn()";
@@ -204,6 +255,23 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             holder.tvSending.setVisibility(View.GONE);
         }
 
+        //If SMS is among saved SMS
+        log.debug(methodName, "Checking Saved SMS: "+sms.isSaved()+" id: "+sms.getId());
+        if(sms.isSaved()){
+            holder.btnStar.setVisibility(View.VISIBLE);
+
+            //If marked for Unstar
+            if(markedForUnstar.contains(position)){
+                holder.btnStar.setLiked(false);
+            }
+            else {
+                holder.btnStar.setLiked(true);
+            }
+        }
+        else{
+            holder.btnStar.setVisibility(View.GONE);
+        }
+
         //If SMS is selected in RecyclerView
         boolean isSelected = selectedSMSes.contains(sms);
         setViewSelected(holder, isSelected);
@@ -211,7 +279,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         holder.tvBody.setText(body);
         holder.tvTime.setText(socialDate);
 
-        if(!replyNotSupportedTold && !isReplySupported){
+        if(!replyNotSupportedTold && type==SMS.TYPE_RECEIVED && !isReplySupported){
             callback.onReplyNotSupported();
         }
 
@@ -238,9 +306,10 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     }
 
 
-    class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener{
+    class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener, OnLikeListener{
         TextView tvBody, tvTime, tvSending;
         View llParent;
+        LikeButton btnStar;
         //Log Initiate
         LogUtil log = new LogUtil(this.getClass().getName());
         String format = context.getResources().getString(R.string.format_thread__datetime);
@@ -255,9 +324,11 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
             tvSending = view.findViewById(R.id.tv_sending);
+            btnStar = view.findViewById(R.id.btn_star);
 
             view.setOnLongClickListener(this);
             view.setOnClickListener(this);
+            btnStar.setOnLikeListener(this);
 
             log.returning(methodName);
         }
@@ -288,8 +359,20 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
         @Override
         public void onClick(View view) {
-            final String methodName =  "onClick()";
-            log.debug(methodName, "Just Entered..");
+            final String methodName =  "onClick(View)";
+            log.justEntered(methodName);
+
+            int id = view.getId();
+            switch (id){
+                default: onHolderClick(view); //Kept switch() for extensibility
+            }
+
+            log.returning(methodName);
+        }
+
+        private void onHolderClick(View view){
+            final String methodName =  "onHolderClick(View)";
+            log.justEntered(methodName);
 
             //If Selector is in Selection Mode
             if (isSelectionModeOn) {
@@ -336,6 +419,33 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
                 String formattedStr = sb.toString();
                 tvTime.setText(formattedStr);
             }
+
+            log.returning(methodName);
+        }
+
+        @Override
+        public void liked(LikeButton likeButton) {
+            final String methodName =  "liked(LikeButton)";
+            log.justEntered(methodName);
+
+            int position = getAdapterPosition();
+            markedForUnstar.remove(position);
+
+            log.returning(methodName);
+        }
+
+        @Override
+        public void unLiked(LikeButton likeButton) {
+            final String methodName =  "unLiked(LikeButton)";
+            log.justEntered(methodName);
+
+            int position = getAdapterPosition();
+            markedForUnstar.add(position);
+
+            SMS sms = smses.get(position);
+            log.debug(methodName, "marked Unstarred for sms id: "+sms.getId()+"Position: "+position);
+
+            log.returning(methodName);
         }
     }
 }

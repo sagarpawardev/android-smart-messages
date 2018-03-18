@@ -8,8 +8,8 @@ import android.os.AsyncTask;
 
 import dev.sagar.smsblocker.tech.beans.Conversation;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
-import dev.sagar.smsblocker.tech.service.helper.ConversationDBAttributes.SMSLocal;
-import dev.sagar.smsblocker.tech.service.helper.ConversationDBHelper;
+import dev.sagar.smsblocker.tech.service.helper.conversation.ConversationDBAttributes.Converesation;
+import dev.sagar.smsblocker.tech.service.helper.DBHelper;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
@@ -22,18 +22,18 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
     private LogUtil log = new LogUtil( this.getClass().getName() );
 
     //Constants
-    private final static String _id = SMSLocal.COLUMN_NAME_ID;
-    private final static String address = SMSLocal.COLUMN_NAME_ADDRESS;
-    private final static String threadId = SMSLocal.COLUMN_NAME_THREAD_ID;
-    private final static String body = SMSLocal.COLUMN_NAME_BODY;
-    private final static String subscriptionId = SMSLocal.COLUMN_NAME_SUBSCRIPTION_ID;
-    private final static String read = SMSLocal.COLUMN_NAME_READ;
-    private final static String date = SMSLocal.COLUMN_NAME_DATE;
-    private final static String type = SMSLocal.COLUMN_NAME_TYPE;
-    private final static String photo = SMSLocal.COLUMN_NAME_PHOTO_URI;
-    private final static String photothumb = SMSLocal.COLUMN_NAME_PHOTO_THUMBNAIL;
-    private final static String contactName = SMSLocal.COLUMN_NAME_CONTACT_NAME;
-    private final static String unreadCount = SMSLocal.COLUMN_NAME_UNREAD_COUNT;
+    private final static String _id = Converesation.COLUMN_NAME_ID;
+    private final static String address = Converesation.COLUMN_NAME_ADDRESS;
+    private final static String threadId = Converesation.COLUMN_NAME_THREAD_ID;
+    private final static String body = Converesation.COLUMN_NAME_BODY;
+    private final static String subscriptionId = Converesation.COLUMN_NAME_SUBSCRIPTION_ID;
+    private final static String read = Converesation.COLUMN_NAME_READ;
+    private final static String date = Converesation.COLUMN_NAME_DATE;
+    private final static String type = Converesation.COLUMN_NAME_TYPE;
+    private final static String photo = Converesation.COLUMN_NAME_PHOTO_URI;
+    private final static String photothumb = Converesation.COLUMN_NAME_PHOTO_THUMBNAIL;
+    private final static String contactName = Converesation.COLUMN_NAME_CONTACT_NAME;
+    private final static String unreadCount = Converesation.COLUMN_NAME_UNREAD_COUNT;
 
     public static final String TYPE_INBOX = "inbox";
     public static final String TYPE_SENT = "sent";
@@ -55,7 +55,7 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
         Context context = contexts[0];
         IndexedHashMap<String, Conversation> convMap = new IndexedHashMap<>();
 
-        ConversationDBHelper dbHelper = new ConversationDBHelper(context);
+        DBHelper dbHelper = new DBHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String[] projection = {"*"};
@@ -64,7 +64,7 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
         String[] selectionArgs = null;
         String mSortOrder = date+" DESC";
 
-        Cursor c = db.query(SMSLocal.TABLE_NAME, projection, selection, selectionArgs, null, null, mSortOrder );
+        Cursor c = db.query(Converesation.TABLE_NAME, projection, selection, selectionArgs, null, null, mSortOrder );
         if(c == null){
             log.info(methodName, "Cursor for conversation Query Returned null");
             return convMap;
