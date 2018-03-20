@@ -121,14 +121,14 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
     @Override
     public SMSViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final String methodName =  "onCreateViewHolder()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_rv_home, parent, false);
         itemView.setOnClickListener(this);
         SMSViewHolder holder = new SMSViewHolder(itemView);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return holder;
     }
 

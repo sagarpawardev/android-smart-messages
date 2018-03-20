@@ -1,5 +1,6 @@
 package dev.sagar.smsblocker.tech.utils;
 
+import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -57,6 +58,7 @@ public class InboxUtil {
     //Reference for Starred_SMS
     private final String starredsms_id = SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ID;
     private final String starredsms_address = SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ADDRESS;
+    private final String starredsms_dateadded = SavedSMSDBAttributes.SavedSMS.COLUMN_DATE_ADDED;
 
     public InboxUtil(Context context) {
         this.context = context;
@@ -429,10 +431,12 @@ public class InboxUtil {
         log.justEntered(methodName);
 
         String id = sms.getId();
+        long currtime = System.currentTimeMillis();
         String address = PhoneUtilsSingleton.getInstance().formatNumber(context, sms.getAddress());
         ContentValues values = new ContentValues();
         values.put(this.starredsms_id, id);
         values.put(this.starredsms_address, address);
+        values.put(this.starredsms_dateadded, currtime);
 
         log.info(methodName, "Starring SMS into database Address: "+address+" Id: "+id);
 
@@ -493,6 +497,100 @@ public class InboxUtil {
 
         log.returning(methodName);
         return count;
+    }
+
+    /**
+     * This method return all the Saves SMS in SAVEDSMS database
+     * @param sortOrder SORT_ASC or SORT_DEC
+     * @return list of starred sms
+     */
+    public List<SMS> getSavedSMSes(int sortOrder){
+        final String methodName =  "getSavedSMSes(int)";
+        log.justEntered(methodName);
+
+        List<SMS> smses = new ArrayList<>();
+
+        dbService = DBServiceSingleton.getInstance();
+        SQLiteOpenHelper dbHelper = new DBHelper(context);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        String[] mProjection = {starredsms_address, starredsms_id};
+        String mSelection = "";
+        String[] mSelectionArgs = {};
+        String mSortOrder = starredsms_dateadded;
+        switch (sortOrder){
+            case SORT_ASC: mSortOrder = mSortOrder + " ASC"; break;
+            case SORT_DESC: mSortOrder = mSortOrder +" DESC"; break;
+            default: log.error(methodName, "Unknown Sorting order");
+        }
+
+        //Create Query for SMS Database
+        Cursor c = dbService.query(db, DBConstants.TABLE_SAVEDSMS, mProjection, mSelection, mSelectionArgs, mSortOrder );
+        ArrayList<String> values = new ArrayList<>();
+        StringBuilder sbQuery = new StringBuilder();
+        log.debug(methodName, "Saved Message Count: "+c.getCount());
+        while(c.moveToNext()){
+            String address = c.getString(c.getColumnIndexOrThrow(this.starredsms_address));
+            String id = c.getString(c.getColumnIndexOrThrow(this.starredsms_id));
+
+            sbQuery.append("("+this.address+"=? AND ");
+            sbQuery.append(this._id+"=? )");
+            if(!c.isLast())
+                sbQuery.append(" OR ");
+            values.add(address);
+            values.add(id);
+        }
+        c.close();
+        db.close();
+        dbHelper.close();
+
+        //Querying SMS Content Provider
+        mProjection = new String[]{"*"};
+        mSelection = sbQuery.toString();
+        mSelectionArgs = values.toArray(new String[values.size()]);
+        mSortOrder = null;
+
+        ContentResolver resolver = context.getContentResolver();
+        c = dbService.query(resolver, DBConstants.URI_INBOX, mProjection, mSelection, mSelectionArgs, mSortOrder );
+        log.debug(methodName, "Saved Reading SMS Count: "+c.getCount());
+        try {
+            while (c.moveToNext()) {
+
+                String from = c.getString(c.getColumnIndexOrThrow(this.address));
+                String id = c.getString(c.getColumnIndexOrThrow(this._id));
+                String body = c.getString(c.getColumnIndexOrThrow(this.body));
+                int subscriptionId = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
+                boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
+                long time = c.getLong(c.getColumnIndexOrThrow(this.date));
+                long type = c.getLong(c.getColumnIndexOrThrow(this.type));
+                boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
+
+                SMS sms = new SMS();
+                sms.setId(id);
+                sms.setAddress(from);
+                sms.setBody(body);
+                sms.setRead(readState);
+                sms.setDateTime(time);
+                sms.setType(type);
+                sms.setSubscription(subscriptionId);
+                sms.setReplySupported(replySupported);
+                sms.setSaved(true);
+
+                smses.add(sms);
+
+                log.debug(methodName, "Address: "+from+" ReplySupported: "+sms.isReplySupported());
+
+            }
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        finally {
+            c.close();
+        }
+
+        log.returning(methodName);
+        return smses;
     }
 
 }

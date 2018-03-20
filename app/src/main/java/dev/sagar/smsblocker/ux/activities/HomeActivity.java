@@ -170,7 +170,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     public void updateSMSinUI(SMS sms){
-        final String methodName =  "addSMSinUI()";
+        final String methodName =  "addSMSinUI(SMS)";
         log.justEntered(methodName);
 
         String phoneNo = sms.getAddress();
@@ -203,6 +203,16 @@ public class HomeActivity extends AppCompatActivity
         return recyclerView.getChildAt(0).getTop() == 0;
     }
 
+    private void startStarredActivity(){
+        final String methodName =  "statrtStarredActivity()";
+        log.justEntered(methodName);
+
+        Intent intent = new Intent(this, StarredSMSActivity.class);
+        startActivity(intent);
+
+        log.returning(methodName);
+    }
+
 
     //--- AppCompatActivity Overrides Start ---
     @Override
@@ -231,7 +241,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final String methodName =  "onCreate()";
+        final String methodName =  "onCreate(Bundle)";
         log.justEntered(methodName);
 
         setContentView(R.layout.activity_home);
@@ -256,7 +266,9 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        switch (id){
+            case R.id.menu_starred_sms: startStarredActivity(); break;
+        }
         return super.onOptionsItemSelected(item);
     }
 

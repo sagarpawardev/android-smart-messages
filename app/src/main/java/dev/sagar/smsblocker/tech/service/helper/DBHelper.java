@@ -49,7 +49,8 @@ public class DBHelper extends SQLiteOpenHelper{
     private static final String SAVEDSMS_CREATE_TABLE =
             "CREATE TABLE " + SavedSMSDBAttributes.SavedSMS.TABLE_NAME + " (" +
                     SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ID + " TEXT, " +
-                    SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ADDRESS + " TEXT " +
+                    SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ADDRESS + " TEXT, " +
+                    SavedSMSDBAttributes.SavedSMS.COLUMN_DATE_ADDED + " TEXT " +
                     ")";
 
     private static final String SAVEDSMS_DELETE_TABLE =

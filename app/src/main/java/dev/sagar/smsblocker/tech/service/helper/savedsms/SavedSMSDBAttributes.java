@@ -16,6 +16,7 @@ public final class SavedSMSDBAttributes {
 
         public static final String COLUMN_NAME_ID = "sms_id";
         public static final String COLUMN_NAME_ADDRESS = "address";
+        public static final String COLUMN_DATE_ADDED = "date_added";
 
     }
 }

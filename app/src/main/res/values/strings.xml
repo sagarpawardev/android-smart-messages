@@ -19,7 +19,7 @@
     <string name="notif_default_app_title">Set App as Default</string>
     <string name="notif_default_app_desc">Setting app default helps Smart Messages to handle SMS smarter</string>
     <string name="thread_hint__send_message">Send Message..</string>
-    <string name="hint_thread__send">Say Hi..</string>
+    <string name="hint_thread__send">Say Hi...</string>
     <string name="desc_dp">display picture</string>
     <string name="title_thread__show_contact">Show Contact</string>
 
@@ -34,7 +34,10 @@
     <string name="label_reply">Reply</string>
     <string name="notif_content_sent">SMS Sent</string>
     <string name="notif_sending_failed">Sending Failed</string>
+    <string name="hint_search">Search</string>
     <string name="search_hint">Search</string>
+    <string name="hint_strred_sms">Starred SMS</string>
     <string name="label_reply_not_supported">Sender does not support reply</string>
+    <string name="title_activity_starred_sms">Starred SMS</string>
 
 </resources>

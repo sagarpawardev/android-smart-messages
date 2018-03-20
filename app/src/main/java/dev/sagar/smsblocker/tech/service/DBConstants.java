@@ -1,5 +1,8 @@
 package dev.sagar.smsblocker.tech.service;
 
+import android.net.Uri;
+import android.provider.Telephony;
+
 import dev.sagar.smsblocker.tech.service.helper.conversation.ConversationDBAttributes;
 import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
 
@@ -13,6 +16,7 @@ public class DBConstants {
 
     public static final String TABLE_CONVERSATION = ConversationDBAttributes.Converesation.TABLE_NAME;
     public static final String TABLE_SAVEDSMS = SavedSMSDBAttributes.SavedSMS.TABLE_NAME;
+    public static final Uri URI_INBOX = Telephony.Sms.Inbox.CONTENT_URI;
 
 
 }
