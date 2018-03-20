@@ -84,14 +84,14 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
         }
         String displayName = contact.getDisplayName();
 
-        if(position == 0){
+        /*if(position == 0){
             Drawable drawable = ContextCompat.getDrawable(context, R.drawable.bkg_threadoverview__top_rounded);
             holder.parent.setBackground(drawable);
         }
         else{
             Drawable drawable = ContextCompat.getDrawable(context, R.drawable.selector_threadoverview);
             holder.parent.setBackground(drawable);
-        }
+        }*/
 
         if(displayName == null)
             displayName = address;

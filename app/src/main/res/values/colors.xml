@@ -21,6 +21,7 @@
     <color name="transparent">#10FFFFFF</color>
     <color name="card_recv_msg">#FFFFFF</color>
     <color name="card_send_msg">#FF5252</color>
+    <color name="background_primary">#FBE9E7</color>
 
 
 </resources>
