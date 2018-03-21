@@ -39,5 +39,6 @@
     <string name="hint_strred_sms">Starred SMS</string>
     <string name="label_reply_not_supported">Sender does not support reply</string>
     <string name="title_activity_starred_sms">Starred SMS</string>
+    <string name="label_undo">Undo</string>
 
 </resources>
