@@ -44,7 +44,7 @@
         <activity
             android:name=".ux.activities.ThreadActivity"
             android:label="@string/app_name"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:parentActivityName=".ux.activities.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
