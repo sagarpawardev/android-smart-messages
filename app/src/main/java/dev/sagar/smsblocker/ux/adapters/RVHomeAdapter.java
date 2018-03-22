@@ -28,13 +28,15 @@ import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.customviews.DisplayPictureView;
 import dev.sagar.smsblocker.ux.filterable.ConversationMapFilter;
+import dev.sagar.smsblocker.ux.filterable.ConversationUnreadFilter;
 
 /**
  * Created by sagarpawar on 15/10/17.
  */
 
 public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHolder>
-        implements View.OnClickListener, Filterable, ConversationMapFilter.Callback{
+        implements View.OnClickListener,
+        ConversationMapFilter.Callback, ConversationUnreadFilter.Callback{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -42,6 +44,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
     //Java Android
     private Context context;
     private ConversationMapFilter convFilter;
+    private ConversationUnreadFilter convUnreadFilter;
 
     //Java Core
     private IndexedHashMap<String, Conversation> conversationMap;
@@ -51,12 +54,18 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
     private ArrayList<String> selectedThreads = new ArrayList<>(); //Better if Changed to Set
     private InboxUtil inboxUtil;
 
+    //Constants
+    public static final int FILTER_UNREAD = 0;
+    public static final int FILTER_TEXT = 1;
+
+
     public RVHomeAdapter(Context context, IndexedHashMap<String, Conversation> conversationMap, Callback callback) {
         this.context = context;
         this.conversationMap = conversationMap;
         this.callback = callback;
 
         this.convFilter = new ConversationMapFilter(context, conversationMap, this);
+        this.convUnreadFilter = new ConversationUnreadFilter(context, conversationMap, this);
         this.filteredConvMap = conversationMap;
 
         log.debug("Constructor", "Conversation Map count: "+ conversationMap.size());
@@ -115,6 +124,22 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
         log.returning(methodName);
         return count;
+    }
+
+    public Filter getFilter(int type){
+        final String methodName =  "getFilter(int)";
+        log.justEntered(methodName);
+
+        Filter filter = null;
+        switch (type){
+            case FILTER_TEXT: filter = convFilter; break;
+            case FILTER_UNREAD: filter = convUnreadFilter; break;
+            default: log.error(methodName, "No such filter of type: "+type);
+        }
+        log.debug(methodName, "SGR Conversation Filter: "+convFilter.getClass().getName());
+
+        log.returning(methodName);
+        return filter;
     }
 
     //--- RecyclerView.Adapter Overrides Start ---
@@ -260,11 +285,10 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
 
     //--- Filterable Overrides Starts ---
-    @Override
-    public Filter getFilter() {
-        return convFilter;
-    }
 
+    /*public Filter getFilter() {
+        return convFilter;
+    }*/
     //--- Filterable Overrides Ends ---
 
 
@@ -273,6 +297,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
     public void onResultsFiltered(IndexedHashMap<String, Conversation> filteredConvMap) {
         this.filteredConvMap = filteredConvMap;
         notifyDataSetChanged();
+        callback.onResultsFiltered();
     }
     //--- ConversationMapFilter.Callback Overrides Ends ---
 
@@ -344,5 +369,6 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         void onItemClicked(String threadId);
         void onItemLongClicked();
         void onAllDeselected();
+        void onResultsFiltered();
     }
 }

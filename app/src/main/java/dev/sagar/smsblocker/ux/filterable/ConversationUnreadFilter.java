@@ -11,7 +11,7 @@ import dev.sagar.smsblocker.tech.utils.LogUtil;
  * Created by sagarpawar on 08/03/18.
  */
 
-public class  ConversationMapFilter extends Filter {
+public class ConversationUnreadFilter extends Filter {
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
 
@@ -22,7 +22,7 @@ public class  ConversationMapFilter extends Filter {
     //Java Android
     private Context context;
 
-    public ConversationMapFilter(Context context, IndexedHashMap<String, Conversation> conversationMap, Callback callback) {
+    public ConversationUnreadFilter(Context context, IndexedHashMap<String, Conversation> conversationMap, Callback callback) {
         this.conversationMap = conversationMap;
         this.context = context;
         this.callback = callback;
@@ -30,22 +30,17 @@ public class  ConversationMapFilter extends Filter {
 
     @Override
     protected FilterResults performFiltering(CharSequence charSequence) {
-        String searchStr = charSequence.toString().toLowerCase();
+
         IndexedHashMap<String, Conversation> filteredConvMap = new IndexedHashMap<>();
-        if (searchStr.isEmpty()) {
+        if (charSequence==null) {
             filteredConvMap.update(conversationMap);
         } else {
             for (int i=0 ;i<conversationMap.size(); i++) {
                 Conversation conv = conversationMap.get(i);
-                String addr = conv.getAddress().toLowerCase();
-                String displayName = conv.getContactName();
-                String body = conv.getBody().toLowerCase();
-                if(displayName != null)
-                    displayName = displayName.toLowerCase();
-                if(addr.contains(searchStr) ||
-                        (displayName!=null && displayName.contains(searchStr)) ||
-                        body.contains(searchStr)
-                        ){
+                boolean isRead = conv.isRead();
+                String addr = conv.getAddress();
+
+                if(!isRead){
                     filteredConvMap.put(addr, conv);
                 }
             }
@@ -58,7 +53,7 @@ public class  ConversationMapFilter extends Filter {
 
     @Override
     protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-        final String methodName =  "publishResults()";
+        final String methodName =  "getItemCount()";
         log.justEntered(methodName);
 
         IndexedHashMap<String, Conversation> filteredConvMap = (IndexedHashMap<String, Conversation>) filterResults.values;

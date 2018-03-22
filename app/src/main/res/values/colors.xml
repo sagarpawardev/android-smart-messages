@@ -12,6 +12,8 @@
     <color name="black">#000000</color>
     <color name="cyan100">#B2EBF2</color>
     <color name="blueA200">#B2EBF2</color>
+    <color name="blueA800">#0277BD</color>
+    <color name="greyA600">#757575</color>
     <color name="blueA200Darker">#ABE3D7</color>
 
 

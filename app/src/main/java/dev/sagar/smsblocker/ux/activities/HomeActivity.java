@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,20 +42,21 @@ import dev.sagar.smsblocker.ux.customviews.NotificationView;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
 
 public class HomeActivity extends AppCompatActivity
-        implements RVHomeAdapter.Callback, LocalSMSReceivedReceiver.Callback, ConversationUtil.Callback,
-        View.OnClickListener{
+        implements RVHomeAdapter.Callback, LocalSMSReceivedReceiver.Callback,
+        ConversationUtil.Callback, View.OnClickListener, CompoundButton.OnCheckedChangeListener{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
 
     //View
-    RecyclerView recyclerView;
-    FloatingActionButton fab;
-    NotificationView notificationView;
-    View viewPlaceHolder;
+    private RecyclerView recyclerView;
+    private FloatingActionButton fab;
+    private NotificationView notificationView;
+    private View viewPlaceHolder;
+    private SwitchCompat switchUnread;
+    private TextView tvTotalCount;
 
     //Java Core
-    //InboxUtil inboxUtil = null;
     ConversationUtil conversationUtil = null;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
     private PermissionUtilSingleton permUtil = PermissionUtilSingleton.getInstance();
@@ -76,6 +80,8 @@ public class HomeActivity extends AppCompatActivity
         notificationView = (NotificationView) findViewById(R.id.notificationView);
         recyclerView = (RecyclerView) findViewById(R.id.lv_threads);
         viewPlaceHolder = findViewById(R.id.holder_placeholder);
+        switchUnread = (SwitchCompat) findViewById(R.id.switch_unread);
+        tvTotalCount = (TextView) findViewById(R.id.tv_total_count);
 
         //if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         if(conversationUtil == null) conversationUtil = new ConversationUtil(this, this);
@@ -87,6 +93,13 @@ public class HomeActivity extends AppCompatActivity
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(adapter);
 
+        setFont();
+    }
+
+    private void setFont(){
+        Typeface myFont = Typeface.createFromAsset(getAssets(),"fonts/VarelaRound-Regular.ttf");
+        switchUnread.setTypeface(myFont);
+        tvTotalCount.setTypeface(myFont);
     }
 
     private void showInboxView(){
@@ -118,6 +131,7 @@ public class HomeActivity extends AppCompatActivity
                 startNewThreadActivity();
             }
         });
+        switchUnread.setOnCheckedChangeListener(this);
         notificationView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -213,6 +227,27 @@ public class HomeActivity extends AppCompatActivity
         log.returning(methodName);
     }
 
+    private String getCountText(int count){
+        final String methodName =  "getCountText()";
+        log.justEntered(methodName);
+
+        String strTotalCount = getString(R.string.text_conversations);
+        if(count>1){
+            strTotalCount = count +" "+ getString(R.string.text_conversations); //8 conversations
+        }
+        else if(count==1){
+            strTotalCount = count +" "+getString(R.string.text_conversation); //1 conversation
+        }
+        else if(count == 0){
+            strTotalCount = getString(R.string.label_no_such_conv); //No unread conversation
+        }
+        else{
+            strTotalCount = "WTF?? this is not possible"; //Not possible :p
+        }
+
+        log.returning(methodName);
+        return strTotalCount;
+    }
 
     //--- AppCompatActivity Overrides Start ---
     @Override
@@ -305,7 +340,10 @@ public class HomeActivity extends AppCompatActivity
 
                 //It is just standard procedure to check length before firing query
                 log.info(methodName, "Filtering List with Query: "+newText);
-                adapter.getFilter().filter(newText);
+                adapter.getFilter(RVHomeAdapter.FILTER_TEXT).filter(newText);
+
+                //Uncheck switch
+                switchUnread.setChecked(false); //Otherwise searching in UnreadOnly mode will show results form read as well
 
                 log.returning(methodName);
                 return true;
@@ -385,12 +423,25 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onAllDeselected() {
         final String methodName =  "allDeselected()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         amCallback.finish();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
+
+    @Override
+    public void onResultsFiltered() {
+        final String methodName =  "onResultsFiltered()";
+        log.justEntered(methodName);
+
+        //Set Total Count
+        String strTotalCount = getCountText(adapter.getItemCount());
+        tvTotalCount.setText(strTotalCount);
+
+        log.returning(methodName);
+    }
+
     //--- RVHomeAdapter.Callback Overrides End ---
 
 
@@ -427,7 +478,7 @@ public class HomeActivity extends AppCompatActivity
     //--- ConversationUtil.Callback Overrides Starts ---
     @Override
     public void onDBRefreshed(int count) {
-        final String methodName =  "onDBRefreshed()";
+        final String methodName =  "onDBRefreshed(int)";
         log.justEntered(methodName);
 
         log.info(methodName, "DB Refreshed :D...");
@@ -439,14 +490,36 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onLatestMsgsFetched(IndexedHashMap<String, Conversation> map) {
-        final String methodName =  "onDBRefreshed()";
+        final String methodName =  "onLatestMsgsFetched(IndexedHashMap<String, Conversation>)";
         log.justEntered(methodName);
 
         conversationMap.update(map);
         adapter.notifyDataSetChanged();
 
+        //Set Total Count
+        String strTotalCount = getCountText(adapter.getItemCount());
+        tvTotalCount.setText(strTotalCount);
+
         log.returning(methodName);
     }
-
     //--- ConversationUtil.Callback Overrides Ends ---
+
+
+    //--- CompoundButton.OnCheckedChangeListener Overrides Starts ---
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+        final String methodName =  "onCheckedChanged(CompoundButton, boolean)";
+        log.justEntered(methodName);
+
+        boolean wantUnread = switchUnread.isChecked();
+        log.debug(methodName, "Is Switch Activated: "+wantUnread);
+        if(wantUnread){
+            adapter.getFilter(RVHomeAdapter.FILTER_UNREAD).filter("*");
+        }else{
+            adapter.getFilter(RVHomeAdapter.FILTER_UNREAD).filter(null);
+        }
+
+        log.returning(methodName);
+    }
+    //--- CompoundButton.OnCheckedChangeListener Overrides Ends ---
 }

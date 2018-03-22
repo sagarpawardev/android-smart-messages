@@ -26,51 +26,51 @@ public class AMCallbackThreadOverview implements ActionMode.Callback{
 
     private void delete(){
         final String methodName =  "onActionItemClicked()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         adapter.deleteSelections();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     public void finish(){
         final String methodName =  "onActionItemClicked()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         if(actionMode!=null)
             actionMode.finish();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     //--- ActionMode.Callback Overrides Start ---
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         final String methodName =  "onActionItemClicked()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         switch (item.getItemId()){
             case R.id.action_delete: delete(); break;
         }
         mode.finish();
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return false;
     }
 
     @Override
     public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
         final String methodName =  "onPrepareActionMode()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return false;
     }
 
     @Override
     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
         final String methodName =  "onCreateActionMode()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         adapter.setSelectionModeOn(true);
 
@@ -78,19 +78,19 @@ public class AMCallbackThreadOverview implements ActionMode.Callback{
         inflater.inflate( R.menu.contextual_threadoverview, menu );
         this.actionMode = actionMode;
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return true;
     }
 
     @Override
     public void onDestroyActionMode(ActionMode actionMode) {
         final String methodName =  "onDestroyActionMode()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         adapter.setSelectionModeOn(false);
         this.actionMode = null;
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
     //--- ActionMode.Callback Overrides End ---
 }
