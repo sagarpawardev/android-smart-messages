@@ -30,6 +30,7 @@ dependencies {
     compile 'com.android.support:design:26.+'
     compile 'com.google.code.gson:gson:2.8.2'
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
+    compile 'com.google.android.gms:play-services-analytics:10.2.4'
     testCompile 'junit:junit:4.12'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     implementation project(':libs:likebutton')

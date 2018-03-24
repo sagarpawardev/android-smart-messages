@@ -365,6 +365,29 @@ public class ContactUtilSingleton {
         return contact.getPhotoThumbnail();
     }
 
+    public Contact getContactOrDefault(Context context, String phoneNumber){
+        final String methodName = "getContactOrDefault()";
+        log.justEntered(methodName);
+
+        Contact contact = null;
+        try{
+            contact = getContact(context, phoneNumber);
+        }
+        catch (ReadContactPermissionException e){
+            log.debug(methodName, "Got null from contacts so defaulting");
+            contact = new Contact();
+            contact.setId(null);
+            String formatAddress = PhoneUtilsSingleton.getInstance().formatNumber(context, phoneNumber);
+            contact.setDisplayName(formatAddress);
+            contact.setPhoto(null);
+            contact.setPhotoThumbnail(null);
+            contact.setNumber(phoneNumber);
+        }
+
+        log.returning(methodName);
+        return contact;
+    }
+
     public Contact getContact(Context context, String phoneNumber) throws ReadContactPermissionException {
         final String methodName = "getContact()";
         log.justEntered(methodName);

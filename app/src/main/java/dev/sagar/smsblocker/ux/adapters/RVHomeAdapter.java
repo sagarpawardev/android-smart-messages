@@ -12,10 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
@@ -29,6 +30,7 @@ import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.customviews.DisplayPictureView;
 import dev.sagar.smsblocker.ux.filterable.ConversationMapFilter;
 import dev.sagar.smsblocker.ux.filterable.ConversationUnreadFilter;
+import dev.sagar.smsblocker.ux.utils.ThemeUtil;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -45,14 +47,16 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
     private Context context;
     private ConversationMapFilter convFilter;
     private ConversationUnreadFilter convUnreadFilter;
+    private Typeface myFont;
 
     //Java Core
     private IndexedHashMap<String, Conversation> conversationMap;
     private IndexedHashMap<String, Conversation> filteredConvMap;
     private Callback callback;
     private boolean isSelectionModeOn=false;
-    private ArrayList<String> selectedThreads = new ArrayList<>(); //Better if Changed to Set
+    private ArrayList<String> selectedConversations = new ArrayList<>(); //Better if Changed to Set
     private InboxUtil inboxUtil;
+    private ThemeUtil themeUtil;
 
     //Constants
     public static final int FILTER_UNREAD = 0;
@@ -70,6 +74,9 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
         log.debug("Constructor", "Conversation Map count: "+ conversationMap.size());
         inboxUtil = new InboxUtil(context);
+        themeUtil = new ThemeUtil(context);
+
+        myFont = themeUtil.getTypeface();
     }
 
     public void setSelectionModeOn(boolean isModeOn){
@@ -77,7 +84,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         log.justEntered(methodName);
 
         isSelectionModeOn = isModeOn;
-        selectedThreads.clear();
+        selectedConversations.clear();
 
         //This Line Clears items when Action Mode is destroyed
         if(!isModeOn) notifyDataSetChanged();
@@ -105,13 +112,15 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
         int count = 0;
 
-        for (String thread: selectedThreads) {
+        //TODO Change for loop to sql In Statement
+        log.error(methodName, "This part reduces performance can be improved");
+        for (String thread: selectedConversations) {
             //Delete SMS from database
             int deleteCount = inboxUtil.deleteThread(thread);
             count += deleteCount;
 
             //Delete SMS from UI
-            int position = selectedThreads.indexOf(thread);
+            int position = selectedConversations.indexOf(thread);
 
             if(deleteCount>0) {
                 notifyItemRemoved(position);
@@ -120,10 +129,33 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             }
             log.debug(methodName, "Deleted "+deleteCount+ " in this Thread but Total: "+count);
         }
-        selectedThreads.clear();
+        selectedConversations.clear();
 
         log.returning(methodName);
         return count;
+    }
+
+
+    public void markSelectionsRead(){
+        final String methodName =  "markSelectionsRead()";
+        log.justEntered(methodName);
+
+        log.info(methodName, "Marking SMS Read..");
+        Set<String> set = new HashSet<>();
+        for (String conversationId: selectedConversations) {
+            set.add(conversationId);
+
+            //Delete SMS from UI
+            int position = selectedConversations.indexOf(conversationId);
+
+            filteredConvMap.get(position).setReadState(true);
+            conversationMap.get(position).setReadState(true);
+        }
+        inboxUtil.markSMSRead(set);
+        selectedConversations.clear();
+        notifyDataSetChanged();
+
+        log.returning(methodName);
     }
 
     public Filter getFilter(int type){
@@ -162,23 +194,13 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         final String methodName =  "onBindViewHolder()";
         log.justEntered(methodName);
 
-        /* This part need to change later it is a performance issue though solved Bug #30*/
-        log.error(methodName, "This part Reduces performance. Need to change later");
-
-        //Adi changes Start
-        Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
-        holder.tvBody.setTypeface(myFont);
-        holder.tvFrom.setTypeface(myFont);
-        holder.tvTime.setTypeface(myFont);
-        //Adi changes End
-
         Conversation conversation = filteredConvMap.get(position);
         String address = conversation.getAddress();
 
         String fromName = conversation.getContactName();
 
         //If SMS is selected in Multiselect mode
-        boolean isSelected = selectedThreads.contains(fromName);
+        boolean isSelected = selectedConversations.contains(fromName);
         holder.parent.setSelected(isSelected);
 
         if(position == 0){
@@ -216,19 +238,8 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         //Setting User Image
         Uri dpUri = conversation.getPhotoThumbnailUri();
 
-        if(dpUri != null) {
-            holder.dpView.setPictureSrc(dpUri);
-        }
-        else {
-            if(!fromName.equals(address)) {
-                String c = String.valueOf(fromName.charAt(0));
-                holder.dpView.setLetterText(c);
-            }
-            else{
-                String str = context.getResources().getString(R.string.hash);
-                holder.dpView.setLetterText(str);
-            }
-        }
+        //Style DisplayPictureView
+        themeUtil.styleDPView(holder.dpView, dpUri, conversation);
 
         log.returning(methodName);
     }
@@ -262,18 +273,18 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         }
         else{
             log.debug(methodName, "Selection Mode is on.");
-            if(!selectedThreads.contains(threadId)){
-                selectedThreads.add(threadId);
+            if(!selectedConversations.contains(threadId)){
+                selectedConversations.add(threadId);
                 setViewSelected(view, true);
                 log.info(methodName, "Item Added in Selected List");
             }
             else{
-                selectedThreads.remove(threadId);
+                selectedConversations.remove(threadId);
                 setViewSelected(view, false);
                 log.info(methodName, "Item removed from Selected List");
             }
 
-            switch (selectedThreads.size()){
+            switch (selectedConversations.size()){
                 case 0: callback.onAllDeselected(); break;
                 default: break;
             }
@@ -318,6 +329,11 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             tvBadge = view.findViewById(R.id.tv_badge);
             parent = view;
 
+            //Set Font for TextViews
+            tvBody.setTypeface(myFont);
+            tvFrom.setTypeface(myFont);
+            tvTime.setTypeface(myFont);
+
             dpView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -353,7 +369,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
                 //Add Long Pressed Item in Selected List
                 int position = getAdapterPosition();
                 Conversation tSms = filteredConvMap.get(position);
-                selectedThreads.add(tSms.getAddress());
+                selectedConversations.add(tSms.getAddress());
                 setViewSelected(view, true);
 
                 return true;

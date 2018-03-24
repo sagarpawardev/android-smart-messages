@@ -23,6 +23,10 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +47,7 @@ import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
+import dev.sagar.smsblocker.ux.analytics.AnalyticsApplication;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThread;
 
 public class ThreadActivity extends AppCompatActivity implements
@@ -74,6 +79,10 @@ public class ThreadActivity extends AppCompatActivity implements
     private RVThreadAdapter adapter;
     private AMCallbackThread amCallback;
     private Toolbar toolbar;
+    //TODO Analytics test
+    private GoogleAnalytics sAnalytics;
+    private Tracker sTracker;
+
 
     //Java Core
     private List<SMS> smses = new ArrayList<>();
@@ -138,13 +147,13 @@ public class ThreadActivity extends AppCompatActivity implements
 
     private SMS sendMsg(){
         final String methodName =  "sendMsg()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
-        String msg = etMsg.getText().toString();
+        String msg = etMsg.getText().toString().trim();
         String phoneNo = address;
         SMS newSMS = smsUtil.sendSMS(phoneNo, msg);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
         return newSMS;
     }
 
@@ -229,7 +238,20 @@ public class ThreadActivity extends AppCompatActivity implements
 
     private void init(){
         final String methodName =  "init()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
+
+        try {
+            //TODO Analytics App
+            sAnalytics = GoogleAnalytics.getInstance(this);
+            sTracker = getDefaultTracker();
+            sTracker.setScreenName("Image~HomeActivity");
+            sTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        }
+        catch (Exception e){
+            log.info(methodName, "Logging Error..");
+            log.error(methodName, e);
+        }
+
 
         recyclerView = (RecyclerView) findViewById(R.id.lv_sms);
         btnSend = (ImageButton) findViewById(R.id.btn_send);
@@ -362,8 +384,8 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "onPause()";
         log.justEntered(methodName);
 
-        //setStatusRead
-        inboxUtil.setStatusRead(address);
+        //markSMSRead
+        inboxUtil.markSMSRead(address);
 
         super.onPause();
 
@@ -514,6 +536,17 @@ public class ThreadActivity extends AppCompatActivity implements
         log.returning(methodName);
     }
     //--- RVThreadAdapter.Callback Ends ---
+
+
+    //TODO Remove Ananlytics
+    synchronized public Tracker getDefaultTracker() {
+        // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
+        if (sTracker == null) {
+            sTracker = sAnalytics.newTracker(R.xml.global_tracker);
+        }
+
+        return sTracker;
+    }
 
 
 }

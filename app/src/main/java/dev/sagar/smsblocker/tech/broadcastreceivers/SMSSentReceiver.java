@@ -49,7 +49,7 @@ public class SMSSentReceiver extends BroadcastReceiver {
             if (action.equals(ActionCode.SMS_SENT)) {
                 Bundle basket = intent.getExtras();
 
-                log.error(methodName, "Sgr Receiving key: "+KEY_SMS);
+                log.debug(methodName, "Sgr Receiving key: "+KEY_SMS);
 
                 String strSMS = basket.getString(KEY_SMS);
                 SMS sms = gson.fromJson(strSMS, SMS.class);

@@ -15,4 +15,10 @@
         android:icon="@drawable/ic_delete_white_24dp"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/action_mark_read"
+        android:orderInCategory="100"
+        android:title="@string/action_mark_read"
+        android:icon="@drawable/ic_email_open_white_24dp"
+        app:showAsAction="ifRoom" />
 </menu>

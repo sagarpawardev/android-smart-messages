@@ -44,5 +44,6 @@
     <string name="text_conversations">conversations</string>
     <string name="text_conversation">conversation</string>
     <string name="label_no_such_conv">No Such Conversations</string>
+    <string name="action_mark_read">Mark Read</string>
 
 </resources>

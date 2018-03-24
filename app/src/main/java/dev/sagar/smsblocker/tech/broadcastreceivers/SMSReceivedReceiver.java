@@ -59,6 +59,7 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
         switch (event) {
             case SMS_RECEIVED: smsReceived(context, intent); break;
             case SMS_DELIVERED: smsDelivered(context, intent); break;
+            case SMS_SENT: smsSent(context, intent); break;
         }
 
         log.returning(methodName);
@@ -104,7 +105,7 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
             sms.setRead(false);
             sms.setType(SMS.TYPE_RECEIVED);
             sms.setSubscription(subscription);
-            log.error(methodName, "Service Center: "+smsMessage.getServiceCenterAddress());
+            log.debug(methodName, "Service Center: "+smsMessage.getServiceCenterAddress());
 
             log.info(methodName, "Received Message From: "+smsMessage.getDisplayOriginatingAddress());
 
@@ -112,18 +113,41 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
             if(!isAppDefault) log.error(methodName, "App is not default");
             if(isAppDefault) {
                 //Save SMS in DataProvider
-                log.info(methodName, "Saving SMS in DataProvider");
-                InboxUtil inboxUtil = new InboxUtil(context);
-                String id = inboxUtil.insertSMS(sms);
-                log.info(methodName, "Received Created id: " + id);
-                sms.setId(id);
+                try {
+                    log.info(methodName, "Saving SMS in DataProvider");
+                    InboxUtil inboxUtil = new InboxUtil(context);
+                    String id = inboxUtil.insertSMS(sms);
+                    log.info(methodName, "Received Created id: " + id);
+                    sms.setId(id);
+                }
+                catch (Exception e){
+                    log.info(methodName, "Logging Error..");
+                    log.error(methodName, e);
+                    Toast.makeText(context, "Failed in Saving", Toast.LENGTH_SHORT).show();
+                }
+                
 
-                //Broadcast SMS Locally
-                log.info(methodName, "Broadcasting SMS");
-                broadcastLocalSMS(context, sms);
+                try {
+                    //Broadcast SMS Locally
+                    log.info(methodName, "Broadcasting SMS");
+                    broadcastLocalSMS(context, sms);
+                }
+                catch (Exception e){
+                        log.info(methodName, "Logging Error..");
+                        log.error(methodName, e);
+                    Toast.makeText(context, "Failed in Broadcasting", Toast.LENGTH_SHORT).show();
+                }
+
 
                 //Create Notification
-                notifUtil.createSMSNotification(context, sms);
+                try{
+                    notifUtil.createSMSNotification(context, sms);
+                }
+                catch (Exception e){
+                        log.info(methodName, "Logging Error..");
+                        log.error(methodName, e);
+                    Toast.makeText(context, "Failed in creating notification", Toast.LENGTH_SHORT).show();
+                }
             }
 
         }
@@ -139,13 +163,23 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
      */
     private void smsDelivered(Context context, Intent intent){
         //Start Log
-        final String methodName = "smsDelivered()";
-        log.verbose(methodName, "Just Entered..");
+        final String methodName = "smsDelivered(Context, Intent)";
+        log.justEntered(methodName);
 
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             Toast.makeText(context, "Message Delivered.", Toast.LENGTH_SHORT);
         }
+        log.returning(methodName);
+    }
+
+    private void smsSent(Context context, Intent intent){
+        final String methodName = "smsDelivered(Context, Intent)";
+        log.justEntered(methodName);
+        //TODO SMS Sent Listener handler
+
+        Toast.makeText(context, "SMS Sent", Toast.LENGTH_SHORT).show();
+        log.returning(methodName);
     }
 
     /**

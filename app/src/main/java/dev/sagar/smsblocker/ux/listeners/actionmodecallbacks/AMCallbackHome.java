@@ -13,14 +13,14 @@ import dev.sagar.smsblocker.ux.adapters.RVHomeAdapter;
  * Created by sagarpawar on 24/11/17.
  */
 
-public class AMCallbackThreadOverview implements ActionMode.Callback{
+public class AMCallbackHome implements ActionMode.Callback{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
     private ActionMode actionMode = null;
 
     private RVHomeAdapter adapter;
-    public AMCallbackThreadOverview(RVHomeAdapter adapter){
+    public AMCallbackHome(RVHomeAdapter adapter){
         this.adapter = adapter;
     }
 
@@ -29,6 +29,16 @@ public class AMCallbackThreadOverview implements ActionMode.Callback{
         log.justEntered(methodName);
 
         adapter.deleteSelections();
+
+        log.returning(methodName);
+    }
+
+    private void markRead(){
+        final String methodName =  "markRead()";
+        log.justEntered(methodName);
+
+
+        adapter.markSelectionsRead();
 
         log.returning(methodName);
     }
@@ -51,6 +61,7 @@ public class AMCallbackThreadOverview implements ActionMode.Callback{
 
         switch (item.getItemId()){
             case R.id.action_delete: delete(); break;
+            case R.id.action_mark_read: markRead(); break;
         }
         mode.finish();
 
@@ -75,7 +86,7 @@ public class AMCallbackThreadOverview implements ActionMode.Callback{
         adapter.setSelectionModeOn(true);
 
         MenuInflater inflater = actionMode.getMenuInflater();
-        inflater.inflate( R.menu.contextual_threadoverview, menu );
+        inflater.inflate( R.menu.contextual_home, menu );
         this.actionMode = actionMode;
 
         log.returning(methodName);

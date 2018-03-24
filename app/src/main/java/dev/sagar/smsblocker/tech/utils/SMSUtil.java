@@ -86,7 +86,8 @@ public class SMSUtil {
                     String strSms = gson.toJson(sms);
                     sendBasket.putString(SMSSentReceiver.KEY_SMS, strSms);
                     sendBasket.putInt(SMSSentReceiver.KEY_TOTAL_PARTS, numParts);
-                    log.error(methodName, "Sgr sending key: "+SMSSentReceiver.KEY_SMS);
+
+                    log.info(methodName, "putting sent action in pendingIntent: "+ActionCode.SMS_SENT);
                     sentIntent.putExtras(sendBasket);
                     sentIntent.setAction(ActionCode.SMS_SENT);
                     PendingIntent sentPIntent = PendingIntent.getBroadcast(context, RequestCode.SMS_SENT, sentIntent, PendingIntent.FLAG_UPDATE_CURRENT );
@@ -109,8 +110,6 @@ public class SMSUtil {
 
             //Send SMS
             log.info(methodName,"Trying to Send SMS");
-
-            log.error(methodName,"Need to add sentIntent and deliveryIntent Here");
 
             smsManager.sendMultipartTextMessage(phoneNo, null, parts, sentPIntents, deliverPIntents);
 

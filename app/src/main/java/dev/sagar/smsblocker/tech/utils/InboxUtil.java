@@ -1,6 +1,5 @@
 package dev.sagar.smsblocker.tech.utils;
 
-import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,16 +10,15 @@ import android.net.Uri;
 import android.provider.Telephony;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.service.DBConstants;
 import dev.sagar.smsblocker.tech.service.DBServiceSingleton;
-import dev.sagar.smsblocker.tech.handlers.ReadStatusHandler;
+import dev.sagar.smsblocker.tech.handlers.MarkSMSReadHandler;
 import dev.sagar.smsblocker.tech.service.helper.DBHelper;
 import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
 
@@ -290,8 +288,8 @@ public class InboxUtil {
      * @param fromNumber Phone Number to set Read status as true
      * @return Number of Fields updated
      */
-    public void setStatusRead(String fromNumber){
-        final String methodName = "setStatusRead()";
+    public void markSMSRead(String fromNumber){
+        final String methodName = "markSMSRead()";
         log.justEntered(methodName);
 
         /*log.error(methodName, "Can be improved Here");
@@ -306,11 +304,23 @@ public class InboxUtil {
                 .getContentResolver()
                 .update(uriSMSUri, values, selection, selectionArgs);
         log.info(methodName, "Update Count: "+updateCount);*/
-
-        new ReadStatusHandler(context).execute(fromNumber);
+        new MarkSMSReadHandler(context).execute(fromNumber);
 
         log.returning(methodName);
     }
+
+    public void markSMSRead(Set<String> fromNumber){
+        final String methodName = "markSMSRead(Set<String>)";
+        log.justEntered(methodName);
+
+        //Mark SMS read
+        for(String conversationId: fromNumber) {
+            new MarkSMSReadHandler(context).execute(conversationId);
+        }
+
+        log.returning(methodName);
+    }
+
 
 
     /**

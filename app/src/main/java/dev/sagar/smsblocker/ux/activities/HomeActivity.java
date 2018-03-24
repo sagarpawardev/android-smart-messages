@@ -39,7 +39,7 @@ import dev.sagar.smsblocker.ux.adapters.RVHomeAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.customviews.NotificationView;
-import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThreadOverview;
+import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackHome;
 
 public class HomeActivity extends AppCompatActivity
         implements RVHomeAdapter.Callback, LocalSMSReceivedReceiver.Callback,
@@ -66,7 +66,7 @@ public class HomeActivity extends AppCompatActivity
     //Java Android
     IndexedHashMap<String, Conversation> conversationMap = new IndexedHashMap<>();
     RVHomeAdapter adapter;
-    private AMCallbackThreadOverview amCallback;
+    private AMCallbackHome amCallback;
 
     //Constants
     final String[] ALL_PERMISSIONS = Permission.ALL;
@@ -86,7 +86,7 @@ public class HomeActivity extends AppCompatActivity
         //if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         if(conversationUtil == null) conversationUtil = new ConversationUtil(this, this);
         adapter = new RVHomeAdapter(this, conversationMap, this);
-        amCallback = new AMCallbackThreadOverview(adapter);
+        amCallback = new AMCallbackHome(adapter);
         smsReceiver = new LocalSMSReceivedReceiver(this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -164,12 +164,12 @@ public class HomeActivity extends AppCompatActivity
 
     public void registerSMSReceiver(){
         final String methodName =  "registerReceivers()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         registerReceiver(smsReceiver, new IntentFilter(EventCode.LOCAL_SMS_RECEIVED));
         smsReceiver.isRegistered = true;
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     public void unregisterSMSReceiver(){
@@ -199,6 +199,7 @@ public class HomeActivity extends AppCompatActivity
         }
         else{
             adapter.notifyItemMoved(oldPosition, newPosition);
+            adapter.notifyDataSetChanged();
         }
 
         //If List is on top

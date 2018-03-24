@@ -479,18 +479,20 @@ public class DBServiceSingleton {
         for(String mAddress: addresses){
             sbRawQuery.append("'"+mAddress+"',");
         }
+
         sbRawQuery.deleteCharAt(sbRawQuery.length()-1); //Deleting , at end
         sbRawQuery.append(")");
 
-        String[] strArgs = null;
-                //alValues.toArray(new Integer[0]);
+        if(addresses.size()>0) { //Updating empty database does not make sense and App crashes as well
+            String[] strArgs = null;
 
-        String rawQuery = sbRawQuery.toString();
-        log.debug(methodName, "Formed Query: "+rawQuery);
-        Cursor c = writableDB.rawQuery(rawQuery, strArgs);
+            String rawQuery = sbRawQuery.toString();
+            log.debug(methodName, "Formed Query: " + rawQuery);
+            Cursor c = writableDB.rawQuery(rawQuery, strArgs);
 
-        log.info(methodName, "Updated rows: "+c.getCount());
-        c.close(); //Query won't update unless moveToFirst() or close() is called
+            log.info(methodName, "Updated rows: " + c.getCount());
+            c.close(); //Query won't update unless moveToFirst() or close() is called
+        }
 
         //-- Update unread_count in Conversation Starts
 

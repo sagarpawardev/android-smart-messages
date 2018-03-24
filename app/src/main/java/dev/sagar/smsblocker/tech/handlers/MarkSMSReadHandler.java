@@ -13,7 +13,7 @@ import dev.sagar.smsblocker.tech.utils.LogUtil;
  * Created by sagarpawar on 05/02/18.
  */
 
-public class ReadStatusHandler extends AsyncTask<String, Void, Void> {
+public class MarkSMSReadHandler extends AsyncTask<String, Void, Void> {
     //Log Initiate
     private LogUtil log = new LogUtil( this.getClass().getName() );
 
@@ -25,7 +25,7 @@ public class ReadStatusHandler extends AsyncTask<String, Void, Void> {
     private final String read = Telephony.Sms.READ;
 
 
-    public ReadStatusHandler(Context context){
+    public MarkSMSReadHandler(Context context){
         this.context = context;
     }
 
