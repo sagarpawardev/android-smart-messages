@@ -374,7 +374,7 @@ public class ContactUtilSingleton {
             contact = getContact(context, phoneNumber);
         }
         catch (ReadContactPermissionException e){
-            log.debug(methodName, "Got null from contacts so defaulting");
+            log.error(methodName, "Got null from contacts so defaulting phoneNu");
             contact = new Contact();
             contact.setId(null);
             String formatAddress = PhoneUtilsSingleton.getInstance().formatNumber(context, phoneNumber);
@@ -401,10 +401,12 @@ public class ContactUtilSingleton {
         //Check Permissions if donot have permission return behave like you don't have contact
         boolean hasContactPerm = PermissionUtilSingleton.getInstance().hasPermission(context, READ_CONTACTS);
         if(!hasContactPerm){
+            log.info(methodName, "No permissions for is given");
             throw new ReadContactPermissionException();
         }
 
         //Actual Procedure
+        log.info(methodName, "Reading Content provider for contact");
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
         String[] projection = {
@@ -414,20 +416,24 @@ public class ContactUtilSingleton {
                 ContactsContract.PhoneLookup.PHOTO_URI,
         };
         Cursor cursor = contentResolver.query(uri, projection, null, null, null);
-        if (cursor == null) {
+        if (cursor == null || cursor.getCount()==0) {
             log.error(methodName, "Nothing in Cursor for "+phoneNumber);
             result.setPhotoThumbnail(null);
             result.setId(null);
             result.setDisplayName(null);
+            result.setPhoto(null);
             result.setNumber(phoneNumber);
         }
         else{
+            log.info(methodName, "Cursor Size: "+cursor.getCount());
             if(cursor.moveToFirst()) {
                 String contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME));
                 String id = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup._ID));
                 String thumb_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
                 String photo_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI));
                 String number = phoneNumber;
+
+                log.info(methodName, "Received contact data for: "+number);
 
                 result.setNumber(number);
                 result.setId(id);
