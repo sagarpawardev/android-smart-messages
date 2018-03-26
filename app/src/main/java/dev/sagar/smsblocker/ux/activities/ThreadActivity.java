@@ -47,7 +47,6 @@ import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
-import dev.sagar.smsblocker.ux.analytics.AnalyticsApplication;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThread;
 
 public class ThreadActivity extends AppCompatActivity implements
@@ -60,7 +59,8 @@ public class ThreadActivity extends AppCompatActivity implements
     private LogUtil log = new LogUtil(this.getClass().getName());
 
     //Constants
-    public static final String KEY_THREAD_ID = "THREAD_ID";
+    public static final String KEY_ADDRESS = "THREAD_ID";
+    public static final String KEY_SMS_ID = "SMS_ID";
     final String[] ALL_PERMISSIONS = Permission.ALL;
     final String READ_SMS = Permission.READ_SMS;
     final String RECEIVE_SMS = Permission.RECEIVE_SMS;
@@ -96,12 +96,20 @@ public class ThreadActivity extends AppCompatActivity implements
     private LocalSMSSentReceiver smsSentReceiver = null;
     private ContactUtilSingleton contactUtil = ContactUtilSingleton.getInstance();
 
+    //Flag
+    private boolean alreadyHighlighted = false;
 
     private void showMsgs(){
         smses.clear();
         List<SMS> tmp = inboxUtil.getAllSMSFromTo(address);
         smses.addAll(tmp);
         adapter.notifyDataSetChanged();
+
+        if(!alreadyHighlighted) { //If this flag is not there then it will be highlighted in every refresh
+            highlightSMS();
+            alreadyHighlighted = true;
+        }
+
     }
 
     private void hideMsgs(){
@@ -236,6 +244,33 @@ public class ThreadActivity extends AppCompatActivity implements
         }
     }
 
+    public void highlightSMS(){
+        final String methodName =  "highlightSMS()";
+        log.justEntered(methodName);
+
+        Bundle basket = getIntent().getExtras();
+        String id = basket.getString(KEY_SMS_ID);
+        if(id!=null){
+            //Find Position
+            log.info(methodName, "Looking for position for SMS id: "+id);
+            for(int i=0; i<smses.size(); i++){
+                SMS sms = smses.get(i);
+                if(sms.getId().equals(id)){
+                    //Scroll to position
+                    log.info(methodName, "Found Position: "+i);
+                    recyclerView.smoothScrollToPosition(i);
+                    adapter.highlightItem(i);
+                    break;
+                }
+            }
+        }
+        else{
+            log.info(methodName, "No special SMS to show");
+        }
+
+        log.returning(methodName);
+    }
+
     private void init(){
         final String methodName =  "init()";
         log.justEntered(methodName);
@@ -267,7 +302,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
         //From Previous Activity
         Bundle basket = getIntent().getExtras();
-        address = basket.getString(KEY_THREAD_ID);
+        address = basket.getString(KEY_ADDRESS);
         adapter = new RVThreadAdapter(this, this, smses);
         amCallback = new AMCallbackThread(this, adapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -308,7 +343,7 @@ public class ThreadActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final String methodName =  "onCreate()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         setContentView(R.layout.activity_thread);
 
@@ -327,7 +362,9 @@ public class ThreadActivity extends AppCompatActivity implements
         hideMsgs();
         addListeners();
 
-        log.debug(methodName, "Returning..");
+        highlightSMS();
+
+        log.returning(methodName);
     }
 
     @Override

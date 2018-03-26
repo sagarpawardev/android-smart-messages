@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -121,6 +122,8 @@ public class SMSUtil {
 
         } catch (Exception e) {
             log.error(methodName, "Sending Failed");
+            Toast.makeText(context, "Give File permissions manually. (Debug)", Toast.LENGTH_LONG).show();
+            log.error(methodName, e);
             e.printStackTrace();
         }
 

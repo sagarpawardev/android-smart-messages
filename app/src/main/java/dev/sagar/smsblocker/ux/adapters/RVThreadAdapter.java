@@ -1,21 +1,19 @@
 package dev.sagar.smsblocker.ux.adapters;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.like.LikeButton;
 import com.like.OnLikeListener;
-
-import org.ocpsoft.prettytime.TimeFormat;
-import org.ocpsoft.prettytime.format.SimpleTimeFormat;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -59,6 +57,10 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     //Constants
     private static final int TYPE_RECEIVED = 0;
     private static final int TYPE_SENT = 1;
+    private static final int HIGHLIGHT_DURATION = 2000;
+
+    //Flag
+    private int highlightPosition = -1;
 
     public RVThreadAdapter(Context context, Callback callback, List<SMS> smses) {
         final String methodName =  "RVThreadAdapter()";
@@ -198,6 +200,23 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         log.returning(methodName);
     }
 
+    public void highlightItem(int position){
+        final String methodName =  "highlightItem(int)";
+        log.justEntered(methodName);
+
+        highlightPosition = position;
+        notifyItemChanged(position);
+
+        log.returning(methodName);
+    }
+
+    private void resetHighlight(){
+        final String methodName =  "highlightItem(int)";
+        log.justEntered(methodName);
+        highlightPosition = -1;
+        log.returning(methodName);
+    }
+
 
     //--- RecyclerView.Adapter Overrides Start ---
     @Override
@@ -230,7 +249,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     }
 
     @Override
-    public void onBindViewHolder(SMSViewHolder holder, int position) {
+    public void onBindViewHolder(final SMSViewHolder holder, int position) {
         final String methodName =  "onBindViewHolder()";
         log.justEntered(methodName);
 
@@ -281,6 +300,58 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
         if(!replyNotSupportedTold && type==SMS.TYPE_RECEIVED && !isReplySupported){
             callback.onReplyNotSupported();
+        }
+
+        //Highlight Item if required
+        if(highlightPosition ==position){
+            int colorFrom = context.getResources().getColor(R.color.orangeA200, null);
+            int colorTo = context.getResources().getColor(R.color.transparent, null);
+            ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+            colorAnimation.setDuration(HIGHLIGHT_DURATION); // milliseconds
+            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+                @Override
+                public void onAnimationUpdate(ValueAnimator animator) {
+                    holder.llParent.setBackgroundColor((int) animator.getAnimatedValue());
+                }
+            });
+            colorAnimation.addListener(new Animator.AnimatorListener() {
+
+                @Override
+                public void onAnimationStart(Animator animator) {
+                    final String methodName =  "onAnimationStart()";
+                    log.justEntered(methodName);
+                    //Nothing here
+                    log.returning(methodName);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    final String methodName =  "onAnimationEnd()";
+                    log.justEntered(methodName);
+
+                    log.info(methodName, "Resetting Highlight animation");
+                    resetHighlight();
+                    log.returning(methodName);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+                    final String methodName =  "onAnimationCancel()";
+                    log.justEntered(methodName);
+                    //Nothing here
+                    log.returning(methodName);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+                    final String methodName =  "onAnimationRepeat()";
+                    log.justEntered(methodName);
+                    //Nothing here
+                    log.returning(methodName);
+                }
+            });
+            colorAnimation.start();
         }
 
         log.returning(methodName);

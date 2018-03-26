@@ -24,5 +24,7 @@
     <dimen name="elevation_thread__msg">5dp</dimen>
     <dimen name="margin_thread__fullpage">6dp</dimen>
     <dimen name="margin_vert__threadoverview">12dp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 
 </resources>

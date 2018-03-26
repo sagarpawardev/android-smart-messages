@@ -12,10 +12,9 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- Analytics Application -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -24,8 +23,7 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".ux.activities.HomeActivity"
+        <activity android:name=".ux.activities.HomeActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
 
@@ -47,20 +45,26 @@
         Here android:windowSoftInputMode="stateHidden" helps in hiding keyboard when activity
         starts and edditext is focused in activity
         -->
-        <activity
-            android:name=".ux.activities.ThreadActivity"
+        <activity android:name=".ux.activities.ThreadActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:parentActivityName=".ux.activities.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity
-            android:name=".ux.activities.NewThreadActivity"
+        <activity android:name=".ux.activities.NewThreadActivity"
             android:label="@string/title_activity_new_thread"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <receiver
-            android:name=".tech.broadcastreceivers.SMSReceivedReceiver"
+        <activity android:name=".ux.activities.StarredSMSActivity"
+            android:label="@string/title_activity_starred_sms"
+            android:parentActivityName=".ux.activities.HomeActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="dev.sagar.smsblocker.ux.activities.HomeActivity" />
+        </activity>
+
+        <receiver android:name=".tech.broadcastreceivers.SMSReceivedReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">
@@ -75,8 +79,7 @@
         </receiver>
 
         <!-- BroadcastReceiver that listens to incoming MMS messages -->
-        <receiver
-            android:name=".tech.broadcastreceivers.MMSReceiver"
+        <receiver android:name=".tech.broadcastreceivers.MMSReceiver"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
@@ -84,6 +87,34 @@
                 <data android:mimeType="application/vnd.wap.mms-message" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".tech.broadcastreceivers.SMSDeliveredReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver android:name=".tech.broadcastreceivers.SMSSentReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver android:name=".tech.broadcastreceivers.NotificationBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Services -->
+        <service android:name=".tech.services.HeadlessSMSService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+                <data android:scheme="mms" />
+                <data android:scheme="mmsto" />
+            </intent-filter>
+        </service>
+
+
 
         <activity
             android:name=".test.activities.TestMainActivity"
@@ -109,32 +140,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".tech.services.HeadlessSMSService"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.SEND_RESPOND_VIA_MESSAGE">
-            <intent-filter>
-                <action android:name="android.intent.action.RESPOND_VIA_MESSAGE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="sms" />
-                <data android:scheme="smsto" />
-                <data android:scheme="mms" />
-                <data android:scheme="mmsto" />
-            </intent-filter>
-        </service>
-
-        <receiver
-            android:name=".tech.broadcastreceivers.SMSDeliveredReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name=".tech.broadcastreceivers.SMSSentReceiver"
-            android:enabled="true"
-            android:exported="false" />
-
         <activity
             android:name=".test.activities.Test2Acitvity"
             android:label="@string/title_activity_test2_acitvity"
@@ -150,11 +155,6 @@
         </activity>
         <activity android:name=".ux.activities.SilentSMSSenderActivity" />
 
-        <receiver
-            android:name=".tech.broadcastreceivers.NotificationBroadcastReceiver"
-            android:enabled="true"
-            android:exported="false" />
-
         <activity android:name=".test.activities.SearchResultsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -168,15 +168,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/home_searchable" />
             -->
-        </activity>
-        <activity
-            android:name=".ux.activities.StarredSMSActivity"
-            android:label="@string/title_activity_starred_sms"
-            android:parentActivityName=".ux.activities.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="dev.sagar.smsblocker.ux.activities.HomeActivity" />
         </activity>
     </application>
 

@@ -371,7 +371,12 @@ public class ContactUtilSingleton {
 
         Contact contact = null;
         try{
+            //TODO Default more data here like Uri, Thumbnail Uri
             contact = getContact(context, phoneNumber);
+            String name = contact.getDisplayName() == null ? contact.getNumber() : contact.getDisplayName();
+
+            contact.setDisplayName(name);
+
         }
         catch (ReadContactPermissionException e){
             log.error(methodName, "Got null from contacts so defaulting phoneNu");

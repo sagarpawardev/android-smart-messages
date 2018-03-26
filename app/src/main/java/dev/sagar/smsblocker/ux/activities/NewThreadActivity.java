@@ -104,7 +104,7 @@ public class NewThreadActivity extends AppCompatActivity
         log.justEntered(methodName);
 
         Bundle bundle = new Bundle();
-        bundle.putString(ThreadActivity.KEY_THREAD_ID, phoneNo);
+        bundle.putString(ThreadActivity.KEY_ADDRESS, phoneNo);
         Intent intent = new Intent(this, ThreadActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);

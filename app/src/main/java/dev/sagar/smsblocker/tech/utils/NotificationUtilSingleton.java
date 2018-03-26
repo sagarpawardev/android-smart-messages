@@ -1,11 +1,11 @@
 package dev.sagar.smsblocker.tech.utils;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -26,7 +26,6 @@ import dev.sagar.smsblocker.ux.activities.ThreadActivity;
 
 public class NotificationUtilSingleton {
 
-    private static final int GROUP_NOTIF_ID = 0;
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
 
@@ -38,6 +37,8 @@ public class NotificationUtilSingleton {
 
     //Constants
     public static final String KEY_REPLY = "reply";
+    private static final int GROUP_NOTIF_ID = 0;
+    private static final String NOTIFICATION_GROUP = "NOTIFICATION_GROUP";
 
     /**
      * This is part of Singleton Design pattern
@@ -92,7 +93,7 @@ public class NotificationUtilSingleton {
 
         Intent resultIntent = new Intent(context, ThreadActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(ThreadActivity.KEY_THREAD_ID, fromNo);
+        bundle.putString(ThreadActivity.KEY_ADDRESS, fromNo);
         resultIntent.putExtras(bundle);
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -114,23 +115,13 @@ public class NotificationUtilSingleton {
 
         int notifId = getNotificationId();
         String address = sms.getAddress();
-        String text = sms.getBody();
         Contact contact = ContactUtilSingleton.getInstance().getContactOrDefault(context, address);;
-        String fromName = contact.getDisplayName();
 
+        //Get Notification Builder
+        NotificationCompat.Builder mBuilder = getNotifBuilder(context, contact, sms);
 
-        int notifColor = context.getResources().getColor(R.color.colorPrimaryDark, null);
         NotificationCompat.Action action = getDirectReplyAction(context, sms, notifId);
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_notif)
-                .setContentTitle(fromName)
-                .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
-                .setWhen(sms.getDateTime())
-                .setColor(notifColor)
-                .setContentText(text)
-                .setShowWhen(true)
-                .addAction(action); // reply action from step b above
+        mBuilder.addAction(action); // reply action from step b above
 
         //Set Priority
         setPriority(context, mBuilder);
@@ -141,7 +132,7 @@ public class NotificationUtilSingleton {
         // Open Activity onClick Ends
         Intent resultIntent = new Intent(context, ThreadActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(ThreadActivity.KEY_THREAD_ID, address);
+        bundle.putString(ThreadActivity.KEY_ADDRESS, address);
         resultIntent.putExtras(bundle);
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -166,38 +157,61 @@ public class NotificationUtilSingleton {
         log.returning(methodName);
     }
 
+    private NotificationCompat.Builder getNotifBuilder(Context context, Contact contact, SMS sms){
 
-    private Notification getGroupSummary(Context context, Contact contact, SMS sms){
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-
-        /*builder//.setContentTitle("Some Content Title")
-                //set content text to support devices running API level < 24
-                //.setContentText("Two new messages")
-                .setSmallIcon(R.drawable.ic_notif)
-                //build summary info into InboxStyle template
-                .setStyle(new NotificationCompat.InboxStyle()
-                        *//*.addLine("Alex Faarborg  Check this out")
-                        .addLine("Jeff Chang    Launch Party")
-                        .setBigContentTitle("2 new messages")
-                        .setSummaryText("janedoe@example.com")*//*
-                );*/
-
-        //FIXME First Notification is overridden. When 2nd notification comes b
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
         String text = sms.getBody();
         String fromName = contact.getDisplayName();
-
-
         int notifColor = context.getResources().getColor(R.color.colorPrimaryDark, null);
-        NotificationCompat.Action action = getDirectReplyAction(context, sms, GROUP_NOTIF_ID);
 
-                builder.setSmallIcon(R.drawable.ic_notif)
-                .setContentTitle(fromName)
+        /*NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_notif)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(text))
-                .setWhen(sms.getDateTime())
+                .setContentTitle(fromName)
+//                .setWhen(sms.getDateTime())
                 .setColor(notifColor)
                 .setContentText(text)
+                .setShowWhen(true);*/
+
+
+        mBuilder.setSmallIcon(R.drawable.ic_notif)
+                //build summary info into InboxStyle template
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        /*.addLine("Alex Faarborg  Check this out")
+                        .addLine("Jeff Chang    Launch Party")*/
+                        //.setBigContentTitle(text)
+                        //.setSummaryText(fromName)
+                        .bigText(text)
+                );
+
+        mBuilder.setSmallIcon(R.drawable.ic_notif)
+                .setContentTitle(fromName)
+                .setColor(notifColor)
+                //.setSubText(fromName)
+                .setContentText(text)
                 .setShowWhen(true)
-                .addAction(action); // reply action from step b above
+                /*.setStyle(new NotificationCompat.InboxStyle()
+                        .addLine(text)
+                        .setBigContentTitle(fromName)
+                        .setSummaryText(fromName)
+                )*/
+        ;
+
+
+        return  mBuilder;
+    }
+
+
+    private Notification getGroupSummary(Context context, Contact contact, SMS sms){
+
+
+        //FIXME First Notification is overridden. When 2nd notification comes b
+
+        NotificationCompat.Action action = getDirectReplyAction(context, sms, GROUP_NOTIF_ID);
+
+        //Get Notification Builder
+        NotificationCompat.Builder builder = getNotifBuilder(context, contact, sms);
+        builder.addAction(action);
 
         setGroup(context, builder, contact);
 
@@ -271,7 +285,7 @@ public class NotificationUtilSingleton {
 
         Intent activityIndent = new Intent(context, ThreadActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(ThreadActivity.KEY_THREAD_ID, fromNo);
+        bundle.putString(ThreadActivity.KEY_ADDRESS, fromNo);
         activityIndent.putExtras(bundle);
         PendingIntent activityPIndent =
                 PendingIntent.getActivity(
@@ -311,8 +325,10 @@ public class NotificationUtilSingleton {
         final String methodName = "groupNotification(Context, NotificationCompat.Builder)";
         log.justEntered(methodName);
 
+        //TODO Change Group key Here
         String formatedNumber = PhoneUtilsSingleton.getInstance().formatNumber(context, contact.getNumber());
-        String groupKey = formatedNumber;
+        //String groupKey = formatedNumber;
+        String groupKey = NOTIFICATION_GROUP;
         builder.setGroup(groupKey);
 
         log.returning(methodName);
@@ -337,12 +353,18 @@ public class NotificationUtilSingleton {
         boolean isInteractive = powerManager.isInteractive();
         if(isInteractive){
             log.info(methodName, "Setting Importance Default");
-            builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-            builder.setDefaults(NotificationCompat.DEFAULT_SOUND);
+
+            Uri soundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+            builder.setPriority(NotificationCompat.PRIORITY_MAX);
+            builder.setSound(soundUri)
+                    .setLights(context.getColor(R.color.colorPrimary), 50, 10)
+                    //.setVibrate(new long[]{500, 500, 500, 500})
+            ;
         }
         else{
             log.info(methodName, "Setting Importance High");
-            builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+            builder.setPriority(NotificationCompat.PRIORITY_MAX);
             builder.setDefaults(NotificationCompat.DEFAULT_ALL);
         }
 
@@ -376,7 +398,7 @@ public class NotificationUtilSingleton {
             intent = new Intent(context, ThreadActivity.class);
             intent.setAction(NotificationBroadcastReceiver.REPLY_ACTION);
             Bundle basket = new Bundle();
-            basket.putString(ThreadActivity.KEY_THREAD_ID, address);
+            basket.putString(ThreadActivity.KEY_ADDRESS, address);
             intent.putExtras(basket);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             pIntent = PendingIntent.getActivity(context, 100, intent,

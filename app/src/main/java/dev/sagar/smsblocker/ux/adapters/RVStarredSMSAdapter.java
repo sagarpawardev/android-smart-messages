@@ -3,32 +3,35 @@ package dev.sagar.smsblocker.ux.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
-import dev.sagar.smsblocker.tech.beans.Conversation;
+import dev.sagar.smsblocker.tech.beans.SIM;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.tech.utils.TelephonyUtilSingleton;
+import dev.sagar.smsblocker.ux.activities.ThreadActivity;
 import dev.sagar.smsblocker.ux.customviews.DisplayPictureView;
+import dev.sagar.smsblocker.ux.utils.ThemeUtil;
 
 /**
  * Created by sagarpawar on 20/03/18.
@@ -42,11 +45,14 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
     //Java Android
     private Context context;
     private Handler deleteHandler;
+    private Typeface myFont;
 
     //Java Core
     private List<SMS> smses;
     private Callback callback;
     private InboxUtil inboxUtil;
+    private ThemeUtil themeUtil;
+    private TelephonyUtilSingleton telephonyUtil;
 
     //Constants
     private final long TIMEOUT_TIME = 3500; //3.5 Seconds equal to Snackbar.LENGTH_LONG
@@ -57,8 +63,47 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
         this.callback = callback;
 
         inboxUtil = new InboxUtil(context);
+        themeUtil = new ThemeUtil(context);
+        myFont = themeUtil.getTypeface();
+        telephonyUtil = TelephonyUtilSingleton.getInstance();
     }
 
+    public SMS itemRemoved(int position){
+        final String methodName =  "itemRemoved(int)";
+        log.justEntered(methodName);
+
+        final SMS sms = smses.remove(position);
+        notifyItemRemoved(position);
+
+        deleteHandler = new Handler();
+        deleteHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                List<SMS> list = new ArrayList<>();
+                list.add(sms);
+                int count = inboxUtil.unstarSMSes(list);
+            }
+        }, TIMEOUT_TIME);
+
+        log.returning(methodName);
+        return sms;
+    }
+
+    public void restore(int position, SMS sms){
+        final String methodName =  "restore(int , SMS)";
+        log.justEntered(methodName);
+
+        //Cancel Deletion
+        deleteHandler.removeCallbacksAndMessages(null);
+
+        //Reflect in UI
+        smses.add(position, sms);
+        notifyItemInserted(position);
+
+        log.returning(methodName);
+    }
+
+    //-- RecyclerView.Adapter<RVStarredSMSAdapter.SMSViewHolder> Overrides Starts
     @Override
     public SMSViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         final String methodName =  "onCreateViewHolder(ViewGroup, int)";
@@ -79,7 +124,6 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
         log.justEntered(methodName);
 
         //Adi changes Start
-        Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
         holder.tvBody.setTypeface(myFont);
         holder.tvFrom.setTypeface(myFont);
         holder.tvTime.setTypeface(myFont);
@@ -145,11 +189,14 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
         log.returning(methodName);
         return count;
     }
+    //-- RecyclerView.Adapter<RVStarredSMSAdapter.SMSViewHolder> Overrides Ends
 
-    protected class SMSViewHolder extends RecyclerView.ViewHolder{
+    protected class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView tvFrom, tvBody, tvTime, tvAddress;
         DisplayPictureView dpView;
         View parent;
+        String format = context.getResources().getString(R.string.format_thread__datetime);
+        DateFormat dateFormat = new SimpleDateFormat(format);
 
         SMSViewHolder(View view) {
             super(view);
@@ -159,6 +206,8 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
             dpView = view.findViewById(R.id.dpv_picture);
             parent = view;
 
+            parent.setOnClickListener(this);
+            tvTime.setOnClickListener(this);
             dpView.setOnClickListener(new View.OnClickListener() {
                 //Log Initiate
                 private LogUtil log = new LogUtil(this.getClass().getName());
@@ -193,42 +242,73 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
                 }
             });
         }
-    }
 
-    public SMS itemRemoved(int position){
-        final String methodName =  "itemRemoved(int)";
-        log.justEntered(methodName);
+        private void showMetaData(){
+            final String methodName =  "showMetaData()";
+            log.justEntered(methodName);
 
-        final SMS sms = smses.remove(position);
-        notifyItemRemoved(position);
+            int position = getAdapterPosition();
+            SMS sms = smses.get(position);
+            long dateTime = sms.getDateTime();
+            Date date = new Date(dateTime);
+            String strDateTime = dateFormat.format(date);
 
-        deleteHandler = new Handler();
-        deleteHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                List<SMS> list = new ArrayList<>();
-                list.add(sms);
-                int count = inboxUtil.unstarSMSes(list);
+            int subscriptionId = sms.getSubscription();
+            SIM sim = telephonyUtil.getSim(context, subscriptionId);
+            String operatorName = sim.getOperator();
+
+            StringBuilder sb = new StringBuilder();
+            if(operatorName != null){
+                sb.append(operatorName+"  |  ");
             }
-        }, TIMEOUT_TIME);
+            sb.append(strDateTime);
 
-        log.returning(methodName);
-        return sms;
+            String formattedStr = sb.toString();
+            tvTime.setText(formattedStr);
+
+            log.returning(methodName);
+        }
+
+        private void startThreadActivity(){
+            final String methodName =  "showMetaData()";
+            log.justEntered(methodName);
+
+            //Find Position
+            log.info(methodName, "Finding SMS object");
+            int position = getAdapterPosition();
+            SMS sms = smses.get(position);
+            String address = sms.getAddress();
+            String id = sms.getId();
+
+            //Start Thread Activity
+            log.info(methodName, "Start Thread Activity");
+            Intent intent = new Intent(context, ThreadActivity.class);
+            Bundle basket = new Bundle();
+            basket.putString(ThreadActivity.KEY_ADDRESS, address);
+            basket.putString(ThreadActivity.KEY_SMS_ID, id);
+            intent.putExtras(basket);
+            context.startActivity(intent);
+
+            log.returning(methodName);
+        }
+
+        //-- View.OnClickListener Overrides Starts
+        @Override
+        public void onClick(View view) {
+            final String methodName =  "itemRemoved(int)";
+            log.justEntered(methodName);
+
+            int id = view.getId();
+            switch (id){
+                case R.id.tv_metadata: showMetaData(); break;
+                default: startThreadActivity(); break;
+            }
+
+            log.returning(methodName);
+        }
+        //-- View.OnClickListener Overrides Ends
     }
 
-    public void restore(int position, SMS sms){
-        final String methodName =  "restore(int , SMS)";
-        log.justEntered(methodName);
-
-        //Cancel Deletion
-        deleteHandler.removeCallbacksAndMessages(null);
-
-        //Reflect in UI
-        smses.add(position, sms);
-        notifyItemInserted(position);
-
-        log.returning(methodName);
-    }
 
     public interface Callback{
 

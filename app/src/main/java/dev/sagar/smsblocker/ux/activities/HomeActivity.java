@@ -405,7 +405,7 @@ public class HomeActivity extends AppCompatActivity
         Intent intent = new Intent(this, ThreadActivity.class);
         Bundle basket = new Bundle();
 
-        basket.putString(ThreadActivity.KEY_THREAD_ID, threadId);
+        basket.putString(ThreadActivity.KEY_ADDRESS, threadId);
         intent.putExtras(basket);
         startActivity(intent);
         overridePendingTransition(R.anim.transition_slide_in, R.anim.transition_slide_out);

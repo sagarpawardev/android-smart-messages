@@ -47,7 +47,7 @@ public class PhoneUtilsSingleton {
 
         //TODO Change Logic Here
         address = address.toUpperCase();
-        boolean result = !(address.charAt(0)<='Z' && address.charAt(0)>='A');
+        boolean result = !( (address.charAt(0)<='Z' && address.charAt(0)>='A') && address.length()<10 ); //If Address is VK-Mumbai or 56065
         log.error(methodName, "This Logic is valid only in India");
 
         log.returning(methodName);
