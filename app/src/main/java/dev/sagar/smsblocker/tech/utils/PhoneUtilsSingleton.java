@@ -25,6 +25,8 @@ public class PhoneUtilsSingleton {
 
 
     public String formatNumber(Context context, String unformattedNumber){
+        final String methodName =  "formatNumber(Context, String)";
+        log.justEntered(methodName);
         TelephonyManager tm = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
         String countryCode = tm.getSimCountryIso();
 
@@ -38,11 +40,13 @@ public class PhoneUtilsSingleton {
             //formattedNumber = unformattedNumber.replaceAll("[-,+]","");
             formattedNumber = unformattedNumber.replaceAll("[+]","");
         }
+
+        log.returning(methodName);
         return formattedNumber;
     }
 
     public boolean isReplySupported(String address){
-        final String methodName =  "isReplySupported()";
+        final String methodName =  "isReplySupported(String)";
         log.justEntered(methodName);
 
         //TODO Change Logic Here

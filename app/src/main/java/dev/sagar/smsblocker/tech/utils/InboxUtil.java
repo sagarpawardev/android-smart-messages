@@ -534,7 +534,7 @@ public class InboxUtil {
             default: log.error(methodName, "Unknown Sorting order");
         }
 
-        //Create Query for SMS Database
+        //Create Query for Saved SMS Database
         Cursor c = dbService.query(db, DBConstants.TABLE_SAVEDSMS, mProjection, mSelection, mSelectionArgs, mSortOrder );
         ArrayList<String> values = new ArrayList<>();
         StringBuilder sbQuery = new StringBuilder();
@@ -554,49 +554,52 @@ public class InboxUtil {
         db.close();
         dbHelper.close();
 
-        //Querying SMS Content Provider
-        mProjection = new String[]{"*"};
-        mSelection = sbQuery.toString();
-        mSelectionArgs = values.toArray(new String[values.size()]);
-        mSortOrder = null;
+        if(values.size()>0) {
+            //Querying SMS Content Provider
+            mProjection = new String[]{"*"};
+            mSelection = sbQuery.toString();
+            mSelectionArgs = values.toArray(new String[values.size()]);
+            mSortOrder = null;
 
-        ContentResolver resolver = context.getContentResolver();
-        c = dbService.query(resolver, DBConstants.URI_INBOX, mProjection, mSelection, mSelectionArgs, mSortOrder );
-        log.debug(methodName, "Saved Reading SMS Count: "+c.getCount());
-        try {
-            while (c.moveToNext()) {
+            ContentResolver resolver = context.getContentResolver();
+            c = dbService.query(resolver, DBConstants.URI_INBOX, mProjection, mSelection, mSelectionArgs, mSortOrder);
+            log.debug(methodName, "Saved Reading SMS Count: " + c.getCount());
+            try {
+                while (c.moveToNext()) {
 
-                String from = c.getString(c.getColumnIndexOrThrow(this.address));
-                String id = c.getString(c.getColumnIndexOrThrow(this._id));
-                String body = c.getString(c.getColumnIndexOrThrow(this.body));
-                int subscriptionId = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
-                boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
-                long time = c.getLong(c.getColumnIndexOrThrow(this.date));
-                long type = c.getLong(c.getColumnIndexOrThrow(this.type));
-                boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
+                    String from = c.getString(c.getColumnIndexOrThrow(this.address));
+                    String id = c.getString(c.getColumnIndexOrThrow(this._id));
+                    String body = c.getString(c.getColumnIndexOrThrow(this.body));
+                    int subscriptionId = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
+                    boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
+                    long time = c.getLong(c.getColumnIndexOrThrow(this.date));
+                    long type = c.getLong(c.getColumnIndexOrThrow(this.type));
+                    boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
 
-                SMS sms = new SMS();
-                sms.setId(id);
-                sms.setAddress(from);
-                sms.setBody(body);
-                sms.setRead(readState);
-                sms.setDateTime(time);
-                sms.setType(type);
-                sms.setSubscription(subscriptionId);
-                sms.setReplySupported(replySupported);
-                sms.setSaved(true);
+                    SMS sms = new SMS();
+                    sms.setId(id);
+                    sms.setAddress(from);
+                    sms.setBody(body);
+                    sms.setRead(readState);
+                    sms.setDateTime(time);
+                    sms.setType(type);
+                    sms.setSubscription(subscriptionId);
+                    sms.setReplySupported(replySupported);
+                    sms.setSaved(true);
 
-                smses.add(sms);
+                    smses.add(sms);
 
-                log.debug(methodName, "Address: "+from+" ReplySupported: "+sms.isReplySupported());
+                    log.debug(methodName, "Address: " + from + " ReplySupported: " + sms.isReplySupported());
 
+                }
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            } finally {
+                c.close();
             }
         }
-        catch (NullPointerException e){
-            e.printStackTrace();
-        }
-        finally {
-            c.close();
+        else{
+            log.info(methodName, "There are no Saved SMS in Database :)");
         }
 
         log.returning(methodName);
