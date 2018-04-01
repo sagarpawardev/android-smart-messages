@@ -99,4 +99,14 @@ public class SMS implements Serializable{
     public void setSaved(boolean saved) {
         this.saved = saved;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        SMS sms = (SMS) obj;
+        if(sms.getId()==null || sms.getAddress()==null){
+            return super.equals(obj);
+        }
+
+        return sms.getId().equals(id) && sms.getAddress().equals(address);
+    }
 }

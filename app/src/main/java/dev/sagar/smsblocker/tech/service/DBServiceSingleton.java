@@ -12,9 +12,11 @@ import android.provider.Telephony;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.service.helper.conversation.ConversationDBAttributes.Converesation;
 import dev.sagar.smsblocker.tech.service.helper.DBHelper;
 import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
@@ -273,14 +275,11 @@ public class DBServiceSingleton {
 
         //Read Old Conversation DB Rows Starts
         log.info(methodName, "Reading old Address and Date rows");
-        String[] mOldProjection = {
-                this.address_local,
-                this.date_local
-        };
+        String[] mOldProjection = {"*"};
         SQLiteDatabase readDB = mDBHelper.getReadableDatabase();
         Cursor mOldCursor = readDB.query(Converesation.TABLE_NAME,
                 mOldProjection, null, null, null, null, null);
-        HashMap<String, Long> oldMap = new HashMap<>();
+        HashMap<String, SMS> oldMap = new HashMap<>();
         if(mOldCursor!=null){
             log.info(methodName, "Reading Address and Date Count:"+mOldCursor.getCount());
             while(mOldCursor.moveToNext()){
@@ -293,7 +292,23 @@ public class DBServiceSingleton {
 
                 log.info(methodName, "Reading contact details: "+address);
                 long date = mOldCursor.getLong(mOldCursor.getColumnIndexOrThrow(this.date_local));
-                oldMap.put(address, date);
+                String id = mOldCursor.getString(mOldCursor.getColumnIndexOrThrow(this._id_local));
+                String body = mOldCursor.getString(mOldCursor.getColumnIndexOrThrow(this.body_local));
+                int subscriptionId = mOldCursor.getInt(mOldCursor.getColumnIndexOrThrow(this.subscriptionId_local));
+                String read = mOldCursor.getString(mOldCursor.getColumnIndex(this.read_local));
+                boolean bRead = (read.equals("0") || read.equalsIgnoreCase("false"));
+                long type = mOldCursor.getLong(mOldCursor.getColumnIndexOrThrow(this.type_local));
+
+                SMS sms = new SMS();
+                sms.setId(id);
+                sms.setAddress(address);
+                sms.setDateTime(date);
+                sms.setId(id);
+                sms.setBody(body);
+                sms.setSubscription(subscriptionId);
+                sms.setRead(bRead);
+                sms.setType(type);
+                oldMap.put(address, sms);
             }
             mOldCursor.close();
         }
@@ -309,13 +324,16 @@ public class DBServiceSingleton {
         String[] mSelectionArgs = {};
         String mSortOrder = this.date +" DESC";
 
-        HashMap<String, Long> newMap = new HashMap<>();
+        HashSet<String> doneSet = new HashSet<>();
         HashMap<String, Integer> unreadCountMap = new HashMap<>();
 
         SQLiteDatabase  writableDB = mDBHelper.getWritableDatabase();
 
         Cursor mLatestSmsCursor = contentResolver
                 .query(mUriSMS, mProjection, mSelection, mSelectionArgs, mSortOrder);
+
+
+        int tempCount = 0;
         if (mLatestSmsCursor != null) {
             log.info(methodName, "Reading latest sms from contact count:"+mLatestSmsCursor.getCount());
             while(mLatestSmsCursor.moveToNext()){
@@ -376,10 +394,27 @@ public class DBServiceSingleton {
                 }
 
 
-                if(newMap.containsKey(address)) continue; //If value is already in Map then go to next value
-                long oldDate = oldMap.get(address)==null ? 0 : oldMap.get(address);
-                if(oldDate >= date) continue; //If oldDate is greater than or equals current date ignore message
+                if(doneSet.contains(address)) continue; //If value is already in Map then go to next value
+
+
+                SMS oldSMS = oldMap.get(address);
+                if(oldSMS == null) continue; //Just in case if nothing found
+
+                tempCount++;
+                if(address.equals("AX-IPAYTM")){
+                    long time = oldMap.get(address).getDateTime();
+                    log.info(methodName, "Dummy Statement");
+                }
+
+
+                long oldDate = oldMap.get(address)==null ? 0 : oldMap.get(address).getDateTime();
+                //if(oldDate >= date) continue; //If oldDate is greater than or equals current date ignore message
                 log.error(methodName, "Olddate: "+oldDate+" newdate:"+date+" address:"+address+" type:"+type);
+                if(id.equals(oldSMS.getId()) && address.equals(oldSMS.getAddress())){
+                    doneSet.add(address);
+                    continue; //If SMS is same as older ones
+                }
+
                 if(oldMap.containsKey(address)) {
                     String whereClause = this.address_local + " = ?";
                     String[] whereArgs = {address};
@@ -388,7 +423,7 @@ public class DBServiceSingleton {
                 else{
                     writableDB.insert(Converesation.TABLE_NAME, null, values);
                 }
-                newMap.put(address, date);
+                doneSet.add(address);
                 result++;
             }
             mLatestSmsCursor.close();
@@ -430,7 +465,7 @@ public class DBServiceSingleton {
 
                 //TODO Default country to format number
 
-                log.info(methodName, "Found contactName: "+contactName+" for address: "+address+" In new map: "+newMap.containsKey(address));
+                log.info(methodName, "Found contactName: "+contactName+" for address: "+address+" In new map: "+doneSet.contains(address));
             }
             mContactCursor.close();
         }
@@ -440,8 +475,7 @@ public class DBServiceSingleton {
         //-- Create a map of all contacts Ends
 
         //Update Photo in Database Starts
-        Set<String> keySet = newMap.keySet();
-        for(String key: keySet){
+        for(String key: doneSet){
             ContactDetails contact = mContactMap.get(key);
 
             if(contact == null){ //In case address does not exists in Contacts
