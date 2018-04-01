@@ -23,6 +23,9 @@ public class PermissionUtilSingleton {
 
     //Java Core
     private static PermissionUtilSingleton instance = null;
+    public static final int RESULT_CODE_APP_DEFAULT = 1588;
+    public static final int RESULT_CODE_SMS_PERMISSION = 1299;
+    public static final int RESULT_CODE_CONTACT_PERMISSION = 120;
 
 
     /**
@@ -116,14 +119,14 @@ public class PermissionUtilSingleton {
      * @param context
      * @return
      */
-    public void askToMakeAppDefault(Context context){
+    public void askToMakeAppDefault(Activity context){
         final String methodName = "askToMakeAppDefault()";
         log.justEntered(methodName);
 
         String myPackageName = context.getPackageName();
         Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
         intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, myPackageName);
-        context.startActivity(intent);
+        context.startActivityForResult(intent, RESULT_CODE_APP_DEFAULT);
 
         log.returning(methodName);
     }

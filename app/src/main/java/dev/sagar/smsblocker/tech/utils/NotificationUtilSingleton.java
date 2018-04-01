@@ -37,7 +37,7 @@ public class NotificationUtilSingleton {
 
     //Constants
     public static final String KEY_REPLY = "reply";
-    private static final int GROUP_NOTIF_ID = 0;
+    private static final int SUMMARY_ID = 0;
     private static final String NOTIFICATION_GROUP = "NOTIFICATION_GROUP";
 
     /**
@@ -117,19 +117,8 @@ public class NotificationUtilSingleton {
         String address = sms.getAddress();
         Contact contact = ContactUtilSingleton.getInstance().getContactOrDefault(context, address);;
 
-        //Get Notification Builder
-        NotificationCompat.Builder mBuilder = getNotifBuilder(context, contact, sms);
 
-        NotificationCompat.Action action = getDirectReplyAction(context, sms, notifId);
-        mBuilder.addAction(action); // reply action from step b above
-
-        //Set Priority
-        setPriority(context, mBuilder);
-
-        //Group Notification
-        setGroup(context, mBuilder, contact);
-
-        // Open Activity onClick Ends
+        //-- Open Activity onClick Ends
         Intent resultIntent = new Intent(context, ThreadActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString(ThreadActivity.KEY_ADDRESS, address);
@@ -141,18 +130,38 @@ public class NotificationUtilSingleton {
                         resultIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
+        //-- Open Activity onClick Ends
+
+        //Get Notification Builder
+        NotificationCompat.Builder mBuilder = getNotifBuilder(context, contact, sms);
+        NotificationCompat.Builder mGroupBuilder = getNotifBuilder(context, contact, sms).setGroupSummary(true);
+
+        NotificationCompat.Action action = getDirectReplyAction(context, sms, notifId);
+        mBuilder.addAction(action); // reply action from step b above
+        mGroupBuilder.addAction(action);
+
+
+        //Set Priority
+        setPriority(context, mBuilder);
+        setPriority(context, mGroupBuilder);
+
+        //Group Notification
+        setGroup(context, mBuilder, contact);
+        setGroup(context,  mGroupBuilder, contact);
+
+        //Setting on click envent
         mBuilder.setContentIntent(resultPendingIntent)
                 .setAutoCancel(true);
-        // Open Activity onClick Ends
-
+        mGroupBuilder.setContentIntent(resultPendingIntent)
+                .setAutoCancel(true);
 
         log.info(methodName, "Creating Notification..");
         NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
         Notification notification = mBuilder.build();
-        mNotificationManager.notify(notifId, notification);
+        Notification notifGroupSummary = mGroupBuilder.build();
 
-        Notification notifGroupSummary = getGroupSummary(context, contact, sms);
-        mNotificationManager.notify(GROUP_NOTIF_ID, notifGroupSummary);
+        mNotificationManager.notify(notifId, notification);
+        mNotificationManager.notify(SUMMARY_ID, notifGroupSummary);
 
         log.returning(methodName);
     }
@@ -174,7 +183,7 @@ public class NotificationUtilSingleton {
                 .setShowWhen(true);*/
 
 
-        mBuilder.setSmallIcon(R.drawable.ic_notif)
+        mBuilder.setSmallIcon(R.drawable.ic_notif_24dp)
                 //build summary info into InboxStyle template
                 .setStyle(new NotificationCompat.BigTextStyle()
                         /*.addLine("Alex Faarborg  Check this out")
@@ -184,7 +193,7 @@ public class NotificationUtilSingleton {
                         .bigText(text)
                 );
 
-        mBuilder.setSmallIcon(R.drawable.ic_notif)
+        mBuilder.setSmallIcon(R.drawable.ic_notif_24dp)
                 .setContentTitle(fromName)
                 .setColor(notifColor)
                 //.setSubText(fromName)
@@ -201,23 +210,6 @@ public class NotificationUtilSingleton {
         return  mBuilder;
     }
 
-
-    private Notification getGroupSummary(Context context, Contact contact, SMS sms){
-
-
-        //FIXME First Notification is overridden. When 2nd notification comes b
-
-        NotificationCompat.Action action = getDirectReplyAction(context, sms, GROUP_NOTIF_ID);
-
-        //Get Notification Builder
-        NotificationCompat.Builder builder = getNotifBuilder(context, contact, sms);
-        builder.addAction(action);
-
-        setGroup(context, builder, contact);
-
-        builder.setGroupSummary(true);
-        return builder.build();
-    }
 
     private int getNotificationId(){
         return sNotificationId++;
@@ -312,21 +304,13 @@ public class NotificationUtilSingleton {
         notificationManager.notify(notificationId, mBuilder.build());
     }*/
 
-    private void showNotification(Context context, Notification notification){
-        final String methodName = "showNotification(Context, Notification)";
-        log.justEntered(methodName);
-
-
-
-        log.returning(methodName);
-    }
 
     private void setGroup(Context context, NotificationCompat.Builder builder, Contact contact){
         final String methodName = "groupNotification(Context, NotificationCompat.Builder)";
         log.justEntered(methodName);
 
         //TODO Change Group key Here
-        String formatedNumber = PhoneUtilsSingleton.getInstance().formatNumber(context, contact.getNumber());
+        //String formatedNumber = PhoneUtilsSingleton.getInstance().formatNumber(context, contact.getNumber());
         //String groupKey = formatedNumber;
         String groupKey = NOTIFICATION_GROUP;
         builder.setGroup(groupKey);

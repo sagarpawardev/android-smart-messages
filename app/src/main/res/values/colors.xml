@@ -25,6 +25,8 @@
     <color name="card_recv_msg">#FFFFFF</color>
     <color name="card_send_msg">#FF5252</color>
     <color name="background_primary">#EEEEEE</color>
+    <color name="grad_start">#F64848</color>
+    <color name="grad_end">#C2185B</color>
 
 
 </resources>
