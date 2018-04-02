@@ -363,14 +363,14 @@ public class HomeActivity extends AppCompatActivity
         if(hasPermission) {
             showInboxView();
             askForDefault();
+            log.info(methodName, "Refreshinng local DB...");
+            conversationUtil.refreshDB();
         }
         else{
             permUtil.ask(this, ALL_PERMISSIONS, REQUEST_CODE_ALL_PERMISSIONS);
         }
         registerSMSReceiver();
 
-        log.info(methodName, "Refreshinng local DB...");
-        conversationUtil.refreshDB();
         super.onStart();
 
         log.returning(methodName);

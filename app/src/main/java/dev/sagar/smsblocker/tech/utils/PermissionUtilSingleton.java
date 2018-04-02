@@ -26,6 +26,7 @@ public class PermissionUtilSingleton {
     public static final int RESULT_CODE_APP_DEFAULT = 1588;
     public static final int RESULT_CODE_SMS_PERMISSION = 1299;
     public static final int RESULT_CODE_CONTACT_PERMISSION = 120;
+    public static final int REQUEST_CODE_ALL_PERMISSION = 786;
 
 
     /**

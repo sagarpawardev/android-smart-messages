@@ -276,7 +276,7 @@ public class InboxUtil {
         final String methodName =  "getAllSMSFromTo()";
         log.justEntered(methodName);
 
-        List<SMS> smses = getAllSMSFromTo(contactNo, SORT_DESC);;
+        List<SMS> smses = getAllSMSFromTo(contactNo, SORT_DESC);
 
         log.returning(methodName);
         return smses;
@@ -442,7 +442,8 @@ public class InboxUtil {
 
         String id = sms.getId();
         long currtime = System.currentTimeMillis();
-        String address = PhoneUtilsSingleton.getInstance().formatNumber(context, sms.getAddress());
+        //String address = PhoneUtilsSingleton.getInstance().formatNumber(context, sms.getAddress());
+        String address = sms.getAddress();
         ContentValues values = new ContentValues();
         values.put(this.starredsms_id, id);
         values.put(this.starredsms_address, address);
@@ -543,11 +544,14 @@ public class InboxUtil {
             String address = c.getString(c.getColumnIndexOrThrow(this.starredsms_address));
             String id = c.getString(c.getColumnIndexOrThrow(this.starredsms_id));
 
-            sbQuery.append("("+this.address+"=? AND ");
-            sbQuery.append(this._id+"=? )");
+            sbQuery.append("(");
+            /*sbQuery.append(this.address+"=?");
+            sbQuery.append(" AND ");*/
+            sbQuery.append(this._id+"=?");
+            sbQuery.append(" ) ");
             if(!c.isLast())
                 sbQuery.append(" OR ");
-            values.add(address);
+            //values.add(address);
             values.add(id);
         }
         c.close();

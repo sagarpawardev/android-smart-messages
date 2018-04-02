@@ -16,11 +16,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.service.helper.conversation.ConversationDBAttributes.Converesation;
 import dev.sagar.smsblocker.tech.service.helper.DBHelper;
 import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 
 /**
  * Created by sagarpawar on 07/02/18.
@@ -33,6 +35,7 @@ public class DBServiceSingleton {
 
     //Java Core
     private static DBServiceSingleton instance = null;
+    private static PermissionUtilSingleton permUtil = null;
     private DBServiceSingleton(){}
 
     //Constants
@@ -81,8 +84,10 @@ public class DBServiceSingleton {
 
 
     public static DBServiceSingleton getInstance(){
-        if(instance == null)
+        if(instance == null) {
             instance = new DBServiceSingleton();
+            permUtil = PermissionUtilSingleton.getInstance();
+        }
         return instance;
     }
 
@@ -398,19 +403,13 @@ public class DBServiceSingleton {
 
 
                 SMS oldSMS = oldMap.get(address);
-                if(oldSMS == null) continue; //Just in case if nothing found
-
-                tempCount++;
-                if(address.equals("AX-IPAYTM")){
-                    long time = oldMap.get(address).getDateTime();
-                    log.info(methodName, "Dummy Statement");
-                }
+                //if(oldSMS == null) continue; //Just in case if nothing found
 
 
                 long oldDate = oldMap.get(address)==null ? 0 : oldMap.get(address).getDateTime();
                 //if(oldDate >= date) continue; //If oldDate is greater than or equals current date ignore message
                 log.error(methodName, "Olddate: "+oldDate+" newdate:"+date+" address:"+address+" type:"+type);
-                if(id.equals(oldSMS.getId()) && address.equals(oldSMS.getAddress())){
+                if(oldSMS!=null && id.equals(oldSMS.getId()) && address.equals(oldSMS.getAddress())){
                     doneSet.add(address);
                     continue; //If SMS is same as older ones
                 }
@@ -444,33 +443,38 @@ public class DBServiceSingleton {
         };
 
         Map<String, ContactDetails> mContactMap = new HashMap<>();
-        Cursor mContactCursor = contentResolver.query(mContactUri, mContactProjection, null, null, null);
-        if (mContactCursor != null) {
 
-            while(mContactCursor.moveToNext()){
-                String contactName = mContactCursor.getString(mContactCursor.getColumnIndex(this.contactName));
-                String photoThumb = mContactCursor.getString(mContactCursor.getColumnIndex(this.photoUriThumbnail));
-                String photoUri = mContactCursor.getString(mContactCursor.getColumnIndex(this.photoUri));
-                String address = mContactCursor.getString(mContactCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+        if(permUtil.hasPermission(context, Permission.READ_CONTACTS)) {
+            Cursor mContactCursor = contentResolver.query(mContactUri, mContactProjection, null, null, null);
+            if (mContactCursor != null) {
 
-                /*String normalizedAddress = PhoneNumberUtils.normalizeNumber(address);*/
+                while (mContactCursor.moveToNext()) {
+                    String contactName = mContactCursor.getString(mContactCursor.getColumnIndex(this.contactName));
+                    String photoThumb = mContactCursor.getString(mContactCursor.getColumnIndex(this.photoUriThumbnail));
+                    String photoUri = mContactCursor.getString(mContactCursor.getColumnIndex(this.photoUri));
+                    String address = mContactCursor.getString(mContactCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                ContactDetails contact = new ContactDetails();
-                contact.name = contactName;
-                contact.photoThumbUri = photoThumb;
-                contact.photoUri = photoUri;
-                contact.address = address;
+                    /*String normalizedAddress = PhoneNumberUtils.normalizeNumber(address);*/
 
-                mContactMap.put(address, contact);
+                    ContactDetails contact = new ContactDetails();
+                    contact.name = contactName;
+                    contact.photoThumbUri = photoThumb;
+                    contact.photoUri = photoUri;
+                    contact.address = address;
 
-                //TODO Default country to format number
+                    mContactMap.put(address, contact);
 
-                log.info(methodName, "Found contactName: "+contactName+" for address: "+address+" In new map: "+doneSet.contains(address));
+                    //TODO Default country to format number
+
+                    log.info(methodName, "Found contactName: " + contactName + " for address: " + address + " In new map: " + doneSet.contains(address));
+                }
+                mContactCursor.close();
+            } else {
+                log.error(methodName, "Nothing in Contacts Cursor for " + address);
             }
-            mContactCursor.close();
         }
         else{
-            log.error(methodName, "Nothing in Contacts Cursor for "+address);
+            log.error(methodName, "No contact read permissions");
         }
         //-- Create a map of all contacts Ends
 

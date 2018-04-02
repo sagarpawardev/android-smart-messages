@@ -112,7 +112,7 @@ public class StarredSMSActivity extends AppCompatActivity implements RVStarredSM
                             int topVisiblePosition = layoutManager.findFirstVisibleItemPosition();
                             int lastVisiblePosition = layoutManager.findLastVisibleItemPosition();
                             if(position < topVisiblePosition || position > lastVisiblePosition ) {
-                                rvStarredSMS.smoothScrollToPosition(position);
+                                rvStarredSMS.scrollToPosition(position);
                             }
                         }
                     })
