@@ -34,4 +34,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     implementation project(':libs:likebutton')
+    implementation project(':libs:shapeloading')
 }

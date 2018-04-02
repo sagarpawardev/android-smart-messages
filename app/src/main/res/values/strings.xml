@@ -63,5 +63,6 @@
 
     <string name="label_next">Next</string>
     <string name="lbl_skip">Skip</string>
+    <string name="text_preparing">Preparing your box...</string>
 
 </resources>

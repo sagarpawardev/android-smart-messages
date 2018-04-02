@@ -1,8 +1,9 @@
 package dev.sagar.smsblocker.ux.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -15,29 +16,41 @@ import android.widget.Toast;
 
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.beans.Conversation;
+import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
+import dev.sagar.smsblocker.tech.utils.ConversationUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.VPIntroAdapter;
-import dev.sagar.smsblocker.ux.dialog.IntroDialog;
 
-public class IntroActivity extends AppCompatActivity {
+public class IntroActivity extends AppCompatActivity implements ConversationUtil.Callback{
 
     private Button btnDefault;
     private PermissionUtilSingleton permUtil = PermissionUtilSingleton.getInstance();
     private ViewPager pager;
     private PagerAdapter mPagerAdapter;
     private Button btnNext, btnSkip;
+    private View loadingViewHolder;
+    private ConversationUtil convUtil;
+    private SharedPreferences prefs;
+    private String KEY_DONE_FLAG = "done_flag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
 
-        boolean appIsDefault = permUtil.isAppDefault(getApplicationContext());
-        if(appIsDefault){
-            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-            startActivity(intent);
-            finish();
+        loadingViewHolder = findViewById(R.id.loading_view_holder);
+
+
+        prefs = getSharedPreferences("my_prefs", Context.MODE_PRIVATE);
+        boolean introShown = prefs.getBoolean(KEY_DONE_FLAG, false);
+        if(introShown){
+            startHomeActivity(); //finish() included in this
         }
+
+
+
+        convUtil = new ConversationUtil(this, this);
 
         /*btnDefault = (Button) findViewById(R.id.btn_default);
         btnDefault.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +126,7 @@ public class IntroActivity extends AppCompatActivity {
         builder.setNegativeButton(lblDeny, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                startHomeActivity();
+                prepareInbox();
             }
         });
 
@@ -122,7 +135,18 @@ public class IntroActivity extends AppCompatActivity {
     }
 
 
+    public void prepareInbox(){
+        pager.setVisibility(View.INVISIBLE);
+        btnNext.setVisibility(View.INVISIBLE);
+        loadingViewHolder.setVisibility(View.VISIBLE);
+        convUtil.refreshDB();
+    }
+
     public void startHomeActivity(){
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(KEY_DONE_FLAG, true);
+        editor.apply();
+
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         startActivity(intent);
         finish();
@@ -135,7 +159,7 @@ public class IntroActivity extends AppCompatActivity {
         if(requestCode == PermissionUtilSingleton.RESULT_CODE_APP_DEFAULT) {
             boolean appIsDefault = permUtil.isAppDefault(getApplicationContext());
             if (appIsDefault) {
-                startHomeActivity();
+                prepareInbox();
             } else {
                 Toast.makeText(getApplicationContext(), "Not made default", Toast.LENGTH_SHORT).show();
             }
@@ -151,7 +175,7 @@ public class IntroActivity extends AppCompatActivity {
                 boolean hasReadSMSPermission = permUtil.hasPermission(this, Permission.READ_CONTACTS);
 
                 if(hasReadSMSPermission){
-                    startHomeActivity();
+                    prepareInbox();
                 }
                 else{
                     Toast.makeText(this, "Permission Not givev :(", Toast.LENGTH_SHORT).show();
@@ -175,13 +199,23 @@ public class IntroActivity extends AppCompatActivity {
                 boolean hasSMSPermission = permUtil.hasPermission(this, Permission.READ_SMS);
 
                 if(hasContactPermission && hasSMSPermission){
-                    startHomeActivity();
+                    prepareInbox();
                     Toast.makeText(this, "Thanks!!", Toast.LENGTH_SHORT).show();
                 }
 
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    @Override
+    public void onDBRefreshed(int count) {
+        startHomeActivity();
+    }
+
+    @Override
+    public void onLatestMsgsFetched(IndexedHashMap<String, Conversation> map) {
+
     }
     //--- AppCompatActivity Overrides Ends ---
 }
