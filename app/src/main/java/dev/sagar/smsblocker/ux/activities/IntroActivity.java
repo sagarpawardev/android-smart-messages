@@ -139,10 +139,17 @@ public class IntroActivity extends AppCompatActivity implements ConversationUtil
         pager.setVisibility(View.INVISIBLE);
         btnNext.setVisibility(View.INVISIBLE);
         loadingViewHolder.setVisibility(View.VISIBLE);
-        convUtil.refreshDB();
+
+        boolean hasSMSPermission = permUtil.hasPermission(this, Permission.READ_SMS);
+        if(hasSMSPermission) {
+            convUtil.refreshDB();
+        }else {
+            startHomeActivity();
+        }
     }
 
     public void startHomeActivity(){
+
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean(KEY_DONE_FLAG, true);
         editor.apply();
