@@ -16,6 +16,7 @@ import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.NotificationUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
+import dev.sagar.smsblocker.tech.utils.PhoneUtilsSingleton;
 
 public class SMSReceivedReceiver extends BroadcastReceiver {
 
@@ -98,13 +99,18 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
             //Create an SMS body
             String msgBody = sbMessage.toString();
             SmsMessage smsMessage = SmsMessage.createFromPdu((byte[])pdus[0], MSG_FORMAT);
+            String address  = smsMessage.getOriginatingAddress();
+            boolean isReplySupported = PhoneUtilsSingleton.getInstance().isReplySupported(address);
+
             SMS sms = new SMS();
-            sms.setAddress(smsMessage.getOriginatingAddress());
+            sms.setAddress(address);
             sms.setDateTime(smsMessage.getTimestampMillis());
             sms.setBody(msgBody);
             sms.setRead(false);
             sms.setType(SMS.TYPE_RECEIVED);
             sms.setSubscription(subscription);
+            sms.setReplySupported(isReplySupported);
+
             log.debug(methodName, "Service Center: "+smsMessage.getServiceCenterAddress());
 
             log.info(methodName, "Received Message From: "+smsMessage.getDisplayOriginatingAddress());

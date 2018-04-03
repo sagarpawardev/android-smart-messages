@@ -362,31 +362,39 @@ public class NotificationUtilSingleton {
         String address = sms.getAddress();
 
         Intent intent;
-        PendingIntent pIntent;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            // start a
-            // (i)  broadcast receiver which runs on the UI thread or
-            // (ii) service for a background task to b executed , but for the purpose of
-            // this codelab, will be doing a broadcast receiver
-            intent = new Intent(context, NotificationBroadcastReceiver.class);
-            intent.setAction(NotificationBroadcastReceiver.REPLY_ACTION);
-            Bundle basket = new Bundle();
-            basket.putString(NotificationBroadcastReceiver.KEY_ADDRESS, address);
-            basket.putInt(NotificationBroadcastReceiver.KEY_NOTIF_ID, notifId);
+        PendingIntent pIntent = null;
 
-            intent.putExtras(basket);
-            pIntent = PendingIntent.getBroadcast(context, 100, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-        } else {
-            // start your activity for Android M and below
-            intent = new Intent(context, ThreadActivity.class);
-            intent.setAction(NotificationBroadcastReceiver.REPLY_ACTION);
-            Bundle basket = new Bundle();
-            basket.putString(ThreadActivity.KEY_ADDRESS, address);
-            intent.putExtras(basket);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            pIntent = PendingIntent.getActivity(context, 100, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+        if(sms.isReplySupported()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                // start a
+                // (i)  broadcast receiver which runs on the UI thread or
+                // (ii) service for a background task to b executed , but for the purpose of
+                // this codelab, will be doing a broadcast receiver
+                intent = new Intent(context, NotificationBroadcastReceiver.class);
+
+                if (sms.isReplySupported()) {
+                    intent.setAction(NotificationBroadcastReceiver.REPLY_ACTION);
+                }
+
+                Bundle basket = new Bundle();
+                basket.putString(NotificationBroadcastReceiver.KEY_ADDRESS, address);
+                basket.putInt(NotificationBroadcastReceiver.KEY_NOTIF_ID, notifId);
+
+                intent.putExtras(basket);
+                pIntent = PendingIntent.getBroadcast(context, 100, intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+            } else {
+                // start your activity for Android M and below
+                intent = new Intent(context, ThreadActivity.class);
+
+                intent.setAction(NotificationBroadcastReceiver.REPLY_ACTION);
+                Bundle basket = new Bundle();
+                basket.putString(ThreadActivity.KEY_ADDRESS, address);
+                intent.putExtras(basket);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                pIntent = PendingIntent.getActivity(context, 100, intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+            }
         }
 
         log.returning(methodName);
