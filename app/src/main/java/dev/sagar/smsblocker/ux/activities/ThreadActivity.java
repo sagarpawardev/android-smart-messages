@@ -53,7 +53,8 @@ public class ThreadActivity extends AppCompatActivity implements
         RVThreadAdapter.Callback,
         LocalSMSReceivedReceiver.Callback,
         LocalSMSSentReceiver.Callback,
-        LocalSMSDeliveredReceiver.Callback{
+        LocalSMSDeliveredReceiver.Callback,
+        InboxUtil.Callback{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -72,7 +73,7 @@ public class ThreadActivity extends AppCompatActivity implements
     private ImageButton btnSend;
     private EditText etMsg;
     private TextView tvHeader;
-    private View holderBodyET;
+    private View holderBodyET, holderLoader, holderMain;
     private View tvReplyNotSupported;
 
     //Java Android
@@ -100,16 +101,9 @@ public class ThreadActivity extends AppCompatActivity implements
     private boolean alreadyHighlighted = false;
 
     private void showMsgs(){
-        smses.clear();
-        List<SMS> tmp = inboxUtil.getAllSMSFromTo(address);
-        smses.addAll(tmp);
-        adapter.notifyDataSetChanged();
-
-        if(!alreadyHighlighted) { //If this flag is not there then it will be highlighted in every refresh
-            highlightSMS();
-            alreadyHighlighted = true;
-        }
-
+        inboxUtil.getAllSMSFromTo(address);
+        holderMain.setVisibility(View.GONE);
+        holderLoader.setVisibility(View.VISIBLE);
     }
 
     private void hideMsgs(){
@@ -293,8 +287,10 @@ public class ThreadActivity extends AppCompatActivity implements
         etMsg = (EditText) findViewById(R.id.et_msg);
         holderBodyET = findViewById(R.id.holder_sms_et);
         tvReplyNotSupported = findViewById(R.id.tv_reply_not_supported);
+        holderLoader = findViewById(R.id.holder_loader);
+        holderMain = findViewById(R.id.holder_main);
 
-        if(inboxUtil == null) inboxUtil = new InboxUtil(this);
+        if(inboxUtil == null) inboxUtil = new InboxUtil(this, this);
         smsUtil = new SMSUtil(this);
         smsReceivedReceiver = new LocalSMSReceivedReceiver(this);
         smsDeliveredReceiver = new LocalSMSDeliveredReceiver(this);
@@ -499,10 +495,10 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         log.error(methodName, "Can be improved Here");
-        List<SMS> temp = inboxUtil.getAllSMSFromTo(address);
-        smses.clear();
+        showMsgs();
+        /*smses.clear();
         smses.addAll(temp);
-        adapter.notifyDataSetChanged();
+        adapter.notifyDataSetChanged();*/
 
         log.returning(methodName);
     }
@@ -525,31 +521,31 @@ public class ThreadActivity extends AppCompatActivity implements
     @Override
     public void onItemLongClicked() {
         final String methodName =  "onItemLongClicked()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         startActionMode(amCallback);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
     public void singleSelectionMode() {
         final String methodName =  "singleSelectionMode()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         amCallback.enableCopy(false);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
     public void multiSelectionMode() {
         final String methodName =  "multiSelectionMode()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         amCallback.enableCopy(true);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
@@ -585,5 +581,26 @@ public class ThreadActivity extends AppCompatActivity implements
         return sTracker;
     }
 
+    //---- InboxUtil.Callback Overrides Starts ----
+    @Override
+    public void onAllSMSFromToResult(List<SMS> updateList) {
+        final String methodName =  "onAllSMSFromToResult()";
+        log.justEntered(methodName);
 
+        holderLoader.setVisibility(View.GONE);
+        holderMain.setVisibility(View.VISIBLE);
+
+        smses.clear();
+
+        smses.addAll(updateList);
+        adapter.notifyDataSetChanged();
+
+        if(!alreadyHighlighted) { //If this flag is not there then it will be highlighted in every refresh
+            highlightSMS();
+            alreadyHighlighted = true;
+        }
+
+        log.returning(methodName);
+    }
+    //---- InboxUtil.Callback Overrides Ends ----
 }

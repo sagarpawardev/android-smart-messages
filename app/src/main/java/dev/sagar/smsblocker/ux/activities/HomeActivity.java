@@ -52,7 +52,7 @@ public class HomeActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private FloatingActionButton fab;
     private NotificationView notificationView;
-    private View viewPlaceHolder;
+    private View viewPlaceHolder, holderLoader, holderMain;
     private SwitchCompat switchUnread;
     private TextView tvTotalCount;
 
@@ -83,6 +83,9 @@ public class HomeActivity extends AppCompatActivity
         switchUnread = (SwitchCompat) findViewById(R.id.switch_unread);
         tvTotalCount = (TextView) findViewById(R.id.tv_total_count);
 
+        holderLoader = findViewById(R.id.holder_loader);
+        holderMain = findViewById(R.id.holder_main);
+
         //if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         if(conversationUtil == null) conversationUtil = new ConversationUtil(this, this);
         adapter = new RVHomeAdapter(this, conversationMap, this);
@@ -109,7 +112,13 @@ public class HomeActivity extends AppCompatActivity
         conversationUtil.getLatestMsgs();
 
         if(conversationMap.size() == 0) {
-            Toast.makeText(this, "You have not received any SMS Yet!!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "You have not received any SMS Yet!!", Toast.LENGTH_SHORT).show();
+            holderLoader.setVisibility(View.VISIBLE);
+            holderMain.setVisibility(View.GONE);
+        }
+        else{
+            holderMain.setVisibility(View.VISIBLE);
+            holderLoader.setVisibility(View.GONE);
         }
     }
 
@@ -501,6 +510,14 @@ public class HomeActivity extends AppCompatActivity
 
         conversationMap.update(map);
         adapter.notifyDataSetChanged();
+
+        if(conversationMap.size() == 0) {
+            Toast.makeText(this, "You have not received any SMS Yet!!", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            holderMain.setVisibility(View.VISIBLE);
+            holderLoader.setVisibility(View.GONE);
+        }
 
         //Set Total Count
         String strTotalCount = getCountText(adapter.getItemCount());

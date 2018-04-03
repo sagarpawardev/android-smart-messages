@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.Telephony;
 
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ public class InboxUtil {
     private DBServiceSingleton dbService = DBServiceSingleton.getInstance();
 
     //Java Core References
+    private Callback callback;
+
+    //Java Constants
     private final String _id = Telephony.Sms._ID;
     private final String address = Telephony.Sms.ADDRESS;
     private final String threadId = Telephony.Sms.THREAD_ID;
@@ -57,6 +61,11 @@ public class InboxUtil {
     private final String starredsms_id = SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ID;
     private final String starredsms_address = SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ADDRESS;
     private final String starredsms_dateadded = SavedSMSDBAttributes.SavedSMS.COLUMN_DATE_ADDED;
+
+    public InboxUtil(Context context, Callback callback) {
+        this.context = context;
+        this.callback = callback;
+    }
 
     public InboxUtil(Context context) {
         this.context = context;
@@ -171,99 +180,32 @@ public class InboxUtil {
      * @param sortingOrder Sorting order {valid values: InboxUtil.SORT_DESC, InboxUtil.SORT_ASC}
      * @return Returns list of SMS from contact number
      */
-    public ArrayList<SMS> getAllSMSFromTo(String contactNo, int sortingOrder){
+    public void getAllSMSFromTo(final String contactNo, final int sortingOrder){
         final String methodName =  "getAllSMSFromTo()";
         log.justEntered(methodName);
 
-        //Reading Saved SMSes
-        String selection = address+" = ?";
-        String[] projection = {starredsms_id};
-        String tableName = DBConstants.TABLE_SAVEDSMS;
-        String[] selectionArgs = {contactNo};
+        if(callback != null) {
+            AsyncTask<Void, Void, List<SMS>> asyncTask = new AsyncTask<Void, Void, List<SMS>>() {
+                @Override
+                protected List<SMS> doInBackground(Void... voids) {
+                    List<SMS> smses = bgGetAllSMSFromTo(contactNo, sortingOrder);
+                    return smses;
+                }
 
-        DBHelper helper = new DBHelper(context);
-        SQLiteDatabase db = helper.getReadableDatabase();
-        DBServiceSingleton dbService = DBServiceSingleton.getInstance();
-        Cursor cursor = dbService.query(db, tableName, projection, selection, selectionArgs, null);
-        log.debug(methodName, "Saved SMS Returned Row Count: "+cursor.getCount()+" Selection: "+selection+" Args: "+selectionArgs[0]);
-        HashSet<String> set = new HashSet<>();
-        try{
-            while(cursor.moveToNext()){
-                String id = cursor.getString(cursor.getColumnIndexOrThrow(this.starredsms_id));
-                set.add(id);
-            }
+                @Override
+                protected void onPostExecute(List<SMS> smses) {
+                    callback.onAllSMSFromToResult(smses);
+                    super.onPostExecute(smses);
+                }
+            };
+            asyncTask.execute();
         }
-        catch (NullPointerException e){
-            e.printStackTrace();
-        }
-        finally {
-            if (cursor!=null) cursor.close();
-            db.close();
-            helper.close();
-        }
-        log.debug(methodName, "Saved SMS Set size: "+set.size());
-
-
-        //Reading SMSes from database
-        Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
-
-        selection = address+" = ?";
-        projection = new String[]{"*"};
-        selectionArgs = new String[]{contactNo};
-        String mSortOrder = null;
-        switch (sortingOrder) {
-            case SORT_DESC: mSortOrder = date+" DESC"; break;
-            case SORT_ASC: mSortOrder = date+" ASC"; break;
-            default: mSortOrder="";
-        }
-
-        ContentResolver mContentResolver = context.getContentResolver();
-        Cursor c = dbService
-                .query(mContentResolver, uriSmsURI, projection, selection, selectionArgs, mSortOrder);
-
-        ArrayList<SMS> smses = new ArrayList<>();
-        log.info(methodName, "Reading SMSes... ");
-
-        try {
-            while (c.moveToNext()) {
-
-                String from = c.getString(c.getColumnIndexOrThrow(this.address));
-                String id = c.getString(c.getColumnIndexOrThrow(this._id));
-                String body = c.getString(c.getColumnIndexOrThrow(this.body));
-                int subscriptionId = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
-                boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
-                long time = c.getLong(c.getColumnIndexOrThrow(this.date));
-                long type = c.getLong(c.getColumnIndexOrThrow(this.type));
-                boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
-
-                SMS sms = new SMS();
-                sms.setId(id);
-                sms.setAddress(from);
-                sms.setBody(body);
-                sms.setRead(readState);
-                sms.setDateTime(time);
-                sms.setType(type);
-                sms.setSubscription(subscriptionId);
-                sms.setReplySupported(replySupported);
-
-                if(set.contains(id))
-                    sms.setSaved(true);
-
-                smses.add(sms);
-
-                log.debug(methodName, "Address: "+from+" ReplySupported: "+c.getString(c.getColumnIndex(this.replySupported)));
-
-            }
-        }
-        catch (NullPointerException e){
-            e.printStackTrace();
-        }
-        finally {
-            if (c!=null) c.close();
+        else{
+            throw new UnsupportedOperationException("SGR. This Operation is not supported. Because callback is null. because of wrong constructor call");
         }
 
         log.returning(methodName);
-        return smses;
+        //return smses;
     }
 
 
@@ -272,14 +214,14 @@ public class InboxUtil {
      * @param contactNo Phone Number to get SMS
      * @return List of SMS from a contract number
      */
-    public List<SMS> getAllSMSFromTo(String contactNo){
+    public void getAllSMSFromTo(String contactNo){
         final String methodName =  "getAllSMSFromTo()";
         log.justEntered(methodName);
 
-        List<SMS> smses = getAllSMSFromTo(contactNo, SORT_DESC);
+        getAllSMSFromTo(contactNo, SORT_DESC);
 
         log.returning(methodName);
-        return smses;
+        //return smses;
     }
 
 
@@ -403,7 +345,7 @@ public class InboxUtil {
         log.error(methodName, "Performance issues Temporarily adding. Need to remove later");
         ContentResolver contentResolver = context.getContentResolver();
         int count=0;
-        List<SMS> smses = getAllSMSFromTo(phoneNo);
+        List<SMS> smses = bgGetAllSMSFromTo(phoneNo, SORT_DESC);
         for(SMS sms: smses){
             String id = sms.getId();
             Uri tempUri = Uri.withAppendedPath(SMS_URI, Uri.encode(id));
@@ -608,6 +550,104 @@ public class InboxUtil {
 
         log.returning(methodName);
         return smses;
+    }
+
+
+
+    private List<SMS>  bgGetAllSMSFromTo(String contactNo, int sortingOrder){
+        final String methodName =  "bgGetAllSMSFromTo(String, int)";
+        log.justEntered(methodName);
+
+        //Reading Saved SMSes
+        String selection = address+" = ?";
+        String[] projection = {starredsms_id};
+        String tableName = DBConstants.TABLE_SAVEDSMS;
+        String[] selectionArgs = {contactNo};
+
+        DBHelper helper = new DBHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        DBServiceSingleton dbService = DBServiceSingleton.getInstance();
+        Cursor cursor = dbService.query(db, tableName, projection, selection, selectionArgs, null);
+        log.debug(methodName, "Saved SMS Returned Row Count: "+cursor.getCount()+" Selection: "+selection+" Args: "+selectionArgs[0]);
+        HashSet<String> set = new HashSet<>();
+        try{
+            while(cursor.moveToNext()){
+                String id = cursor.getString(cursor.getColumnIndexOrThrow(this.starredsms_id));
+                set.add(id);
+            }
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        finally {
+            if (cursor!=null) cursor.close();
+            db.close();
+            helper.close();
+        }
+        log.debug(methodName, "Saved SMS Set size: "+set.size());
+
+
+        //Reading SMSes from database
+        Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
+
+        selection = address+" = ?";
+        projection = new String[]{"*"};
+        selectionArgs = new String[]{contactNo};
+        String mSortOrder = null;
+        switch (sortingOrder) {
+            case SORT_DESC: mSortOrder = date+" DESC"; break;
+            case SORT_ASC: mSortOrder = date+" ASC"; break;
+            default: mSortOrder="";
+        }
+
+        ContentResolver mContentResolver = context.getContentResolver();
+        Cursor c = dbService
+                .query(mContentResolver, uriSmsURI, projection, selection, selectionArgs, mSortOrder);
+
+        ArrayList<SMS> smses = new ArrayList<>();
+        log.info(methodName, "Reading SMSes... ");
+
+        try {
+            while (c.moveToNext()) {
+
+                String from = c.getString(c.getColumnIndexOrThrow(this.address));
+                String id = c.getString(c.getColumnIndexOrThrow(this._id));
+                String body = c.getString(c.getColumnIndexOrThrow(this.body));
+                int subscriptionId = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
+                boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
+                long time = c.getLong(c.getColumnIndexOrThrow(this.date));
+                long type = c.getLong(c.getColumnIndexOrThrow(this.type));
+                boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
+
+                SMS sms = new SMS();
+                sms.setId(id);
+                sms.setAddress(from);
+                sms.setBody(body);
+                sms.setRead(readState);
+                sms.setDateTime(time);
+                sms.setType(type);
+                sms.setSubscription(subscriptionId);
+                sms.setReplySupported(replySupported);
+
+                if(set.contains(id))
+                    sms.setSaved(true);
+
+                smses.add(sms);
+
+                log.debug(methodName, "Address: "+from+" ReplySupported: "+c.getString(c.getColumnIndex(this.replySupported)));
+
+            }
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        finally {
+            if (c!=null) c.close();
+        }
+        return smses;
+    }
+    public interface Callback{
+        void onAllSMSFromToResult(List<SMS> updateList);
     }
 
 }

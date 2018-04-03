@@ -11,69 +11,90 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/holder_switch"
-        android:background="@color/background_primary">
+        android:layout_height="match_parent"
+        android:id="@+id/holder_main">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="15dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="4dp"
-            android:paddingBottom="4dp"
-            android:gravity="center_vertical"
-            android:textSize="12sp"
-            android:layout_centerInParent="true"
-            android:textColor="@color/blueA800"
-            android:layout_alignParentStart="true"
-            android:id="@+id/tv_total_count"/>
+            android:id="@+id/holder_switch"
+            android:visibility="gone"
+            android:background="@color/background_primary">
 
-        <android.support.v7.widget.SwitchCompat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAlignment="viewStart"
-            android:drawablePadding="4dp"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:textSize="12sp"
-            android:textColor="@color/blueA800"
-            app:switchPadding="10dp"
-            android:fontFamily="serif"
-            android:text="@string/label_unread_only"
-            android:layout_alignParentEnd="true"
-            android:id="@+id/switch_unread"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="15dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                android:layout_centerInParent="true"
+                android:textColor="@color/blueA800"
+                android:layout_alignParentStart="true"
+                android:id="@+id/tv_total_count"/>
 
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="viewStart"
+                android:drawablePadding="4dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textSize="12sp"
+                android:textColor="@color/blueA800"
+                app:switchPadding="10dp"
+                android:fontFamily="serif"
+                android:text="@string/label_unread_only"
+                android:layout_alignParentEnd="true"
+                android:id="@+id/switch_unread"/>
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_below="@id/holder_switch"
+            android:visibility="gone"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="0dp"
+            android:id="@+id/lv_threads"/>
+
+        <dev.sagar.smsblocker.ux.customviews.NotificationView
+            android:id="@+id/notificationView"
+            android:background="@drawable/grad"
+            android:alpha="0.85"
+            android:padding="8dp"
+            app:titleText="@string/notif_default_app_title"
+            app:descText="@string/notif_default_app_desc"
+            app:titleColor="@color/white"
+            app:descColor="@color/white"
+            android:visibility="gone"
+            app:closeBtnBackground="@drawable/ripple_effect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <include layout="@layout/placeholder_permission"
+            android:visibility="gone"/>
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_below="@id/holder_switch"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginTop="0dp"
-        android:id="@+id/lv_threads"/>
-
-    <dev.sagar.smsblocker.ux.customviews.NotificationView
-        android:id="@+id/notificationView"
-        android:background="@drawable/grad"
-        android:alpha="0.85"
-        android:padding="8dp"
-        app:titleText="@string/notif_default_app_title"
-        app:descText="@string/notif_default_app_desc"
-        app:titleColor="@color/white"
-        app:descColor="@color/white"
-        android:visibility="gone"
-        app:closeBtnBackground="@drawable/ripple_effect"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <include layout="@layout/placeholder_permission"
-        android:visibility="gone"/>
+        android:layout_centerInParent="true"
+        android:id="@+id/holder_loader">
+        <com.mingle.widget.LoadingView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/loading_view"/>
+    </RelativeLayout>
 
 </RelativeLayout>
