@@ -402,23 +402,28 @@ public class HomeActivity extends AppCompatActivity
     //--- RVHomeAdapter.Callback Overrides Start ---
     @Override
     public void onItemClicked(String threadId) {
+        final String methodName =  "onItemClicked(String)";
+        log.justEntered(methodName);
+
         Intent intent = new Intent(this, ThreadActivity.class);
         Bundle basket = new Bundle();
 
         basket.putString(ThreadActivity.KEY_ADDRESS, threadId);
         intent.putExtras(basket);
         startActivity(intent);
-        overridePendingTransition(R.anim.transition_slide_in, R.anim.transition_slide_out);
+        overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out);
+
+        log.returning(methodName);
     }
 
     @Override
     public void onItemLongClicked() {
         final String methodName =  "onItemLongClicked()";
-        log.debug(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         startActionMode(amCallback);
 
-        log.debug(methodName, "Returning..");
+        log.returning(methodName);
     }
 
     @Override
