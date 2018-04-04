@@ -305,7 +305,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         //Highlight Item if required
         if(highlightPosition ==position){
             int colorFrom = context.getResources().getColor(R.color.orangeA200, null);
-            int colorTo = context.getResources().getColor(R.color.transparent, null);
+            int colorTo = context.getResources().getColor(R.color.transparent_light_grey, null);
             ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
             colorAnimation.setDuration(HIGHLIGHT_DURATION); // milliseconds
             colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

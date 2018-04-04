@@ -21,7 +21,8 @@
     <color name="selected_thread">#E1F5FE</color>
     <color name="text_msg">#FFFFFF</color>
     <color name="blueA200_2">#448AFF</color>
-    <color name="transparent">#10FFFFFF</color>
+    <color name="transparent">#00000000</color>
+    <color name="transparent_light_grey">#10FFFFFF</color>
     <color name="card_recv_msg">#FFFFFF</color>
     <color name="card_send_msg">#FF5252</color>
     <color name="background_primary">#EEEEEE</color>
