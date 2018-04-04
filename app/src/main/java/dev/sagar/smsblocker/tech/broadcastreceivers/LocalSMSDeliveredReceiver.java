@@ -54,24 +54,26 @@ public class LocalSMSDeliveredReceiver extends BroadcastReceiver {
         SMS sms = gson.fromJson(jsonSMS, SMS.class);
 
         String action = intent.getAction();
-        String msg = "";
+        String msg = null;
         switch (action){
             case SMSDeliveredReceiver.KEY_SMS_DELIVERED:
                 msg = context.getString(R.string.txt_delivered);
+                log.info(methodName, "Calling Callback");
                 callback.onSMSDelivered(sms);
                 break;
             case SMSDeliveredReceiver.KEY_DELIVERY_CANCELLED:
                 msg = context.getString(R.string.err_delivery_cancelled);
                 break;
-            default:
+            /*default:
                 msg = context.getString(R.string.err_unknown_delivery);
-                log.error(methodName, "Some Unknown Error occurred action code: "+action);
+                log.error(methodName, "Some Unknown Error occurred action code: "+action);*/
         }
 
-        log.info(methodName, "Toasting text: "+msg);
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-        log.info(methodName, "Calling Callback");
-        callback.onSMSDelivered(sms);
+        if(msg!=null) {
+            log.info(methodName, "Toasting text: " + msg);
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        }
+
 
         log.returning(methodName);
     }

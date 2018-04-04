@@ -45,7 +45,7 @@ public class LocalSMSReceivedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         final String methodName = "onReceive()";
-        log.verbose(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         //Receive SMS
         if (intent.getAction().equals(EVENT_RECEIVED)) {
@@ -57,7 +57,7 @@ public class LocalSMSReceivedReceiver extends BroadcastReceiver {
             callback.onSMSReceived(sms);
         }
 
-        log.info(methodName, "Returned..");
+        log.returning(methodName);
     }
 
 

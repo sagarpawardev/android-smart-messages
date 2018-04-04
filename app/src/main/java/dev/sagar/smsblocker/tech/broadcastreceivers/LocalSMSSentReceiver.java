@@ -59,7 +59,7 @@ public class LocalSMSSentReceiver extends BroadcastReceiver {
         SMS sms = gson.fromJson(jsonSMS, SMS.class);
 
 
-        String msg = "Not Initialized";
+        String msg = null;
         switch (action){
             case SMSSentReceiver.KEY_SMS_SENT:
                 sms.setType(SMS.TYPE_SENT);
@@ -81,13 +81,15 @@ public class LocalSMSSentReceiver extends BroadcastReceiver {
                 msg = context.getString(R.string.err_null_pdu);
                 sms.setType(SMS.TYPE_FAILED);
                 callback.onSMSSentFailure(sms); break;
-            default:
+            /*default:
                 log.error(methodName, "Some different error: "+action);
-                msg = context.getString(R.string.err_unknown_sending);
+                msg = context.getString(R.string.err_unknown_sending);*/
         }
 
-        log.info(methodName, "Toasting text: "+msg);
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        if(msg!=null) {
+            log.info(methodName, "Toasting text: " + msg);
+            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+        }
 
         log.returning(methodName);
     }
