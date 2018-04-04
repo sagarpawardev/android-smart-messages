@@ -1,5 +1,7 @@
 package dev.sagar.smsblocker.tech.datastructures;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,6 +30,7 @@ public class IndexedHashMap<K,V>{
     public PositionLog put(K key, V value){
         int oldPosition = -1;
         int newPosition = -1;
+
         if(map.containsKey(key)) {
             V tValue = map.get(key);
             oldPosition = list.indexOf(tValue);

@@ -35,6 +35,7 @@ import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.datastructures.PositionLog;
 import dev.sagar.smsblocker.tech.utils.ConversationUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.tech.utils.PhoneUtilsSingleton;
 import dev.sagar.smsblocker.ux.adapters.RVHomeAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
@@ -60,6 +61,7 @@ public class HomeActivity extends AppCompatActivity
     ConversationUtil conversationUtil = null;
     final private int REQUEST_CODE_ALL_PERMISSIONS = 123;
     private PermissionUtilSingleton permUtil = PermissionUtilSingleton.getInstance();
+    private PhoneUtilsSingleton phoneUtils = PhoneUtilsSingleton.getInstance();
     private LocalSMSReceivedReceiver smsReceiver = null;
     private boolean alreadyAsked = false;
 
@@ -200,7 +202,8 @@ public class HomeActivity extends AppCompatActivity
         Conversation conversation = new Conversation(getApplicationContext(), sms);
 
         log.error(methodName, "Improvement can be done here");
-        PositionLog mPositionLog = conversationMap.put(phoneNo, conversation);
+        String formattedPhone = phoneUtils.formatNumber(this, phoneNo);
+        PositionLog mPositionLog = conversationMap.put(formattedPhone, conversation);
         int oldPosition = mPositionLog.getOldPosition();
         int newPosition = mPositionLog.getNewPosition();
         if(oldPosition == -1) { //Item Newly Added

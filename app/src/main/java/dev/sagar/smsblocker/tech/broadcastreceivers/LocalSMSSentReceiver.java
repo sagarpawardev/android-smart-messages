@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.EventCode;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
@@ -51,17 +52,42 @@ public class LocalSMSSentReceiver extends BroadcastReceiver {
         final String methodName = "onReceive()";
         log.justEntered(methodName);
 
-        int resultCode = getResultCode();
+
+        String action = intent.getAction();
         Bundle basket = intent.getExtras();
         String jsonSMS = basket.getString(KEY_SMS);
         SMS sms = gson.fromJson(jsonSMS, SMS.class);
 
-        log.info(methodName, "Calling Callback");
-        switch (resultCode) {
-            case Activity.RESULT_OK: callback.onSMSSent(sms);
-                break;
-            default: callback.onSMSSentFailure(sms); break;
+
+        String msg = "Not Initialized";
+        switch (action){
+            case SMSSentReceiver.KEY_SMS_SENT:
+                sms.setType(SMS.TYPE_SENT);
+                msg = context.getString(R.string.txt_sms_sent);
+                callback.onSMSSent(sms); break;
+            case SMSSentReceiver.KEY_GENERIC_FAILURE:
+                sms.setType(SMS.TYPE_FAILED);
+                msg = context.getString(R.string.err_generic_failure);
+                callback.onSMSSentFailure(sms); break;
+            case SMSSentReceiver.KEY_NO_SERVICE:
+                sms.setType(SMS.TYPE_FAILED);
+                msg = context.getString(R.string.err_no_service);
+                callback.onSMSSentFailure(sms); break;
+            case SMSSentReceiver.KEY_RADIO_OFF:
+                msg = context.getString(R.string.err_radio_off);
+                sms.setType(SMS.TYPE_FAILED);
+                callback.onSMSSentFailure(sms); break;
+            case SMSSentReceiver.KEY_NULL_PDU_FLAG:
+                msg = context.getString(R.string.err_null_pdu);
+                sms.setType(SMS.TYPE_FAILED);
+                callback.onSMSSentFailure(sms); break;
+            default:
+                log.error(methodName, "Some different error: "+action);
+                msg = context.getString(R.string.err_unknown_sending);
         }
+
+        log.info(methodName, "Toasting text: "+msg);
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
 
         log.returning(methodName);
     }

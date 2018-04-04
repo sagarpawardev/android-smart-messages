@@ -1,5 +1,6 @@
 package dev.sagar.smsblocker.tech.broadcastreceivers;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Telephony;
+import android.telephony.SmsManager;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -30,7 +32,14 @@ public class SMSSentReceiver extends BroadcastReceiver {
     public final static String KEY_PART_INDEX = "part_index";
     public final static String KEY_TOTAL_PARTS = "total_parts";
     public final static String KEY_SMS = "sms";
-    private final static String LOCAL_SMS_SENT = EventCode.LOCAL_SMS_SENT;
+
+    public final static String KEY_SMS_SENT = "sms_sent_flag";
+    public final static String KEY_GENERIC_FAILURE = "generic_failure_flag";
+    public final static String KEY_NO_SERVICE = "no_service_flag";
+    public final static String KEY_NULL_PDU_FLAG = "null_pdu_flag";
+    public final static String KEY_RADIO_OFF = "radio_off";
+
+    //private final static String LOCAL_SMS_SENT = EventCode.LOCAL_SMS_SENT;
 
     private final static String type = Telephony.Sms.TYPE;
     private final static String _id = Telephony.Sms._ID;
@@ -43,31 +52,97 @@ public class SMSSentReceiver extends BroadcastReceiver {
         final String methodName = "onReceive()";
         log.justEntered(methodName);
 
-        String action = intent.getAction();
-        log.info(methodName, "Event Occured: "+action);
+
+        switch (getResultCode()) {
+            case Activity.RESULT_OK:
+                Toast.makeText(context, "SMS Sent", Toast.LENGTH_SHORT)
+                        .show();
+                resultOk(context, intent);
+                break;
+            case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                Toast.makeText(context, "Generic failure",
+                        Toast.LENGTH_SHORT).show();
+                resultFailure(context, intent, KEY_GENERIC_FAILURE);
+                break;
+            case SmsManager.RESULT_ERROR_NO_SERVICE:
+                Toast.makeText(context, "No service",
+                        Toast.LENGTH_SHORT).show();
+                resultFailure(context, intent, KEY_NO_SERVICE);
+                break;
+            case SmsManager.RESULT_ERROR_NULL_PDU:
+                Toast.makeText(context, "Null PDU", Toast.LENGTH_SHORT)
+                        .show();
+                resultFailure(context, intent, KEY_NULL_PDU_FLAG);
+                break;
+            case SmsManager.RESULT_ERROR_RADIO_OFF:
+                Toast.makeText(context, "Radio off",
+                        Toast.LENGTH_SHORT).show();
+                resultFailure(context, intent, KEY_RADIO_OFF);
+                break;
+        }
+    }
+
+
+    private void resultOk(Context context, Intent intent){
+        final String methodName = "resultOk(Context, Intent)";
+        log.justEntered(methodName);
+
         try {
-            if (action.equals(ActionCode.SMS_SENT)) {
-                Bundle basket = intent.getExtras();
+            Bundle basket = intent.getExtras();
 
-                log.debug(methodName, "Sgr Receiving key: "+KEY_SMS);
+            log.debug(methodName, "Sgr Receiving key: "+KEY_SMS);
 
-                String strSMS = basket.getString(KEY_SMS);
-                SMS sms = gson.fromJson(strSMS, SMS.class);
-                String id = sms.getId();
+            String strSMS = basket.getString(KEY_SMS);
+            SMS sms = gson.fromJson(strSMS, SMS.class);
+            String id = sms.getId();
 
-                String selection = _id + " = ?";
-                String[] selectionArgs = {id};
-                ContentValues values = new ContentValues();
-                values.put(type, SMS.TYPE_SENT);
+            String selection = _id + " = ?";
+            String[] selectionArgs = {id};
+            ContentValues values = new ContentValues();
+            values.put(type, SMS.TYPE_SENT);
 
-                int updateCount = context
-                        .getContentResolver()
-                        .update(SMS_URI, values, selection, selectionArgs);
-                log.info(methodName, "Update Count: " + updateCount);
+            int updateCount = context
+                    .getContentResolver()
+                    .update(SMS_URI, values, selection, selectionArgs);
+            log.info(methodName, "Update Count: " + updateCount);
 
-                log.info(methodName, "Broadcasting Locally");
-                broadcastLocalSMS(context, sms);
-            }
+            log.info(methodName, "Broadcasting Locally");
+            broadcastLocalSMS(context, sms, KEY_SMS_SENT);
+
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
+        log.returning(methodName);
+    }
+
+    private void resultFailure(Context context, Intent intent, String resultCode){
+        final String methodName = "resultOk(Context, Intent)";
+        log.justEntered(methodName);
+
+        try {
+            Bundle basket = intent.getExtras();
+
+            log.debug(methodName, "Sgr Receiving key: "+KEY_SMS);
+
+            String strSMS = basket.getString(KEY_SMS);
+            SMS sms = gson.fromJson(strSMS, SMS.class);
+            String id = sms.getId();
+
+            String selection = _id + " = ?";
+            String[] selectionArgs = {id};
+            ContentValues values = new ContentValues();
+            values.put(type, SMS.TYPE_FAILED);
+
+            int updateCount = context
+                    .getContentResolver()
+                    .update(SMS_URI, values, selection, selectionArgs);
+            log.info(methodName, "Update Count: " + updateCount);
+
+            log.info(methodName, "Broadcasting Locally");
+            broadcastLocalSMS(context, sms, resultCode);
+
         }
         catch (NullPointerException e){
             e.printStackTrace();
@@ -81,9 +156,14 @@ public class SMSSentReceiver extends BroadcastReceiver {
      * This method broadcast SMS SENT Locally
      * @param context Context
      */
-    private void broadcastLocalSMS(Context context, SMS sms){
+    private void broadcastLocalSMS(Context context, SMS sms, String resultCode){
+        final String methodName = "broadcastLocalSMS(Context, SMS)";
+        log.justEntered(methodName);
+
         Bundle basket = new Bundle();
         basket.putSerializable(LocalSMSSentReceiver.KEY_SMS, sms);
-        broadcastUtil.broadcast(context, LOCAL_SMS_SENT, basket);
+        broadcastUtil.broadcast(context, resultCode, basket);
+
+        log.returning(methodName);
     }
 }

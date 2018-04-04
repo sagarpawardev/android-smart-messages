@@ -83,24 +83,31 @@ public class SMSUtil {
                 for(int i=0; i<numParts; i++){
                     Intent sentIntent = new Intent(context, SMSSentReceiver.class);
                     Bundle sendBasket = new Bundle();
-                    sendBasket.putInt(SMSSentReceiver.KEY_PART_INDEX, i);
-                    String strSms = gson.toJson(sms);
-                    sendBasket.putString(SMSSentReceiver.KEY_SMS, strSms);
-                    sendBasket.putInt(SMSSentReceiver.KEY_TOTAL_PARTS, numParts);
-
-                    log.info(methodName, "putting sent action in pendingIntent: "+ActionCode.SMS_SENT);
-                    sentIntent.putExtras(sendBasket);
-                    sentIntent.setAction(ActionCode.SMS_SENT);
-                    PendingIntent sentPIntent = PendingIntent.getBroadcast(context, RequestCode.SMS_SENT, sentIntent, PendingIntent.FLAG_UPDATE_CURRENT );
-
                     Intent deliverIntent = new Intent(context, SMSDeliveredReceiver.class);
                     Bundle deliverBasket = new Bundle();
+
+
+                    sendBasket.putInt(SMSSentReceiver.KEY_PART_INDEX, i);
                     deliverBasket.putSerializable(SMSDeliveredReceiver.KEY_PART_INDEX, i);
+
+                    String strSms = gson.toJson(sms);
+                    sendBasket.putString(SMSSentReceiver.KEY_SMS, strSms);
                     deliverBasket.putSerializable(SMSDeliveredReceiver.KEY_SMS, sms);
-                    deliverBasket.putSerializable(SMSDeliveredReceiver.KEY_TOTAL_PARTS, numParts);
+
+                    sentIntent.putExtras(sendBasket);
                     deliverIntent.putExtras(deliverBasket);
+
+                    sendBasket.putInt(SMSSentReceiver.KEY_TOTAL_PARTS, numParts);
+                    deliverBasket.putSerializable(SMSDeliveredReceiver.KEY_TOTAL_PARTS, numParts);
+
+                    log.info(methodName, "putting sent action in pendingIntent: "+ActionCode.SMS_SENT);
+
+                    sentIntent.setAction(ActionCode.SMS_SENT);
                     deliverIntent.setAction(ActionCode.SMS_DELIVERED);
+
+                    PendingIntent sentPIntent = PendingIntent.getBroadcast(context, RequestCode.SMS_SENT, sentIntent, PendingIntent.FLAG_UPDATE_CURRENT );
                     PendingIntent deliverPIntent = PendingIntent.getBroadcast(context, RequestCode.SMS_DELIVERED, deliverIntent, PendingIntent.FLAG_UPDATE_CURRENT );
+
 
                     sentPIntents.add(sentPIntent);
                     deliverPIntents.add(deliverPIntent);
