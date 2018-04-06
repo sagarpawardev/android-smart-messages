@@ -53,7 +53,7 @@ public class HomeActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private FloatingActionButton fab;
     private NotificationView notificationView;
-    private View viewPlaceHolder, holderLoader, holderMain;
+    private View viewPlaceHolder, holderLoader, holderMain, holderSwitch;
     private SwitchCompat switchUnread;
     private TextView tvTotalCount;
 
@@ -87,6 +87,7 @@ public class HomeActivity extends AppCompatActivity
 
         holderLoader = findViewById(R.id.holder_loader);
         holderMain = findViewById(R.id.holder_main);
+        holderSwitch = findViewById(R.id.holder_switch);
 
         //if(inboxUtil == null) inboxUtil = new InboxUtil(this);
         if(conversationUtil == null) conversationUtil = new ConversationUtil(this, this);
@@ -117,8 +118,10 @@ public class HomeActivity extends AppCompatActivity
             //Toast.makeText(this, "You have not received any SMS Yet!!", Toast.LENGTH_SHORT).show();
             holderLoader.setVisibility(View.VISIBLE);
             holderMain.setVisibility(View.GONE);
+            holderSwitch.setVisibility(View.GONE);
         }
         else{
+            holderSwitch.setVisibility(View.VISIBLE);
             holderMain.setVisibility(View.VISIBLE);
             holderLoader.setVisibility(View.GONE);
         }
@@ -519,6 +522,7 @@ public class HomeActivity extends AppCompatActivity
         }
         else{
             holderMain.setVisibility(View.VISIBLE);
+            holderSwitch.setVisibility(View.VISIBLE);
             holderLoader.setVisibility(View.GONE);
         }
 
