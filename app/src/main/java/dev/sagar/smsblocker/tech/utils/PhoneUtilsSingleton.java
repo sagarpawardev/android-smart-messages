@@ -45,6 +45,44 @@ public class PhoneUtilsSingleton {
         return formattedNumber;
     }
 
+    public String encode(String str){
+        final String methodName =  "encode(String)";
+        log.justEntered(methodName);
+
+        log.error(methodName, "This Logic valid only in India");
+        //FIXME For following cases
+        // 1. SearchStr: 98989898       DBString: +9198989898 or 098989898
+        // 2. SearchStr: +9198989898    DBString: 98989898
+        StringBuffer sb = new StringBuffer();
+
+
+        if(str.startsWith("+91")){
+            str.replaceFirst("\\+91", "");
+        }
+        else if(str.startsWith("0")){
+            str.replaceFirst("0","");
+        }
+
+        if(str.length()>=10){ //% at starting of string
+            sb.append('%');
+        }
+
+        for(char c: str.toCharArray()){
+            if(c==' ' || c=='(' || c==')'){
+                c = '%';
+            }
+            sb.append(c);
+        }
+
+        if(str.length()>=10){ //% at end of string
+            sb.append('%');
+        }
+
+        //String become something like '%9876543%'
+        log.returning(methodName);
+        return sb.toString();
+    }
+
     public boolean isReplySupported(String address){
         final String methodName =  "isReplySupported(String)";
         log.justEntered(methodName);

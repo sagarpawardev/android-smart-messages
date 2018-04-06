@@ -35,6 +35,7 @@ public class InboxUtil {
     //Java Android References
     private Context context;
     private DBServiceSingleton dbService = DBServiceSingleton.getInstance();
+    private PhoneUtilsSingleton phoneUtils = PhoneUtilsSingleton.getInstance();
 
     //Java Core References
     private Callback callback;
@@ -559,10 +560,11 @@ public class InboxUtil {
         log.justEntered(methodName);
 
         //Reading Saved SMSes
-        String selection = address+" = ?";
+        String selection = address+" LIKE ?";
         String[] projection = {starredsms_id};
         String tableName = DBConstants.TABLE_SAVEDSMS;
-        String[] selectionArgs = {contactNo};
+        String encodedAddress = phoneUtils.encode(contactNo);
+        String[] selectionArgs = {encodedAddress};
 
         DBHelper helper = new DBHelper(context);
         SQLiteDatabase db = helper.getReadableDatabase();

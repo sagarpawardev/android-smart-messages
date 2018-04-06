@@ -23,6 +23,7 @@ import dev.sagar.smsblocker.tech.service.helper.DBHelper;
 import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
+import dev.sagar.smsblocker.tech.utils.PhoneUtilsSingleton;
 
 /**
  * Created by sagarpawar on 07/02/18.
@@ -36,6 +37,7 @@ public class DBServiceSingleton {
     //Java Core
     private static DBServiceSingleton instance = null;
     private static PermissionUtilSingleton permUtil = null;
+    private static PhoneUtilsSingleton phoneUtils = PhoneUtilsSingleton.getInstance();
     private DBServiceSingleton(){}
 
     //Constants
@@ -462,7 +464,8 @@ public class DBServiceSingleton {
                     contact.photoUri = photoUri;
                     contact.address = address;
 
-                    mContactMap.put(address, contact);
+                    String formattedAddress = phoneUtils.formatNumber(context, contact.address);
+                    mContactMap.put(formattedAddress, contact);
 
                     //TODO Default country to format number
 
@@ -480,7 +483,8 @@ public class DBServiceSingleton {
 
         //Update Photo in Database Starts
         for(String key: doneSet){
-            ContactDetails contact = mContactMap.get(key);
+            String formattedKey = phoneUtils.formatNumber(context, key);
+            ContactDetails contact = mContactMap.get(formattedKey);
 
             if(contact == null){ //In case address does not exists in Contacts
                 continue;
@@ -491,9 +495,13 @@ public class DBServiceSingleton {
             values.put(this.photoUri_local, contact.photoUri);
             values.put(this.photoUriThumbnail_local, contact.photoThumbUri);
 
-            String whereClause = this.address_local + " = ?";
-            String[] whereArgs = {contact.address};
+            String whereClause = this.address_local + " LIKE ?";
+            String encodedAddress = phoneUtils.encode(contact.address);
+            
+
+            String[] whereArgs = {encodedAddress};
             writableDB.update(Converesation.TABLE_NAME, values, whereClause, whereArgs);
+
         }
         //-- Update Photo in Database Ends
 
@@ -505,6 +513,7 @@ public class DBServiceSingleton {
 
         ArrayList<Integer> alValues = new ArrayList<>();
         Set<String> addresses = unreadCountMap.keySet();
+
         for(String mAddress: addresses){
             Integer iUnreadCount = unreadCountMap.get(mAddress);
             int unreadCount = iUnreadCount==null ? 0 : iUnreadCount;
