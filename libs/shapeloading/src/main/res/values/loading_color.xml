@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="triangle">#4CAF50</color>
+    <color name="circle">#03A9F4</color>
+    <color name="rect">#FFEB3B</color>
+    <color name="view_bg">#00000000</color>
+    <color name="shadow">#25808080</color>
+    <color name="dialog_bg">#f5f5f5</color>
+
+</resources>
