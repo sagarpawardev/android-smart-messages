@@ -95,12 +95,15 @@ public class DisplayPictureView extends RelativeLayout{
         circularIv.setVisibility(VISIBLE);
         circularIv.setImageDrawable(drawable);
         tvHolder.setVisibility(GONE);
+
     }
 
     public void setPictureSrc(Uri uri){
+
         circularIv.setVisibility(VISIBLE);
         circularIv.setImageURI(uri);
         tvHolder.setVisibility(GONE);
+
     }
 
     public void setLetterText(String text){

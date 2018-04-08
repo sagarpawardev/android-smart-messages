@@ -11,6 +11,7 @@ public class Contact {
     private String id,
     displayName,
     number;
+    private String type;
 
     private Uri photoThumbnail, photo;
 
@@ -52,5 +53,13 @@ public class Contact {
 
     public void setPhoto(Uri photo) {
         this.photo = photo;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

@@ -73,5 +73,11 @@
     <string name="err_delivery_cancelled">Delivery Cancelled</string>
     <string name="txt_delivered">SMS Delivered</string>
     <string name="err_unknown_delivery">Unknown Error while Delivering</string>
+    <string name="txt_home">Home</string>
+    <string name="txt_mobile">Mobile</string>
+    <string name="txt_work">Work</string>
+    <string name="txt_home_fax">Home Fax</string>
+    <string name="txt_work_fax">Work Fax</string>
+    <string name="txt_main">Main</string>
 
 </resources>

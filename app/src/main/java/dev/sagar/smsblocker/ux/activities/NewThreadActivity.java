@@ -1,6 +1,8 @@
 package dev.sagar.smsblocker.ux.activities;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -37,6 +41,7 @@ public class NewThreadActivity extends AppCompatActivity
     private EditText etSearchContact;
     private RecyclerView rvContacts;
     private View viewPlaceholder;
+    private boolean numericBtnFlag = true;
 
     //Internal Objects
     private ArrayList<Contact> contacts = new ArrayList<>();
@@ -90,6 +95,12 @@ public class NewThreadActivity extends AppCompatActivity
             ArrayList<Contact> temp = contactUtil.getAllContacts(this);
             contacts.addAll(temp);
             contactsAdapter.notifyDataSetChanged();
+
+            Editable editableTxt = etSearchContact.getText();
+            if(editableTxt!=null){
+                String searchText = editableTxt.toString();
+                searchContacts(searchText);
+            }
         }
         catch (ReadContactPermissionException ex){
             ex.printStackTrace();
@@ -158,9 +169,51 @@ public class NewThreadActivity extends AppCompatActivity
                 log.justEntered(methodName);
 
                 String searchStr = editable.toString();
+                if(searchStr.length()==0){
+                    Drawable drawable = getDrawable(R.drawable.numeric_pad_icon_24dp);
+                    etSearchContact.setCompoundDrawablesWithIntrinsicBounds(null, null,
+                            drawable, null);
+                    numericBtnFlag = true;
+
+                }else{
+                    Drawable drawable = getDrawable(R.drawable.ic_close_white_24dp);
+                    etSearchContact.setCompoundDrawablesWithIntrinsicBounds(null, null,
+                            drawable, null);
+                    numericBtnFlag = false;
+                }
+
                 searchContacts(searchStr);
 
                 log.returning(methodName);
+            }
+        });
+
+        etSearchContact.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_LEFT = 0;
+                final int DRAWABLE_TOP = 1;
+                final int DRAWABLE_RIGHT = 2;
+                final int DRAWABLE_BOTTOM = 3;
+
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (etSearchContact.getRight() - etSearchContact.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+
+                        if(numericBtnFlag) {
+                            if(etSearchContact.getInputType() == InputType.TYPE_CLASS_PHONE) {
+                                etSearchContact.setInputType(InputType.TYPE_CLASS_TEXT);
+                            }
+                            else{
+                                etSearchContact.setInputType(InputType.TYPE_CLASS_PHONE);
+                            }
+                        }
+                        else {
+                            etSearchContact.setText("");
+                        }
+                        return true;
+                    }
+                }
+                return false;
             }
         });
 

@@ -8,11 +8,13 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import dev.sagar.smsblocker.Permission;
+import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 
@@ -62,7 +64,7 @@ public class ContactUtilSingleton {
      */
     public String getContactName(Context context, String phoneNumber) throws ReadContactPermissionException {
         final String methodName = "getContactName()";
-        log.info(methodName, "Just Entered...");
+        log.justEntered(methodName);
 
         Contact contact =  getContact(context, phoneNumber);
         String name = contact.getDisplayName();
@@ -148,7 +150,7 @@ public class ContactUtilSingleton {
      */
     public ArrayList<Contact> getAllContacts(Context context) throws ReadContactPermissionException{
         final String methodName = "getAllContacts()";
-        log.info(methodName, "Just Entered..");
+        log.justEntered(methodName);
 
         //Checking Permission
         boolean hasReadContactPermission = PermissionUtilSingleton.getInstance().hasPermission(context, READ_CONTACTS);
@@ -162,7 +164,8 @@ public class ContactUtilSingleton {
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Phone.PHOTO_URI
+                ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
+                ContactsContract.CommonDataKinds.Phone.TYPE
         };
         String selection
                 //= ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER +" > 1"
@@ -182,9 +185,11 @@ public class ContactUtilSingleton {
         }
 
         while (cursor.moveToNext()) {
-            String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-            String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-            String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            String name = cursor.getString(cursor.getColumnIndex(Phone.DISPLAY_NAME));
+            String id = cursor.getString(cursor.getColumnIndex(Phone.CONTACT_ID));
+            String number = cursor.getString(cursor.getColumnIndex(Phone.NUMBER));
+            int type = cursor.getInt(cursor.getColumnIndex(Phone.TYPE));
+
             if(number == null){
                 log.info(methodName, name+" Does not have a number and its id is: "+id);
                 continue;
@@ -194,6 +199,48 @@ public class ContactUtilSingleton {
             contact.setDisplayName(name);
             contact.setId(id);
             contact.setNumber(number);
+
+            String strType = null;
+
+            /*switch (type){
+                case Phone.TYPE_HOME:
+                    strType = context.getString(R.string.txt_home);
+                    break;
+                case Phone.TYPE_MOBILE:
+                    strType = context.getString(R.string.txt_mobile);
+                    break;
+                case Phone.TYPE_WORK:
+                    strType = context.getString(R.string.txt_work);
+                    break;
+                case Phone.TYPE_FAX_HOME:
+                    strType = context.getString(R.string.txt_home_fax);
+                    break;
+                case Phone.TYPE_FAX_WORK:
+                    strType = context.getString(R.string.txt_work_fax);
+                    break;
+                case Phone.TYPE_MAIN:
+                    strType = context.getString(R.string.txt_main);
+                    break;
+                case Phone.TYPE_OTHER:
+                    strType = "Other";
+                    break;
+                case Phone.TYPE_CUSTOM:
+                    strType = "Custom";
+                    break;
+                case Phone.TYPE_PAGER:
+                    strType = "Pager";
+                    break;
+            }*/
+
+            CharSequence seq = ContactsContract.CommonDataKinds.Phone.getTypeLabel(
+                    context.getResources(),
+                    type,
+                    context.getString(R.string.txt_mobile)
+            );
+            contact.setType(seq.toString());
+
+
+
 
             String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
             if(image_uri != null){
@@ -236,7 +283,8 @@ public class ContactUtilSingleton {
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
                 ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
-                ContactsContract.CommonDataKinds.Phone.PHOTO_URI
+                ContactsContract.CommonDataKinds.Phone.PHOTO_URI,
+                ContactsContract.CommonDataKinds.Phone.TYPE
         };
         String selection =
                 ContactsContract.CommonDataKinds.Phone.NUMBER +" LIKE ? OR " +
@@ -256,16 +304,24 @@ public class ContactUtilSingleton {
             String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
             String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+            int type = cursor.getInt(cursor.getColumnIndex(Phone.TYPE));
 
             if(number == null){
                 log.info(methodName, name+" Does not have a number and its id is: "+id);
                 continue;
             }
 
+            CharSequence seq = ContactsContract.CommonDataKinds.Phone.getTypeLabel(
+                    context.getResources(),
+                    type,
+                    context.getString(R.string.txt_mobile)
+            );
+
             Contact contact = new Contact();
             contact.setDisplayName(name);
             contact.setId(id);
             contact.setNumber(number);
+            contact.setType(seq.toString());
 
             String image_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.PHOTO_URI));
             if(image_uri != null){
@@ -386,6 +442,7 @@ public class ContactUtilSingleton {
             contact.setDisplayName(formatAddress);
             contact.setPhoto(null);
             contact.setPhotoThumbnail(null);
+            contact.setType(null);
             contact.setNumber(phoneNumber);
         }
 
@@ -425,6 +482,7 @@ public class ContactUtilSingleton {
                     ContactsContract.PhoneLookup._ID,
                     ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI,
                     ContactsContract.PhoneLookup.PHOTO_URI,
+                    ContactsContract.PhoneLookup.TYPE,
             };
             Cursor cursor = contentResolver.query(uri, projection, null, null, null);
             if (cursor == null || cursor.getCount() == 0) {
@@ -443,11 +501,20 @@ public class ContactUtilSingleton {
                     String photo_uri = cursor.getString(cursor.getColumnIndex(ContactsContract.PhoneLookup.PHOTO_URI));
                     String number = phoneNumber;
 
+                    int type = cursor.getInt(cursor.getColumnIndex(ContactsContract.PhoneLookup.TYPE));
+                    CharSequence seq = ContactsContract.CommonDataKinds.Phone.getTypeLabel(
+                            context.getResources(),
+                            type,
+                            context.getString(R.string.txt_mobile)
+                    );
+
                     log.info(methodName, "Received contact data for: " + number);
 
                     result.setNumber(number);
                     result.setId(id);
                     result.setDisplayName(contactName);
+                    result.setType(seq.toString());
+
                     if (thumb_uri != null) {
                         Uri imgUri = Uri.parse(thumb_uri);
                         result.setPhotoThumbnail(imgUri);

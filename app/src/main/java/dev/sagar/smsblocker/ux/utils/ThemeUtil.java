@@ -51,7 +51,7 @@ public class ThemeUtil {
             dpView.setPictureSrc(uri);
         }
         else {
-            if(fromName!=null) {
+            if(fromName!=null && !fromName.startsWith("+")) {
                 String c = String.valueOf(fromName.charAt(0));
                 dpView.setLetterText(c);
             }

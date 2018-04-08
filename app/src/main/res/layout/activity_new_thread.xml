@@ -33,6 +33,9 @@
                 android:hint="@string/hint_newthread__searchcontacts"
                 android:maxLines="1"
                 android:background="@drawable/color"
+
+                android:drawableEnd="@drawable/numeric_pad_icon_24dp"
+                android:drawableTint="@color/white"
                 android:layout_marginTop="0dp"
                 />
         </android.support.v7.widget.Toolbar>

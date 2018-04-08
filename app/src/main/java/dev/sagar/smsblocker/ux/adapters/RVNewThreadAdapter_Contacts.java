@@ -2,6 +2,7 @@ package dev.sagar.smsblocker.ux.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.ux.customviews.DisplayPictureView;
+import dev.sagar.smsblocker.ux.utils.ThemeUtil;
 
 /**
  * Created by sagarpawar on 22/10/17.
@@ -31,6 +34,7 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
     //Java Core
     private ArrayList<Contact> contacts;
     private Callback callback;
+    private ThemeUtil themeUtil;
 
     //Constants
     private final int CONTACTS = 0;
@@ -40,6 +44,7 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
         this.context = context;
         this.contacts = contacts;
         this.callback = callback;
+        themeUtil = new ThemeUtil(context);
     }
 
     private ContactViewHolder contactViewHolder(ViewGroup parent, LayoutInflater inflater){
@@ -72,22 +77,27 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
         log.justEntered(methodName);
 
 
-
-
         ContactViewHolder holder = (ContactViewHolder) viewHolder;
         Contact contact = contacts.get(position);
         String displayName = contact.getDisplayName();
         String phoneNo = contact.getNumber();
         String id = contact.getId();
+        String type = contact.getType();
+        Uri uri = contact.getPhotoThumbnail();
+
         holder.tvId.setText(id);
         holder.tvName.setText(displayName);
         holder.tvNumber.setText(phoneNo);
+        holder.tvAddressType.setText(type);
+        themeUtil.styleDPView(holder.dpView, uri, contact);
+        //holder.dpView.setPictureSrc(uri);
+
 
         //Adi changes Start
-
-        Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
+        Typeface myFont = themeUtil.getTypeface();
         holder.tvName.setTypeface(myFont,Typeface.BOLD);
         holder.tvNumber.setTypeface(myFont);
+        holder.tvAddressType.setTypeface(myFont);
         //Adi changes End
 
         log.returning(methodName);
@@ -163,12 +173,13 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
         log.justEntered(methodName);
 
         int size = contacts.size();
-        if(size == 0){
+        outer: if(size == 0){
             String searchStr = callback.needSearchString();
 
             //If Search String is empty and size also 0 then permissions problem or no contact
             if(searchStr.isEmpty()){
-                return 0;
+                size = 0;
+                break outer;
             }
 
             //If Neither Numeric not spaces like '+91 8877993322' notify Activity and return size 0
@@ -176,10 +187,11 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
                 if( !isNumber(c) && c!='+') {
                     callback.onEmptySearch();
                     log.returning(methodName);
-                    return 0;
+                    size = 0;
+                    break outer;
                 }
             }
-            return 1;
+            size = 1;
         }
 
         log.returning(methodName);
@@ -199,8 +211,9 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
     }
 
     class ContactViewHolder extends RecyclerView.ViewHolder{
-        TextView tvName, tvNumber, tvId;
+        TextView tvName, tvNumber, tvId, tvAddressType;
         EditText etSearch;
+        DisplayPictureView dpView;
 
         ContactViewHolder(View view) {
             super(view);
@@ -209,6 +222,8 @@ public class RVNewThreadAdapter_Contacts extends RecyclerView.Adapter<RecyclerVi
             tvNumber = view.findViewById(R.id.tv_phone_no);
             tvId = view.findViewById(R.id.tv_contact_id);
             etSearch =view.findViewById(R.id.et_search_contact);
+            tvAddressType = view.findViewById(R.id.tv_address_type);
+            dpView = view.findViewById(R.id.dpv_picture);
 
         }
     }
