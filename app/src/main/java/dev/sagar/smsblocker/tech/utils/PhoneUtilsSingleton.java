@@ -78,6 +78,7 @@ public class PhoneUtilsSingleton {
             sb.append('%');
         }
 
+        log.debug(methodName, "Encoded String: "+sb.toString());
         //String become something like '%9876543%'
         log.returning(methodName);
         return sb.toString();

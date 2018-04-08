@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +46,8 @@ import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackHome;
 
 public class HomeActivity extends AppCompatActivity
         implements RVHomeAdapter.Callback, LocalSMSReceivedReceiver.Callback,
-        ConversationUtil.Callback, View.OnClickListener, CompoundButton.OnCheckedChangeListener{
+        ConversationUtil.Callback, View.OnClickListener, CompoundButton.OnCheckedChangeListener,
+        SwipeRefreshLayout.OnRefreshListener{
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -54,8 +57,10 @@ public class HomeActivity extends AppCompatActivity
     private FloatingActionButton fab;
     private NotificationView notificationView;
     private View viewPlaceHolder, holderLoader, holderMain, holderSwitch;
+    private ProgressBar progressBar;
     private SwitchCompat switchUnread;
     private TextView tvTotalCount;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     //Java Core
     ConversationUtil conversationUtil = null;
@@ -84,6 +89,8 @@ public class HomeActivity extends AppCompatActivity
         viewPlaceHolder = findViewById(R.id.holder_placeholder);
         switchUnread = (SwitchCompat) findViewById(R.id.switch_unread);
         tvTotalCount = (TextView) findViewById(R.id.tv_total_count);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         holderLoader = findViewById(R.id.holder_loader);
         holderMain = findViewById(R.id.holder_main);
@@ -152,6 +159,7 @@ public class HomeActivity extends AppCompatActivity
                 permUtil.askToMakeAppDefault(HomeActivity.this);
             }
         });
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
 
@@ -307,6 +315,10 @@ public class HomeActivity extends AppCompatActivity
         init();
         addListeners();
 
+        swipeRefreshLayout.setColorSchemeResources(
+                R.color.grad_start,
+                R.color.grad_end);
+
         //By default assume permission is Not given
         hideInboxView();
 
@@ -369,9 +381,8 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    protected void onStart() {
-        final String methodName =  "onStart()";
+    private void refreshConversations(){
+        final String methodName =  "refreshConversations()";
         log.justEntered(methodName);
 
         boolean hasPermission = permUtil.hasPermission(this, READ_SMS);
@@ -380,14 +391,22 @@ public class HomeActivity extends AppCompatActivity
             askForDefault();
             log.info(methodName, "Refreshinng local DB...");
             conversationUtil.refreshDB();
+            progressBar.setVisibility(View.VISIBLE);
         }
         else{
             permUtil.ask(this, ALL_PERMISSIONS, REQUEST_CODE_ALL_PERMISSIONS);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        final String methodName =  "onStart()";
+        log.justEntered(methodName);
+
+        refreshConversations();
         registerSMSReceiver();
 
         super.onStart();
-
         log.returning(methodName);
     }
 
@@ -530,6 +549,9 @@ public class HomeActivity extends AppCompatActivity
         String strTotalCount = getCountText(adapter.getItemCount());
         tvTotalCount.setText(strTotalCount);
 
+        swipeRefreshLayout.setRefreshing(false);
+        progressBar.setVisibility(View.GONE);
+
         log.returning(methodName);
     }
     //--- ConversationUtil.Callback Overrides Ends ---
@@ -552,4 +574,17 @@ public class HomeActivity extends AppCompatActivity
         log.returning(methodName);
     }
     //--- CompoundButton.OnCheckedChangeListener Overrides Ends ---
+
+
+    //--- SwipeRefreshLayout.OnRefreshListener Overrides Starts
+    @Override
+    public void onRefresh() {
+        final String methodName =  "onRefresh()";
+        log.justEntered(methodName);
+
+        refreshConversations();
+
+        log.returning(methodName);
+    }
+    //--- SwipeRefreshLayout.OnRefreshListener Overrides Ends
 }
