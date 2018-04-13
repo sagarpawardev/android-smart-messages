@@ -46,6 +46,25 @@ public class IndexedHashMap<K,V>{
         return result;
     }
 
+    public PositionLog put(K key, V value, int index){
+        int oldPosition = -1;
+        int newPosition = -1;
+
+        if(map.containsKey(key)) {
+            V tValue = map.get(key);
+            oldPosition = list.indexOf(tValue);
+            list.remove(oldPosition);
+            map.remove(key);
+        }
+
+        map.put(key, value);
+        list.add(index, value);
+        newPosition = index;
+
+        PositionLog result = new PositionLog(oldPosition, newPosition);
+        return result;
+    }
+
     public void update(IndexedHashMap<K, V> newMap){
         Map<K, V> oldMap = newMap.getMap();
         map = new LinkedHashMap<>(oldMap);
@@ -86,5 +105,15 @@ public class IndexedHashMap<K,V>{
 
     private ArrayList<V> getArrayList(){
         return list;
+    }
+
+    public void clear(){
+        map.clear();
+        list.clear();
+    }
+
+    public int indexOf(K key){
+        V value = get(key);
+        return list.indexOf(value);
     }
 }

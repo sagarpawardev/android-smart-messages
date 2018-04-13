@@ -1,6 +1,7 @@
 package dev.sagar.smsblocker.tech.beans;
 
 import android.provider.Telephony;
+import android.telephony.SmsManager;
 
 import java.io.Serializable;
 

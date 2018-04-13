@@ -25,8 +25,9 @@ public class LocalSMSSentReceiver extends BroadcastReceiver {
     LogUtil log = new LogUtil(this.getClass().getName());
 
     //Constant
-    public static final String KEY_SMS = "sms";
-    public static final String EVENT_SENT = LocalSMSSentReceiver.class.getName();
+    public static final String KEY_SMS = SMSSentReceiver.KEY_SMS;
+    public static final String KEY_ACTION = SMSSentReceiver.KEY_ACTION;
+    public static final String EVENT_SENT = SMSSentReceiver.EVENT_CODE;
 
     //Java Android
     private Gson gson = new Gson();
@@ -54,10 +55,15 @@ public class LocalSMSSentReceiver extends BroadcastReceiver {
 
 
         String action = intent.getAction();
-        Bundle basket = intent.getExtras();
-        String jsonSMS = basket.getString(KEY_SMS);
-        SMS sms = gson.fromJson(jsonSMS, SMS.class);
+        log.debug(methodName, "Received Action: "+action);
 
+        Bundle basket = intent.getExtras();
+        //String jsonSMS = basket.getString(KEY_SMS);
+        action = basket.getString(KEY_ACTION);
+        SMS sms = (SMS) basket.getSerializable(KEY_SMS);
+
+
+        log.debug(methodName, "SMS Action Code: "+action);
 
         String msg = null;
         switch (action){

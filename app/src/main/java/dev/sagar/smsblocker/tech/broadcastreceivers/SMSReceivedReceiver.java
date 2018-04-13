@@ -34,12 +34,13 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
     private final BroadcastUtilSingleton broadcastUtil = BroadcastUtilSingleton.getInstance();
 
     //Constants
+    public static final String EVENT_CODE = "even_sms_received";
+    public static final String KEY_SMS = "sms";
     private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
     private static final String SMS_DELIVERED = "android.provider.Telephony.SMS_DELIVERED";
     private static final String SMS_SENT = "android.provider.Telephony.SMS_SENT";
     private static final String MSG_FORMAT = "3gpp";
 
-    private static final String LOCAL_SMS_RECEIVED = LocalSMSReceivedReceiver.class.getName();
     //public static final String KEY_SMS_RECEIVED = "key_sms_received";
 
 
@@ -196,6 +197,6 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
         Bundle basket = new Bundle();
         String jsonSMS = gson.toJson(sms);
         basket.putString(LocalSMSReceivedReceiver.KEY_SMS, jsonSMS);
-        broadcastUtil.broadcast(context, LOCAL_SMS_RECEIVED, basket);
+        broadcastUtil.broadcast(context, EVENT_CODE, basket);
     }
 }

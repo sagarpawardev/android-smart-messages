@@ -186,15 +186,15 @@ public class InboxUtil {
         log.justEntered(methodName);
 
         if(callback != null) {
-            AsyncTask<Void, Void, List<SMS>> asyncTask = new AsyncTask<Void, Void, List<SMS>>() {
+            AsyncTask<Void, Void, IndexedHashMap<String, SMS>> asyncTask = new AsyncTask<Void, Void, IndexedHashMap<String, SMS>>() {
                 @Override
-                protected List<SMS> doInBackground(Void... voids) {
-                    List<SMS> smses = bgGetAllSMSFromTo(contactNo, sortingOrder);
+                protected IndexedHashMap<String, SMS> doInBackground(Void... voids) {
+                    IndexedHashMap<String, SMS> smses = bgGetAllSMSFromTo(contactNo, sortingOrder);
                     return smses;
                 }
 
                 @Override
-                protected void onPostExecute(List<SMS> smses) {
+                protected void onPostExecute(IndexedHashMap<String, SMS> smses) {
                     callback.onAllSMSFromToResult(smses);
                     super.onPostExecute(smses);
                 }
@@ -346,8 +346,9 @@ public class InboxUtil {
         log.error(methodName, "Performance issues Temporarily adding. Need to remove later");
         ContentResolver contentResolver = context.getContentResolver();
         int count=0;
-        List<SMS> smses = bgGetAllSMSFromTo(phoneNo, SORT_DESC);
-        for(SMS sms: smses){
+        IndexedHashMap<String, SMS> smses = bgGetAllSMSFromTo(phoneNo, SORT_DESC);
+        for(int i=0; i<smses.size(); i++){
+            SMS sms = smses.get(i);
             String id = sms.getId();
             Uri tempUri = Uri.withAppendedPath(SMS_URI, Uri.encode(id));
             int tempCount = contentResolver.delete(tempUri, null, null);
@@ -555,7 +556,7 @@ public class InboxUtil {
 
 
 
-    private List<SMS>  bgGetAllSMSFromTo(String contactNo, int sortingOrder){
+    private IndexedHashMap<String, SMS>  bgGetAllSMSFromTo(String contactNo, int sortingOrder){
         final String methodName =  "bgGetAllSMSFromTo(String, int)";
         log.justEntered(methodName);
 
@@ -606,7 +607,7 @@ public class InboxUtil {
         Cursor c = dbService
                 .query(mContentResolver, uriSmsURI, projection, selection, selectionArgs, mSortOrder);
 
-        ArrayList<SMS> smses = new ArrayList<>();
+        IndexedHashMap<String, SMS> smses = new IndexedHashMap<>();
         log.info(methodName, "Reading SMSes... ");
 
         try {
@@ -634,7 +635,7 @@ public class InboxUtil {
                 if(set.contains(id))
                     sms.setSaved(true);
 
-                smses.add(sms);
+                smses.put(id, sms);
 
                 log.debug(methodName, "Address: "+from+" ReplySupported: "+c.getString(c.getColumnIndex(this.replySupported)));
 
@@ -649,7 +650,7 @@ public class InboxUtil {
         return smses;
     }
     public interface Callback{
-        void onAllSMSFromToResult(List<SMS> updateList);
+        void onAllSMSFromToResult(IndexedHashMap<String, SMS> updateList);
     }
 
 }

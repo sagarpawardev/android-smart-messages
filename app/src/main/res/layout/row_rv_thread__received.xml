@@ -105,16 +105,5 @@
     <!--</android.support.v7.widget.CardView>-->
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/view_holder"
-        android:id="@+id/tv_sending"
-        android:visibility="gone"
-        android:text="Sending..."/>
-
-
-
 
 </android.support.constraint.ConstraintLayout>

@@ -29,9 +29,11 @@ public class SMSSentReceiver extends BroadcastReceiver {
     //Java Android
     private final Gson gson = new Gson();
 
+    public final static String EVENT_CODE = "event_sms_sent";
     public final static String KEY_PART_INDEX = "part_index";
     public final static String KEY_TOTAL_PARTS = "total_parts";
     public final static String KEY_SMS = "sms";
+    public final static String KEY_ACTION = "action";
 
     public final static String KEY_SMS_SENT = "sms_sent_flag";
     public final static String KEY_GENERIC_FAILURE = "generic_failure_flag";
@@ -49,34 +51,24 @@ public class SMSSentReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        final String methodName = "onReceive()";
+        final String methodName = "onReceive(Context, Intent)";
         log.justEntered(methodName);
 
 
         switch (getResultCode()) {
             case Activity.RESULT_OK:
-                Toast.makeText(context, "SMS Sent", Toast.LENGTH_SHORT)
-                        .show();
                 resultOk(context, intent);
                 break;
             case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                Toast.makeText(context, "Generic failure",
-                        Toast.LENGTH_SHORT).show();
                 resultFailure(context, intent, KEY_GENERIC_FAILURE);
                 break;
             case SmsManager.RESULT_ERROR_NO_SERVICE:
-                Toast.makeText(context, "No service",
-                        Toast.LENGTH_SHORT).show();
                 resultFailure(context, intent, KEY_NO_SERVICE);
                 break;
             case SmsManager.RESULT_ERROR_NULL_PDU:
-                Toast.makeText(context, "Null PDU", Toast.LENGTH_SHORT)
-                        .show();
                 resultFailure(context, intent, KEY_NULL_PDU_FLAG);
                 break;
             case SmsManager.RESULT_ERROR_RADIO_OFF:
-                Toast.makeText(context, "Radio off",
-                        Toast.LENGTH_SHORT).show();
                 resultFailure(context, intent, KEY_RADIO_OFF);
                 break;
         }
@@ -118,7 +110,7 @@ public class SMSSentReceiver extends BroadcastReceiver {
     }
 
     private void resultFailure(Context context, Intent intent, String resultCode){
-        final String methodName = "resultOk(Context, Intent)";
+        final String methodName = "resultOk(Context, Intent, String)";
         log.justEntered(methodName);
 
         try {
@@ -157,12 +149,13 @@ public class SMSSentReceiver extends BroadcastReceiver {
      * @param context Context
      */
     private void broadcastLocalSMS(Context context, SMS sms, String resultCode){
-        final String methodName = "broadcastLocalSMS(Context, SMS)";
+        final String methodName = "broadcastLocalSMS(Context, SMS, String)";
         log.justEntered(methodName);
 
         Bundle basket = new Bundle();
-        basket.putSerializable(LocalSMSSentReceiver.KEY_SMS, sms);
-        broadcastUtil.broadcast(context, resultCode, basket);
+        basket.putSerializable(KEY_SMS, sms);
+        basket.putString(KEY_ACTION, resultCode);
+        broadcastUtil.broadcast(context, EVENT_CODE, basket);
 
         log.returning(methodName);
     }

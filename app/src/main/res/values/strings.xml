@@ -68,7 +68,7 @@
     <string name="txt_sms_sent">SMS Sent</string>
     <string name="err_generic_failure">Generic Failure</string>
     <string name="err_no_service">No Service</string>
-    <string name="err_radio_off">Radio id Off</string>
+    <string name="err_radio_off">Radio is Off</string>
     <string name="err_null_pdu">Null PDU</string>
     <string name="err_delivery_cancelled">Delivery Cancelled</string>
     <string name="txt_delivered">SMS Delivered</string>

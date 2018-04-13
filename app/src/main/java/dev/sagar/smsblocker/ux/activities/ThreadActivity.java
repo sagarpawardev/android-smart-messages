@@ -38,6 +38,7 @@ import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSDeliveredReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceivedReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSSentReceiver;
+import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
@@ -86,7 +87,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
 
     //Java Core
-    private List<SMS> smses = new ArrayList<>();
+    private IndexedHashMap<String, SMS> smses = new IndexedHashMap<>();
     private String address;
     private InboxUtil inboxUtil = null;
     private SMSUtil smsUtil;
@@ -163,11 +164,11 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "registerReceivers()";
         log.justEntered(methodName);
 
-        registerReceiver(smsReceivedReceiver, new IntentFilter(EventCode.LOCAL_SMS_RECEIVED));
+        registerReceiver(smsReceivedReceiver, new IntentFilter(LocalSMSReceivedReceiver.EVENT_RECEIVED));
         smsReceivedReceiver.isRegistered = true;
-        registerReceiver(smsSentReceiver, new IntentFilter(EventCode.LOCAL_SMS_RECEIVED));
+        registerReceiver(smsSentReceiver, new IntentFilter(LocalSMSSentReceiver.EVENT_SENT));
         smsSentReceiver.isRegistered = true;
-        registerReceiver(smsDeliveredReceiver, new IntentFilter(EventCode.LOCAL_SMS_RECEIVED));
+        registerReceiver(smsDeliveredReceiver, new IntentFilter(LocalSMSDeliveredReceiver.EVENT_DELIVERED));
         smsDeliveredReceiver.isRegistered = true;
 
         log.returning(methodName);
@@ -201,7 +202,8 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         //add item in list
-        smses.add(0, newSMS);
+        String id = newSMS.getId();
+        smses.put(id, newSMS, 0);
 
         //notify adapter that item is inserted
         adapter.notifyItemInserted(0);
@@ -214,7 +216,8 @@ public class ThreadActivity extends AppCompatActivity implements
         final String methodName =  "addSMSinUI()";
         log.justEntered(methodName);
 
-        smses.add(0, sms); //Adding Element to first in List
+        String id = sms.getId();
+        smses.put(id, sms, 0); //Adding Element to first in List
         adapter.notifyDataSetChanged();
         //recyclerView.scrollToPosition(smses.size()-1);
 
@@ -491,11 +494,15 @@ public class ThreadActivity extends AppCompatActivity implements
     //--- LocalSMSSentReceiver.Callback Overriders Start ---
     @Override
     public void onSMSSent(SMS sms) {
-        final String methodName =  "onSMSSent()";
+        final String methodName =  "onSMSSent(SMS)";
         log.justEntered(methodName);
 
-        log.error(methodName, "Can be improved Here");
-        showMsgs();
+        String id = sms.getId();
+        SMS orgSMS = smses.get(id);
+        orgSMS.setType(SMS.TYPE_SENT);
+        int position = smses.indexOf(id);
+
+        adapter.notifyItemChanged(position);
         /*smses.clear();
         smses.addAll(temp);
         adapter.notifyDataSetChanged();*/
@@ -505,7 +512,17 @@ public class ThreadActivity extends AppCompatActivity implements
 
     @Override
     public void onSMSSentFailure(SMS sms) {
-        Toast.makeText(this, "SMS Sending Failed", Toast.LENGTH_SHORT).show();
+        final String methodName =  "onSMSSentFailure(SMS)";
+        log.justEntered(methodName);
+
+        String id = sms.getId();
+        SMS orgSMS = smses.get(id);
+        orgSMS.setType(SMS.TYPE_FAILED);
+        int position = smses.indexOf(id);
+
+        adapter.notifyItemChanged(position);
+
+        log.returning(methodName);
     }
     //--- LocalSMSSentReceiver.Callback Overriders Ends ---
 
@@ -516,6 +533,7 @@ public class ThreadActivity extends AppCompatActivity implements
         Toast.makeText(this, "SMS Delivered", Toast.LENGTH_SHORT).show();
     }
     //--- LocalSMSDeliveredReceiver.Callback Overriders Ends ---
+
 
     //--- RVThreadAdapter.Callback Starts ---
     @Override
@@ -583,7 +601,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
     //---- InboxUtil.Callback Overrides Starts ----
     @Override
-    public void onAllSMSFromToResult(List<SMS> updateList) {
+    public void onAllSMSFromToResult(IndexedHashMap<String, SMS> updateList) {
         final String methodName =  "onAllSMSFromToResult()";
         log.justEntered(methodName);
 
@@ -592,7 +610,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
         smses.clear();
 
-        smses.addAll(updateList);
+        smses.update(updateList);
         adapter.notifyDataSetChanged();
 
         if(!alreadyHighlighted) { //If this flag is not there then it will be highlighted in every refresh

@@ -18,6 +18,7 @@ public class SMSDeliveredReceiver extends BroadcastReceiver {
     //Log Initiate
     LogUtil log = new LogUtil( this.getClass().getName() );
 
+    public final static String EVENT_CODE = "sms_event_delivered";
     public final static String KEY_PART_INDEX = "part_index";
     public final static String KEY_TOTAL_PARTS = "total_parts";
     public final static String KEY_SMS = "sms";

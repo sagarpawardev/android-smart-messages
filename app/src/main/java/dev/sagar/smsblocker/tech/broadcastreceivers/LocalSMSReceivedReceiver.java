@@ -20,8 +20,8 @@ public class LocalSMSReceivedReceiver extends BroadcastReceiver {
     LogUtil log = new LogUtil(this.getClass().getName());
 
     //Constant
-    public static final String EVENT_RECEIVED = LocalSMSReceivedReceiver.class.getName();
-    public static final String KEY_SMS = "sms";
+    public static final String EVENT_RECEIVED = SMSReceivedReceiver.EVENT_CODE;
+    public static final String KEY_SMS = SMSReceivedReceiver.KEY_SMS;
 
     //Java Android
     private Gson gson = new Gson();

@@ -4,11 +4,14 @@ import android.animation.Animator;
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +29,7 @@ import java.util.Set;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SIM;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
@@ -47,7 +51,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     private InboxUtil inboxUtil;
 
     //Java Core
-    private List<SMS> smses;
+    private IndexedHashMap<String, SMS> smses;
     private boolean isSelectionModeOn = false;
     private List<SMS> selectedSMSes = new ArrayList<>();
     private TelephonyUtilSingleton telephonyUtil;
@@ -62,7 +66,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     //Flag
     private int highlightPosition = -1;
 
-    public RVThreadAdapter(Context context, Callback callback, List<SMS> smses) {
+    public RVThreadAdapter(Context context, Callback callback, IndexedHashMap<String, SMS> smses) {
         final String methodName =  "RVThreadAdapter()";
         log.justEntered(methodName);
 
@@ -94,7 +98,9 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
             //Delete SMS from UI
             int position = selectedSMSes.indexOf(sms);
-            smses.remove(sms);
+
+            String id = sms.getId();
+            smses.remove(id);
             notifyItemRemoved(position);
         }
         selectedSMSes.clear();
@@ -218,6 +224,25 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     }
 
 
+    private void setStateImage(long type, ImageView ivState){
+        Drawable drawable = null;
+        Resources res = context.getResources();
+
+        if(type == SMS.TYPE_SENT){
+            drawable = res.getDrawable(R.drawable.ic_check_all_white_24dp, null);
+        }
+        else if(type == SMS.TYPE_FAILED){
+            drawable = res.getDrawable(R.drawable.ic_highlight_off_white_24dp, null);
+        }
+        else if(type == SMS.TYPE_QUEUED){
+            drawable = res.getDrawable(R.drawable.ic_schedule_white_24dp, null);
+        }
+
+        //If message is received type
+        if(drawable!=null)
+            ivState.setImageDrawable(drawable);
+    }
+
     //--- RecyclerView.Adapter Overrides Start ---
     @Override
     public SMSViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -267,12 +292,8 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         String socialDate = DateUtilSingleton.getInstance().socialFormat(time);
         boolean isReplySupported = sms.isReplySupported();
 
-        if(type == SMS.TYPE_QUEUED) {
-            holder.tvSending.setVisibility(View.VISIBLE);
-        }
-        else {
-            holder.tvSending.setVisibility(View.GONE);
-        }
+        //SetImage View
+        setStateImage(type, holder.ivState);
 
         //If SMS is among saved SMS
         log.debug(methodName, "Checking Saved SMS: "+sms.isSaved()+" id: "+sms.getId());
@@ -378,13 +399,14 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
 
 
     class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener, OnLikeListener{
-        TextView tvBody, tvTime, tvSending;
+        TextView tvBody, tvTime;
         View llParent;
         LikeButton btnStar;
         //Log Initiate
         LogUtil log = new LogUtil(this.getClass().getName());
         String format = context.getResources().getString(R.string.format_thread__datetime);
         DateFormat dateFormat = new SimpleDateFormat(format);
+        ImageView ivState;
 
         SMSViewHolder(View view) {
             super(view);
@@ -394,7 +416,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             llParent = view;
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
-            tvSending = view.findViewById(R.id.tv_sending);
+            ivState = view.findViewById(R.id.iv_state);
             btnStar = view.findViewById(R.id.btn_star);
 
             view.setOnLongClickListener(this);

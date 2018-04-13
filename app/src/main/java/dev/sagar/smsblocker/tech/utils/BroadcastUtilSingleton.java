@@ -38,8 +38,15 @@ public class BroadcastUtilSingleton {
      * @param basket
      */
     public void broadcast(Context context, String eventName, Bundle basket){
+        final String method = "broadcast()";
+        log.justEntered(method);
+
+        log.debug(method, "Broadcasting Event: "+eventName);
         Intent intent = new Intent(eventName);
         intent.putExtras(basket);
         context.sendBroadcast(intent);
+        log.debug(method, "Broadcaster Event");
+
+        log.returning(method);
     }
 }
