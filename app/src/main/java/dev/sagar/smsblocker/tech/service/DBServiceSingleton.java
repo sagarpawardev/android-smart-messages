@@ -237,6 +237,8 @@ public class DBServiceSingleton {
                 String convSelection = selection.replaceFirst(colThreadId, convColThreadId);
                 int rowCount = writableDB.delete(DBConstants.TABLE_CONVERSATION, convSelection, selectionArgs);
                 log.info(methodName, "Deleted Thread from Conversation count: " + rowCount);
+                writableDB.close();;
+                dbHelper.close();
             }
         }catch (Exception ex){
             //This is added in case Some null pointer is occurred
