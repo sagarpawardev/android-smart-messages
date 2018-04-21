@@ -340,14 +340,13 @@ public class InboxUtil {
 
     /**
      * This method will delete all SMS from (or) SMS sent to, phoneNo
-     * @param phoneNo Phne Number as Thread Id to deletes
+     * @param threadId Thread Id to delete
      * @return Number of SMS deleted
      */
-    public int deleteThread(String phoneNo){
+    public int deleteThread(String threadId){
         final String methodName =  "deleteThread()";
         log.justEntered(methodName);
 
-        String threadId = getThreadId(phoneNo);
         Uri uri = Telephony.Sms.CONTENT_URI;
         String whereClause = this.threadId+" LIKE ?";
         String[] whereArgs = {threadId};

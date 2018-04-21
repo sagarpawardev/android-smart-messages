@@ -115,18 +115,18 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
         //TODO Change for loop to sql In Statement
         log.error(methodName, "This part reduces performance can be improved");
-        for (String thread: selectedConversations) {
+        for (String threadId: selectedConversations) {
             //Delete SMS from database
-            int deleteCount = inboxUtil.deleteThread(thread);
+            int deleteCount = inboxUtil.deleteThread(threadId);
             count += deleteCount;
 
             //Delete SMS from UI
-            int position = selectedConversations.indexOf(thread);
+            int position = selectedConversations.indexOf(threadId);
 
             if(deleteCount>0) {
                 notifyItemRemoved(position);
-                filteredConvMap.remove(thread);
-                conversationMap.remove(thread);
+                filteredConvMap.remove(threadId);
+                conversationMap.remove(threadId);
             }
             log.debug(methodName, "Deleted "+deleteCount+ " in this Thread but Total: "+count);
         }
@@ -238,7 +238,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         holder.tvTime.setText(socialDate);
         holder.tvFrom.setText(fromName);
         holder.tvBody.setText(conversation.getBody());
-        holder.tvAddress.setText(conversation.getAddress());
+        holder.tvThreadId.setText(conversation.getThreadId());
 
         //Setting User Image
         Uri dpUri = conversation.getPhotoThumbnailUri();
@@ -274,7 +274,8 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
         if(!isSelectionModeOn) {
             log.debug(methodName, "sending Callback..");
-            callback.onItemClicked(threadId);
+            Conversation conversation = this.conversationMap.get(threadId);
+            callback.onItemClicked(conversation);
         }
         else{
             log.debug(methodName, "Selection Mode is on.");
@@ -319,7 +320,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
 
     protected class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
-        TextView tvFrom, tvBody, tvTime, tvAddress;
+        TextView tvFrom, tvBody, tvTime, tvThreadId;
         DisplayPictureView dpView;
         View parent;
         TextView tvBadge;
@@ -330,7 +331,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
             dpView = view.findViewById(R.id.dpv_picture);
-            tvAddress = view.findViewById(R.id.tv_thread_id);
+            tvThreadId = view.findViewById(R.id.tv_thread_id);
             tvBadge = view.findViewById(R.id.tv_badge);
             parent = view;
 
@@ -344,7 +345,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
                 public void onClick(View view) {
                     String contactID = null;
                     try {
-                        String threadId = tvAddress.getText().toString();
+                        String threadId = tvThreadId.getText().toString();
                         Contact contact = ContactUtilSingleton.getInstance().getContact(context, threadId);
                         contactID = contact.getId();
                     } catch (ReadContactPermissionException e) {
@@ -366,7 +367,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         @Override
         public boolean onLongClick(View view) {
             final String methodName =  "onLongClick()";
-            log.debug(methodName, "Just Entered..");
+            log.justEntered(methodName);
 
             if (!isSelectionModeOn) {
                 callback.onItemLongClicked();
@@ -374,20 +375,20 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
                 //Add Long Pressed Item in Selected List
                 int position = getAdapterPosition();
                 Conversation tSms = filteredConvMap.get(position);
-                selectedConversations.add(tSms.getAddress());
+                selectedConversations.add(tSms.getThreadId());
                 setViewSelected(view, true);
 
                 return true;
             }
 
-            log.debug(methodName, "Returning..");
+            log.returning(methodName);
             return false;
         }
         //--- View.OnLongClickListener Overrides End ---
     }
 
     public interface Callback{
-        void onItemClicked(String threadId);
+        void onItemClicked(Conversation conversation);
         void onItemLongClicked();
         void onAllDeselected();
         void onResultsFiltered();

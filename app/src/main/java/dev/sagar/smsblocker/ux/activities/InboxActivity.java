@@ -27,12 +27,8 @@ import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
-import dev.sagar.smsblocker.tech.EventCode;
 import dev.sagar.smsblocker.tech.RequestCode;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.beans.SIM;
@@ -52,7 +48,7 @@ import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThread;
 
-public class ThreadActivity extends AppCompatActivity implements
+public class InboxActivity extends AppCompatActivity implements
         RVThreadAdapter.Callback,
         LocalSMSReceivedReceiver.Callback,
         LocalSMSSentReceiver.Callback,
@@ -63,7 +59,8 @@ public class ThreadActivity extends AppCompatActivity implements
     private LogUtil log = new LogUtil(this.getClass().getName());
 
     //Constants
-    public static final String KEY_ADDRESS = "THREAD_ID";
+    public static final String KEY_THREAD_ID = "THREAD_ID"; //This is required to read SMS
+    public static final String KEY_ADDRESS = "ADDRESS_ID"; //This is required to show Contact related details
     public static final String KEY_SMS_ID = "SMS_ID";
     final String[] ALL_PERMISSIONS = Permission.ALL;
     final String READ_SMS = Permission.READ_SMS;
@@ -91,6 +88,7 @@ public class ThreadActivity extends AppCompatActivity implements
 
     //Java Core
     private IndexedHashMap<String, SMS> smses = new IndexedHashMap<>();
+    private String threadId;
     private String address;
     private InboxUtil inboxUtil = null;
     private SMSUtil smsUtil;
@@ -106,7 +104,7 @@ public class ThreadActivity extends AppCompatActivity implements
     private boolean alreadyHighlighted = false;
 
     private void showMsgs(){
-        inboxUtil.getAllSMSFromTo(address);
+        inboxUtil.getAllSMSFromTo(this.address);
         holderMain.setVisibility(View.GONE);
         holderLoader.setVisibility(View.VISIBLE);
     }
@@ -122,17 +120,17 @@ public class ThreadActivity extends AppCompatActivity implements
         String contact = null;
         Uri dpUri = null;
         try {
-            contact = contactUtil.getContactName(this, address);
-            dpUri = contactUtil.getPictureUri(this, address);
+            contact = contactUtil.getContactName(this, this.address);
+            dpUri = contactUtil.getPictureUri(this, this.address);
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
-            contact = address;
+            contact = this.address;
         }
 
         log.info(methodName, "Setting contactName: "+contact);
         toolbar.setTitle(contact);
-        if(contact!=null && !contact.equals(address)) {
-            toolbar.setSubtitle(address);
+        if(contact!=null && !contact.equals(this.address)) {
+            toolbar.setSubtitle(this.address);
         }
         else
             toolbar.setSubtitle(null);
@@ -157,7 +155,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         String msg = etMsg.getText().toString().trim();
-        String phoneNo = address;
+        String phoneNo = this.address;
         SMS newSMS = smsUtil.sendSMS(phoneNo, msg);
 
         log.returning(methodName);
@@ -231,7 +229,7 @@ public class ThreadActivity extends AppCompatActivity implements
     public void showContact(){
         String contactID = null;
         try {
-            Contact contact = ContactUtilSingleton.getInstance().getContact(this, address);
+            Contact contact = ContactUtilSingleton.getInstance().getContact(this, this.address);
             contactID = contact.getId();
         } catch (ReadContactPermissionException e) {
             e.printStackTrace();
@@ -306,7 +304,8 @@ public class ThreadActivity extends AppCompatActivity implements
 
         //From Previous Activity
         Bundle basket = getIntent().getExtras();
-        address = basket.getString(KEY_ADDRESS);
+        this.threadId = basket.getString(KEY_THREAD_ID);
+        this.address = basket.getString(KEY_ADDRESS);
         adapter = new RVThreadAdapter(this, this, smses);
         amCallback = new AMCallbackThread(this, adapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -385,7 +384,7 @@ public class ThreadActivity extends AppCompatActivity implements
                 }
                 else{
                     hideMsgs();
-                    Toast.makeText(ThreadActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(InboxActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -430,7 +429,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         //markSMSRead
-        inboxUtil.markSMSRead(address);
+        inboxUtil.markSMSRead(this.address);
 
         super.onPause();
 
@@ -455,14 +454,12 @@ public class ThreadActivity extends AppCompatActivity implements
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_thread, menu);
 
-        String id = null;
+
         //Hide Show contact option if contact not in contact
-        try {
-            Contact contact = ContactUtilSingleton.getInstance().getContact(this, address);
-            id = contact.getId();
-        } catch (ReadContactPermissionException e) {
-            e.printStackTrace();
-        }
+        Contact contact = contactUtil.getContactOrDefault(this, this.address);
+
+        String id = contact.getId();
+
         if(id == null) {
             MenuItem item = menu.findItem(R.id.showContact);
             item.setVisible(false);
@@ -491,7 +488,7 @@ public class ThreadActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         String from = sms.getAddress();
-        if(from.equals(address)) {
+        if(from.equals(this.address)) {
             addSMSinUI(sms);
         }
 

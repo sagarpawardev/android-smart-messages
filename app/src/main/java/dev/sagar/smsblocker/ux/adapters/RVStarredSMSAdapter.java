@@ -29,7 +29,7 @@ import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.TelephonyUtilSingleton;
-import dev.sagar.smsblocker.ux.activities.ThreadActivity;
+import dev.sagar.smsblocker.ux.activities.InboxActivity;
 import dev.sagar.smsblocker.ux.customviews.DisplayPictureView;
 import dev.sagar.smsblocker.ux.utils.ThemeUtil;
 
@@ -282,10 +282,10 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
 
             //Start Thread Activity
             log.info(methodName, "Start Thread Activity");
-            Intent intent = new Intent(context, ThreadActivity.class);
+            Intent intent = new Intent(context, InboxActivity.class);
             Bundle basket = new Bundle();
-            basket.putString(ThreadActivity.KEY_ADDRESS, address);
-            basket.putString(ThreadActivity.KEY_SMS_ID, id);
+            basket.putString(InboxActivity.KEY_THREAD_ID, address);
+            basket.putString(InboxActivity.KEY_SMS_ID, id);
             intent.putExtras(basket);
             context.startActivity(intent);
 

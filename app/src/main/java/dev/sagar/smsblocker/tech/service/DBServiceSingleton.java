@@ -18,6 +18,7 @@ import java.util.Set;
 
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.service.helper.conversation.ConversationDBAttributes;
 import dev.sagar.smsblocker.tech.service.helper.conversation.ConversationDBAttributes.Converesation;
 import dev.sagar.smsblocker.tech.service.helper.DBHelper;
 import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
@@ -209,13 +210,23 @@ public class DBServiceSingleton {
      * @return
      */
     public int delete(Context context, Uri uri, String selection, String[] selectionArgs){
-        String methodName ="delete()";
+        String methodName ="delete(Context , Uri , String , String[] )";
         log.justEntered(methodName);
-
-        //TODO need to delete from conversation Database as well and update from SMS database in case only latest SMS is deleted
 
         ContentResolver contentResolver = context.getContentResolver();
         int count = contentResolver.delete(uri, selection, selectionArgs);
+
+        //TODO need to delete from conversation Database as well and update from SMS database in case only latest SMS is deleted
+        Uri deleteThreadUri = Telephony.Sms.CONTENT_URI;
+        String colThreadId = Telephony.Sms.THREAD_ID;
+        if(uri.equals(deleteThreadUri) && selection!=null && selection.contains(colThreadId)){ //FIXME selection may contain value thread_id like " thread_id = 'thread_id'"
+            String convColThreadId = Converesation.COLUMN_NAME_THREAD_ID;
+            DBHelper dbHelper = new DBHelper(context);
+            SQLiteDatabase writableDB = dbHelper.getWritableDatabase();
+            String convSelection = selection.replaceFirst(colThreadId, convColThreadId);
+            int rowCount = writableDB.delete(DBConstants.TABLE_CONVERSATION, convSelection, selectionArgs);
+            log.info(methodName, "Deleted Thread from Conversation count: "+rowCount);
+        }
 
         log.returning(methodName);
         return count;
@@ -554,7 +565,7 @@ public class DBServiceSingleton {
         //-- Update unread_count in Conversation Starts
 
 
-        //TODO: Delete Condition when conversation is removed from main database but exists in Local Database
+        //Delete SMS From Conversation DB if not found in latest SMS DB
         Set<String> deletedThreads = oldMap.keySet();
         StringBuilder sbDeleteQuery = new StringBuilder();
         sbDeleteQuery.append(threadId_local+" IN (");

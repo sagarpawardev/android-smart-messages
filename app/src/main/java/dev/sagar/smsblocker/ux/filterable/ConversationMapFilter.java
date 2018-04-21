@@ -40,13 +40,14 @@ public class  ConversationMapFilter extends Filter {
                 String addr = conv.getAddress().toLowerCase();
                 String displayName = conv.getContactName();
                 String body = conv.getBody().toLowerCase();
+                String threadId = conv.getThreadId();
                 if(displayName != null)
                     displayName = displayName.toLowerCase();
                 if(addr.contains(searchStr) ||
                         (displayName!=null && displayName.contains(searchStr)) ||
                         body.contains(searchStr)
                         ){
-                    filteredConvMap.put(addr, conv);
+                    filteredConvMap.put(threadId, conv);
                 }
             }
         }

@@ -81,8 +81,9 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
             long type = c.getLong(c.getColumnIndexOrThrow(this.type));
             String strPhotoUri = c.getString(c.getColumnIndexOrThrow(this.photo));
             String strPhotoThumbUri = c.getString(c.getColumnIndexOrThrow(this.photothumb));
-            String contactName = c.getString(c.getColumnIndexOrThrow(this.contactName));
+            String contactName =  c.getString(c.getColumnIndexOrThrow(this.contactName));
             int unreadCount = c.getInt(c.getColumnIndexOrThrow(this.unreadCount));
+            String threadId = c.getString(c.getColumnIndexOrThrow(this.threadId));
 
             Uri uriPhoto = null;
             if(strPhotoUri!=null){
@@ -106,8 +107,9 @@ public class LatestMsgHandler extends AsyncTask<Context, Void, IndexedHashMap<St
             conversation.setPhotoThumbnailUri(uriPhotoThumb);
             conversation.setContactName(contactName);
             conversation.setUnreadCount(unreadCount);
+            conversation.setThreadId(threadId);
 
-            convMap.put(address, conversation);
+            convMap.put(threadId, conversation);
 
         }
 

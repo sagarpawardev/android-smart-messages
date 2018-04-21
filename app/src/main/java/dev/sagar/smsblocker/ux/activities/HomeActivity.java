@@ -209,12 +209,11 @@ public class HomeActivity extends AppCompatActivity
         final String methodName =  "addSMSinUI(SMS)";
         log.justEntered(methodName);
 
-        String phoneNo = sms.getAddress();
+        String lThreadId = sms.getThreadId();
         Conversation conversation = new Conversation(getApplicationContext(), sms);
 
         log.error(methodName, "Improvement can be done here");
-        String formattedPhone = phoneUtils.formatNumber(this, phoneNo);
-        PositionLog mPositionLog = conversationMap.put(formattedPhone, conversation);
+        PositionLog mPositionLog = conversationMap.put(lThreadId, conversation);
         int oldPosition = mPositionLog.getOldPosition();
         int newPosition = mPositionLog.getNewPosition();
         if(oldPosition == -1) { //Item Newly Added
@@ -435,14 +434,17 @@ public class HomeActivity extends AppCompatActivity
 
     //--- RVHomeAdapter.Callback Overrides Start ---
     @Override
-    public void onItemClicked(String threadId) {
+    public void onItemClicked(Conversation conversation) {
         final String methodName =  "onItemClicked(String)";
         log.justEntered(methodName);
 
-        Intent intent = new Intent(this, ThreadActivity.class);
+        String threadId = conversation.getThreadId();
+        String address = conversation.getAddress();
+        Intent intent = new Intent(this, InboxActivity.class);
         Bundle basket = new Bundle();
 
-        basket.putString(ThreadActivity.KEY_ADDRESS, threadId);
+        basket.putString(InboxActivity.KEY_THREAD_ID, threadId);
+        basket.putString(InboxActivity.KEY_ADDRESS, address);
         intent.putExtras(basket);
         startActivity(intent);
         overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out);

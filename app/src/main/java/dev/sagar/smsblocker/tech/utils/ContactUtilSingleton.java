@@ -67,10 +67,11 @@ public class ContactUtilSingleton {
         log.justEntered(methodName);
 
         Contact contact =  getContact(context, phoneNumber);
-        String name = contact.getDisplayName();
-
-        if(name == null){
+        String name;
+        if(contact == null){
             name = phoneNumber;
+        }else{
+            name = contact.getDisplayName();
         }
 
 
@@ -351,7 +352,7 @@ public class ContactUtilSingleton {
         final String methodName = "getPictureUri()";
         log.justEntered(methodName);
 
-        Contact contact = getContact(context, phoneNo);
+        Contact contact = getContactOrDefault(context, phoneNo);
 
         /*//Caching
         if(contactMap.containsKey(phoneNo)){
@@ -429,13 +430,18 @@ public class ContactUtilSingleton {
         try{
             //TODO Default more data here like Uri, Thumbnail Uri
             contact = getContact(context, phoneNumber);
-            String name = contact.getDisplayName() == null ? contact.getNumber() : contact.getDisplayName();
+            if(contact != null) {
+                String name = contact.getDisplayName() == null ? contact.getNumber() : contact.getDisplayName();
 
-            contact.setDisplayName(name);
+                contact.setDisplayName(name);
+            }
 
         }
         catch (ReadContactPermissionException e){
             log.error(methodName, "Got null from contacts so defaulting phoneNu");
+        }
+
+        if(contact == null){
             contact = new Contact();
             contact.setId(null);
             String formatAddress = PhoneUtilsSingleton.getInstance().formatNumber(context, phoneNumber);
@@ -487,11 +493,7 @@ public class ContactUtilSingleton {
             Cursor cursor = contentResolver.query(uri, projection, null, null, null);
             if (cursor == null || cursor.getCount() == 0) {
                 log.error(methodName, "Nothing in Cursor for " + phoneNumber);
-                result.setPhotoThumbnail(null);
-                result.setId(null);
-                result.setDisplayName(null);
-                result.setPhoto(null);
-                result.setNumber(phoneNumber);
+                result = null;
             } else {
                 log.info(methodName, "Cursor Size: " + cursor.getCount());
                 if (cursor.moveToFirst()) {

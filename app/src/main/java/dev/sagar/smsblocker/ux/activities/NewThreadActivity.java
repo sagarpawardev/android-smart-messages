@@ -1,7 +1,6 @@
 package dev.sagar.smsblocker.ux.activities;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -115,8 +114,8 @@ public class NewThreadActivity extends AppCompatActivity
         log.justEntered(methodName);
 
         Bundle bundle = new Bundle();
-        bundle.putString(ThreadActivity.KEY_ADDRESS, phoneNo);
-        Intent intent = new Intent(this, ThreadActivity.class);
+        bundle.putString(InboxActivity.KEY_ADDRESS, phoneNo);
+        Intent intent = new Intent(this, InboxActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
 

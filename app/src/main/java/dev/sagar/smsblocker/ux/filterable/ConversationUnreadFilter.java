@@ -38,10 +38,10 @@ public class ConversationUnreadFilter extends Filter {
             for (int i=0 ;i<conversationMap.size(); i++) {
                 Conversation conv = conversationMap.get(i);
                 boolean isRead = conv.isRead();
-                String addr = conv.getAddress();
+                String threadId = conv.getThreadId();
 
                 if(!isRead){
-                    filteredConvMap.put(addr, conv);
+                    filteredConvMap.put(threadId, conv);
                 }
             }
         }
