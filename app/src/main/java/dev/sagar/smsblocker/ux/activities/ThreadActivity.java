@@ -35,6 +35,7 @@ import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.EventCode;
 import dev.sagar.smsblocker.tech.RequestCode;
 import dev.sagar.smsblocker.tech.beans.Contact;
+import dev.sagar.smsblocker.tech.beans.SIM;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSDeliveredReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceivedReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSSentReceiver;
@@ -43,6 +44,7 @@ import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.PictureUtilSingleton;
+import dev.sagar.smsblocker.tech.utils.TelephonyUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
@@ -76,6 +78,7 @@ public class ThreadActivity extends AppCompatActivity implements
     private TextView tvHeader;
     private View holderBodyET, holderLoader, holderMain;
     private View tvReplyNotSupported;
+    private TextView tvSim;
 
     //Java Android
     private RVThreadAdapter adapter;
@@ -97,6 +100,7 @@ public class ThreadActivity extends AppCompatActivity implements
     private LocalSMSDeliveredReceiver smsDeliveredReceiver = null;
     private LocalSMSSentReceiver smsSentReceiver = null;
     private ContactUtilSingleton contactUtil = ContactUtilSingleton.getInstance();
+    private TelephonyUtilSingleton telephonyUtils = TelephonyUtilSingleton.getInstance();
 
     //Flag
     private boolean alreadyHighlighted = false;
@@ -292,6 +296,7 @@ public class ThreadActivity extends AppCompatActivity implements
         tvReplyNotSupported = findViewById(R.id.tv_reply_not_supported);
         holderLoader = findViewById(R.id.holder_loader);
         holderMain = findViewById(R.id.holder_main);
+        tvSim = (TextView) findViewById(R.id.tv_sim);
 
         if(inboxUtil == null) inboxUtil = new InboxUtil(this, this);
         smsUtil = new SMSUtil(this);
@@ -403,6 +408,10 @@ public class ThreadActivity extends AppCompatActivity implements
         else{
             permUtil.ask(this, ALL_PERMISSIONS, REQUEST_CODE_ALL_PERMISSIONS);
         }
+
+        SIM currentSIM = telephonyUtils.getDefaultSmsSIM(this);
+        int slot = currentSIM.getSlotNo()+1;  //As slot 0 indexed
+        tvSim.setText(String.valueOf(slot));
 
         super.onStart();
 

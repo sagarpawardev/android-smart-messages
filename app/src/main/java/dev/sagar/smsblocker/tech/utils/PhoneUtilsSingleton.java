@@ -57,10 +57,10 @@ public class PhoneUtilsSingleton {
 
 
         if(str.startsWith("+91")){
-            str.replaceFirst("\\+91", "");
+            str = str.replaceFirst("\\+91", "");
         }
         else if(str.startsWith("0")){
-            str.replaceFirst("0","");
+            str = str.replaceFirst("0","");
         }
 
         if(str.length()>=10){ //% at starting of string
@@ -96,5 +96,10 @@ public class PhoneUtilsSingleton {
         log.debug(methodName, "I will return : "+result);
         log.returning(methodName);
         return result;
+    }
+
+    public String normalizeAddress(String unformattedAddress){
+        String normalizedAddress = PhoneNumberUtils.normalizeNumber(unformattedAddress);
+        return normalizedAddress;
     }
 }

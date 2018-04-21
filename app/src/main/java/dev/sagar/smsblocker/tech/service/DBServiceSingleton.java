@@ -40,7 +40,7 @@ public class DBServiceSingleton {
     private static PhoneUtilsSingleton phoneUtils = PhoneUtilsSingleton.getInstance();
     private DBServiceSingleton(){}
 
-    //Constants
+    //<editor-fold desc="Java Constants">
     private final String _id = Telephony.Sms._ID;
     private final String threadId = Telephony.Sms.THREAD_ID;
     private final String address = Telephony.Sms.ADDRESS;
@@ -60,6 +60,7 @@ public class DBServiceSingleton {
     private final String photoUri = ContactsContract.CommonDataKinds.Phone.PHOTO_URI;
     private final String photoUriThumbnail = ContactsContract.CommonDataKinds.Phone.PHOTO_THUMBNAIL_URI;
     private final String contactName = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME;
+    private final String contactId = ContactsContract.CommonDataKinds.Phone.CONTACT_ID;
 
     private final String _id_local = Converesation.COLUMN_NAME_ID;
     private final String threadId_local = Converesation.COLUMN_NAME_THREAD_ID;
@@ -83,6 +84,7 @@ public class DBServiceSingleton {
     private final String unreadCount_local = Converesation.COLUMN_NAME_UNREAD_COUNT;
 
     public static final String TABLE_STARSMS = SavedSMSDBAttributes.SavedSMS.TABLE_NAME;
+    //</editor-fold>
 
 
     public static DBServiceSingleton getInstance(){
@@ -280,6 +282,7 @@ public class DBServiceSingleton {
         Uri mUriSMS = Telephony.Sms.CONTENT_URI;
 
 
+        //<editor-fold desc="Read Old Conversation DB Rows Starts">
         //Read Old Conversation DB Rows Starts
         log.info(methodName, "Reading old Address and Date rows");
         String[] mOldProjection = {"*"};
@@ -305,17 +308,19 @@ public class DBServiceSingleton {
                 String read = mOldCursor.getString(mOldCursor.getColumnIndex(this.read_local));
                 boolean bRead = (read.equals("0") || read.equalsIgnoreCase("false"));
                 long type = mOldCursor.getLong(mOldCursor.getColumnIndexOrThrow(this.type_local));
+                String threadId = mOldCursor.getString(mOldCursor.getColumnIndex(this.threadId_local));
 
                 SMS sms = new SMS();
                 sms.setId(id);
                 sms.setAddress(address);
                 sms.setDateTime(date);
-                sms.setId(id);
                 sms.setBody(body);
                 sms.setSubscription(subscriptionId);
                 sms.setRead(bRead);
                 sms.setType(type);
-                oldMap.put(address, sms);
+                sms.setThreadId(threadId);
+
+                oldMap.put(threadId, sms);
             }
             mOldCursor.close();
         }
@@ -323,6 +328,7 @@ public class DBServiceSingleton {
             log.error(methodName, "OLD Conversation Query returned null cursor");
         }
         //-- Read Old Conversation DB Rows Ends
+        //</editor-fold>
 
         //Reading Latest SMS DB Rows from ContentProvider Starts
         log.info(methodName, "Reading Latest SMS from Contact");
@@ -332,6 +338,7 @@ public class DBServiceSingleton {
         String mSortOrder = this.date +" DESC";
 
         HashSet<String> doneSet = new HashSet<>();
+        HashSet<String> addressDoneSet = new HashSet<>(); //Adding temporarily
         HashMap<String, Integer> unreadCountMap = new HashMap<>();
 
         SQLiteDatabase  writableDB = mDBHelper.getWritableDatabase();
@@ -339,12 +346,11 @@ public class DBServiceSingleton {
         Cursor mLatestSmsCursor = contentResolver
                 .query(mUriSMS, mProjection, mSelection, mSelectionArgs, mSortOrder);
 
-
-        int tempCount = 0;
         if (mLatestSmsCursor != null) {
             log.info(methodName, "Reading latest sms from contact count:"+mLatestSmsCursor.getCount());
             while(mLatestSmsCursor.moveToNext()){
 
+                //<editor-fold desc="SMS Field init">
                 String id = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndexOrThrow(this._id));
                 String address = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndexOrThrow(this.address));
                 String body = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndexOrThrow(this.body));
@@ -361,12 +367,6 @@ public class DBServiceSingleton {
                 String subject = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndex(this.subject));
                 String locked = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndex(this.locked));
                 String errorCode = mLatestSmsCursor.getString(mLatestSmsCursor.getColumnIndex(this.errorCode));
-
-                /*String normalizedAddress = PhoneNumberUtils.normalizeNumber(address);
-                String address = normalizedAddress;
-                if(address.length() < 8){ //If Number is like VK-Voda its normalized code is 3856778
-                    address = originalAddress;
-                }*/
 
                 log.info(methodName, "Reading SMS from contactNumber: "+address+" ");
 
@@ -387,44 +387,53 @@ public class DBServiceSingleton {
                 values.put(this.subject_local, subject);
                 values.put(this.locked_local, locked);
                 values.put(this.errorCode_local, errorCode);
+                //</editor-fold>
 
-                //If unread increment count
-                log.info(methodName, "Raw Unread value: "+read+" for address: "+address);
+
+                //<editor-fold desc="Increment Unread Count">
+                log.info(methodName, "Raw Unread value: "+read+" for thread_id: "+threadId);
                 boolean bUnread = (read.equals("0") || read.equalsIgnoreCase("false")); //If object is saved as integer or boolean
                 if(bUnread){
-                    Integer unreadCount = unreadCountMap.get(address);
+                    Integer unreadCount = unreadCountMap.get(threadId);
                     int count = unreadCount==null ? 0 : unreadCount;
                     count++;
-                    unreadCountMap.put(address, count); //Increment count here
+                    unreadCountMap.put(threadId, count); //Increment count here
                     values.put(this.unreadCount_local, count);
-                    log.info(methodName, "Adding unread count: "+count+" for address: "+address);
+                    log.info(methodName, "Adding unread count: "+count+" for thread_id: "+threadId);
+                }
+                //</editor-fold>
+
+
+                if(doneSet.contains(threadId)) continue; //If value is already in Map then go to next value
+                if(address.equals("VK-iPaytm")){
+                    log.info(methodName, "Test Debug");
                 }
 
-
-                if(doneSet.contains(address)) continue; //If value is already in Map then go to next value
-
-
-                SMS oldSMS = oldMap.get(address);
-                //if(oldSMS == null) continue; //Just in case if nothing found
-
-
-                long oldDate = oldMap.get(address)==null ? 0 : oldMap.get(address).getDateTime();
-                //if(oldDate >= date) continue; //If oldDate is greater than or equals current date ignore message
-                log.error(methodName, "Olddate: "+oldDate+" newdate:"+date+" address:"+address+" type:"+type);
-                if(oldSMS!=null && id.equals(oldSMS.getId()) && address.equals(oldSMS.getAddress())){
-                    doneSet.add(address);
+                SMS oldSMS = oldMap.get(threadId);
+                if(oldSMS!=null && oldSMS.getThreadId().equals(threadId)){ //If New message the oldSMS will be null
+                    oldMap.remove(threadId);
+                    doneSet.add(threadId);
+                    String formattedAddress = phoneUtils.formatNumber(context, address);
+                    addressDoneSet.add(formattedAddress);
                     continue; //If SMS is same as older ones
                 }
 
-                if(oldMap.containsKey(address)) {
-                    String whereClause = this.address_local + " = ?";
-                    String[] whereArgs = {address};
+                log.error(methodName, "");
+                if(oldMap.containsKey(threadId)) {
+                    String whereClause = this.threadId_local + " LIKE ?";
+                    String[] whereArgs = {threadId};
                     writableDB.update(Converesation.TABLE_NAME, values, whereClause, whereArgs);
                 }
                 else{
                     writableDB.insert(Converesation.TABLE_NAME, null, values);
                 }
-                doneSet.add(address);
+
+                //Move Thread id from old_bucket to done_bucket
+                oldMap.remove(threadId);
+                doneSet.add(threadId);
+                String formattedAddress = phoneUtils.formatNumber(context, address);
+                addressDoneSet.add(formattedAddress);
+
                 result++;
             }
             mLatestSmsCursor.close();
@@ -441,7 +450,8 @@ public class DBServiceSingleton {
                 this.photoUri,
                 this.photoUriThumbnail,
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
-                this.contactName
+                this.contactName,
+                this.contactId
         };
 
         Map<String, ContactDetails> mContactMap = new HashMap<>();
@@ -454,6 +464,7 @@ public class DBServiceSingleton {
                     String contactName = mContactCursor.getString(mContactCursor.getColumnIndex(this.contactName));
                     String photoThumb = mContactCursor.getString(mContactCursor.getColumnIndex(this.photoUriThumbnail));
                     String photoUri = mContactCursor.getString(mContactCursor.getColumnIndex(this.photoUri));
+                    String contactId = mContactCursor.getString(mContactCursor.getColumnIndex(this.contactId));
                     String address = mContactCursor.getString(mContactCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
                     /*String normalizedAddress = PhoneNumberUtils.normalizeNumber(address);*/
@@ -469,7 +480,7 @@ public class DBServiceSingleton {
 
                     //TODO Default country to format number
 
-                    log.info(methodName, "Found contactName: " + contactName + " for address: " + address + " In new map: " + doneSet.contains(address));
+                    log.info(methodName, "Found contactName: " + contactName + " for thread_id: " + threadId + " In new map: " + doneSet.contains(threadId));
                 }
                 mContactCursor.close();
             } else {
@@ -482,7 +493,7 @@ public class DBServiceSingleton {
         //-- Create a map of all contacts Ends
 
         //Update Photo in Database Starts
-        for(String key: doneSet){
+        for(String key: addressDoneSet){
             String formattedKey = phoneUtils.formatNumber(context, key);
             ContactDetails contact = mContactMap.get(formattedKey);
 
@@ -509,28 +520,28 @@ public class DBServiceSingleton {
         StringBuilder sbRawQuery = new StringBuilder();
         sbRawQuery.append(" UPDATE ");
         sbRawQuery.append(Converesation.TABLE_NAME);
-        sbRawQuery.append(" SET "+ Converesation.COLUMN_NAME_UNREAD_COUNT+"= CASE "+ Converesation.COLUMN_NAME_ADDRESS);
+        sbRawQuery.append(" SET "+ this.unreadCount_local+"= CASE "+ this.threadId_local);
 
         ArrayList<Integer> alValues = new ArrayList<>();
-        Set<String> addresses = unreadCountMap.keySet();
+        Set<String> threadIds = unreadCountMap.keySet();
 
-        for(String mAddress: addresses){
-            Integer iUnreadCount = unreadCountMap.get(mAddress);
+        for(String mThreadIds: threadIds){
+            Integer iUnreadCount = unreadCountMap.get(mThreadIds);
             int unreadCount = iUnreadCount==null ? 0 : iUnreadCount;
-            sbRawQuery.append(" WHEN '"+mAddress+"' THEN "+unreadCount);
+            sbRawQuery.append(" WHEN '"+mThreadIds+"' THEN "+unreadCount);
             alValues.add(unreadCount);
         }
         sbRawQuery.append(" END WHERE ");
         sbRawQuery.append(Converesation.COLUMN_NAME_ADDRESS);
         sbRawQuery.append(" IN (");
-        for(String mAddress: addresses){
+        for(String mAddress: threadIds){
             sbRawQuery.append("'"+mAddress+"',");
         }
 
         sbRawQuery.deleteCharAt(sbRawQuery.length()-1); //Deleting , at end
         sbRawQuery.append(")");
 
-        if(addresses.size()>0) { //Updating empty database does not make sense and App crashes as well
+        if(threadIds.size()>0) { //Updating empty database does not make sense and App crashes as well
             String[] strArgs = null;
 
             String rawQuery = sbRawQuery.toString();
@@ -540,10 +551,27 @@ public class DBServiceSingleton {
             log.info(methodName, "Updated rows: " + c.getCount());
             c.close(); //Query won't update unless moveToFirst() or close() is called
         }
-
         //-- Update unread_count in Conversation Starts
 
+
         //TODO: Delete Condition when conversation is removed from main database but exists in Local Database
+        Set<String> deletedThreads = oldMap.keySet();
+        StringBuilder sbDeleteQuery = new StringBuilder();
+        sbDeleteQuery.append(threadId_local+" IN (");
+        String whereArgs[] = new String[deletedThreads.size()];
+        int size = deletedThreads.size();
+        for(String threadId: deletedThreads){
+            sbDeleteQuery.append("?");
+            if(--size > 0) {
+                sbDeleteQuery.append(",");
+            }
+            whereArgs[size] = threadId;
+        }
+        sbDeleteQuery.append(")");
+
+        String whereQuery = sbDeleteQuery.toString();
+        log.debug(methodName, "Formed Query: "+whereQuery);
+        writableDB.delete(DBConstants.TABLE_CONVERSATION, whereQuery, whereArgs);
 
         writableDB.close();
         mDBHelper.close();
@@ -553,6 +581,6 @@ public class DBServiceSingleton {
 
 
     class ContactDetails{
-        String name, photoUri, photoThumbUri, address;
+        String name, photoUri, photoThumbUri, address, id;
     }
 }

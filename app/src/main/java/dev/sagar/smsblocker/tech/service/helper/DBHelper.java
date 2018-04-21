@@ -19,8 +19,8 @@ public class DBHelper extends SQLiteOpenHelper{
                     ConversationDBAttributes.Converesation.COLUMN_NAME_ID + " TEXT " +
                     //"PRIMARY KEY"  //If some other sms app is handling db and it keps duplicate id then App wil keep on failing
                     "," +
-                    ConversationDBAttributes.Converesation.COLUMN_NAME_THREAD_ID + " TEXT," +
-                    ConversationDBAttributes.Converesation.COLUMN_NAME_ADDRESS + " TEXT UNIQUE," +
+                    ConversationDBAttributes.Converesation.COLUMN_NAME_THREAD_ID + " TEXT UNIQUE," +
+                    ConversationDBAttributes.Converesation.COLUMN_NAME_ADDRESS + " TEXT," +
                     ConversationDBAttributes.Converesation.COLUMN_NAME_PERSON + " TEXT," +
                     ConversationDBAttributes.Converesation.COLUMN_NAME_DATE + " TEXT," +
                     ConversationDBAttributes.Converesation.COLUMN_NAME_PROTOCOL + " TEXT," +

@@ -1,6 +1,7 @@
 package dev.sagar.smsblocker.tech.utils;
 
 import android.content.Context;
+import android.telephony.SmsManager;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
@@ -32,6 +33,15 @@ public class TelephonyUtilSingleton{
         TelephonyManager tManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         String carrierName = tManager.getSimOperatorName();
         return carrierName;
+    }
+
+    public SIM getDefaultSmsSIM(Context context){
+
+        SmsManager smsManager = SmsManager.getDefault();
+        int subsId = smsManager.getSubscriptionId();
+        SIM defaultSIM = getSim(context, subsId);
+
+        return defaultSIM;
     }
 
     public int getSimCount(Context context){

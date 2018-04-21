@@ -19,8 +19,14 @@ public final class ConversationDBAttributes {
         public static final String COLUMN_NAME_ID = "_id";
         public static final String COLUMN_NAME_THREAD_ID = "thread_id";
         public static final String COLUMN_NAME_ADDRESS = "address";
-        public static final String COLUMN_NAME_PERSON = "person";
+        public static final String COLUMN_NAME_PHOTO_URI = "photo_uri";
+        public static final String COLUMN_NAME_PHOTO_THUMBNAIL = "photo_thumbnail_url";
+        public static final String COLUMN_NAME_CONTACT_NAME = "display_name";
+        public static final String COLUMN_NAME_UNREAD_COUNT = "unread_count";
         public static final String COLUMN_NAME_DATE = "time_in_millis";
+
+
+        public static final String COLUMN_NAME_PERSON = "person";
         public static final String COLUMN_NAME_PROTOCOL = "protocol";
         public static final String COLUMN_NAME_READ = "read_status";
         public static final String COLUMN_NAME_STATUS = "status";
@@ -33,10 +39,6 @@ public final class ConversationDBAttributes {
         public static final String COLUMN_NAME_LOCKED = "locked";
         public static final String COLUMN_NAME_ERROR_CODE = "error_code";
 
-        public static final String COLUMN_NAME_PHOTO_URI = "photo_uri";
-        public static final String COLUMN_NAME_PHOTO_THUMBNAIL = "photo_thumbnail_url";
-        public static final String COLUMN_NAME_CONTACT_NAME = "display_name";
-        public static final String COLUMN_NAME_UNREAD_COUNT = "unread_count";
 
     }
 }

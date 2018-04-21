@@ -79,5 +79,6 @@
     <string name="txt_home_fax">Home Fax</string>
     <string name="txt_work_fax">Work Fax</string>
     <string name="txt_main">Main</string>
+    <string name="deleted">Deleted</string>
 
 </resources>

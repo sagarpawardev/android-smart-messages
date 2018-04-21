@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -130,6 +131,10 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             log.debug(methodName, "Deleted "+deleteCount+ " in this Thread but Total: "+count);
         }
         selectedConversations.clear();
+
+        //Toast Deleted
+        String labelDeleted = context.getString(R.string.deleted);
+        Toast.makeText(context, labelDeleted, Toast.LENGTH_SHORT).show();
 
         log.returning(methodName);
         return count;

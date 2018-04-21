@@ -19,6 +19,7 @@ public class SMS implements Serializable{
     private boolean read;
     private boolean replySupported;
     private boolean saved = false;
+    private String threadId;
 
     private int subscription;
 
@@ -101,6 +102,14 @@ public class SMS implements Serializable{
         this.saved = saved;
     }
 
+    public String getThreadId() {
+        return threadId;
+    }
+
+    public void setThreadId(String threadId) {
+        this.threadId = threadId;
+    }
+
     @Override
     public boolean equals(Object obj) {
         SMS sms = (SMS) obj;
@@ -108,6 +117,6 @@ public class SMS implements Serializable{
             return super.equals(obj);
         }
 
-        return sms.getId().equals(id) && sms.getAddress().equals(address);
+        return sms.getId().equals(id) && sms.getThreadId().equals(threadId);
     }
 }

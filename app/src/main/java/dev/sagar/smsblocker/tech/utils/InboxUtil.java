@@ -9,12 +9,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.Telephony;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.service.DBConstants;
@@ -32,15 +34,16 @@ public class InboxUtil {
     //Log Initiate
     private LogUtil log = new LogUtil( this.getClass().getName() );
 
-    //Java Android References
+    //<editor-fold desc="Java Android">
     private Context context;
     private DBServiceSingleton dbService = DBServiceSingleton.getInstance();
     private PhoneUtilsSingleton phoneUtils = PhoneUtilsSingleton.getInstance();
+    //</editor-fold>
 
     //Java Core References
     private Callback callback;
 
-    //Java Constants
+    //<editor-fold desc="Java Constants">
     private final String _id = Telephony.Sms._ID;
     private final String address = Telephony.Sms.ADDRESS;
     private final String threadId = Telephony.Sms.THREAD_ID;
@@ -57,11 +60,13 @@ public class InboxUtil {
     public static final String TYPE_SENT = "sent";
     public static final int SORT_DESC = 0;
     public static final int SORT_ASC = 1;
+    //</editor-fold>
 
-    //Reference for Starred_SMS
+    //<editor-fold desc="References for Starred_SMS">
     private final String starredsms_id = SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ID;
     private final String starredsms_address = SavedSMSDBAttributes.SavedSMS.COLUMN_NAME_ADDRESS;
     private final String starredsms_dateadded = SavedSMSDBAttributes.SavedSMS.COLUMN_DATE_ADDED;
+    //</editor-fold>
 
     public InboxUtil(Context context, Callback callback) {
         this.context = context;
@@ -342,9 +347,22 @@ public class InboxUtil {
         final String methodName =  "deleteThread()";
         log.justEntered(methodName);
 
-        //TODO: Instead od delete messages one by one delete all message at once. Also provide methods to delete from multipleThreads
+        String threadId = getThreadId(phoneNo);
+        Uri uri = Telephony.Sms.CONTENT_URI;
+        String whereClause = this.threadId+" LIKE ?";
+        String[] whereArgs = {threadId};
+
+        int deleteCount = dbService.delete(context, uri, whereClause, whereArgs);
+
+
+        log.info(methodName, "Deleted!");
+
+        log.returning(methodName);
+        return deleteCount;
+
+
+       /* //TODO: Instead od delete messages one by one delete all message at once. Also provide methods to delete from multipleThreads
         log.error(methodName, "Performance issues Temporarily adding. Need to remove later");
-        ContentResolver contentResolver = context.getContentResolver();
         int count=0;
         IndexedHashMap<String, SMS> smses = bgGetAllSMSFromTo(phoneNo, SORT_DESC);
         for(int i=0; i<smses.size(); i++){
@@ -354,7 +372,7 @@ public class InboxUtil {
             int tempCount = contentResolver.delete(tempUri, null, null);
             log.debug(methodName,"Delete Count: "+tempCount);
             count += tempCount;
-        }
+        }*/
 
         /*String selection = address+" = ?";
         String[] selectionArgs = {phoneNo};
@@ -370,8 +388,8 @@ public class InboxUtil {
             e.printStackTrace();
         }*/
 
-        log.returning(methodName);
-        return count;
+        /*log.returning(methodName);
+        return count;*/
     }
 
 
@@ -554,8 +572,6 @@ public class InboxUtil {
         return smses;
     }
 
-
-
     private IndexedHashMap<String, SMS>  bgGetAllSMSFromTo(String contactNo, int sortingOrder){
         final String methodName =  "bgGetAllSMSFromTo(String, int)";
         log.justEntered(methodName);
@@ -590,12 +606,21 @@ public class InboxUtil {
         log.debug(methodName, "Saved SMS Set size: "+set.size());
 
 
+        IndexedHashMap<String, SMS> smses = new IndexedHashMap<>();
+        //Find ThreadID
+        String threadId = getThreadId(contactNo);
+        if(threadId==null){
+            log.returning(methodName);
+            return smses;
+        }
+
         //Reading SMSes from database
         Uri uriSmsURI = Telephony.Sms.CONTENT_URI;
+        ContentResolver mContentResolver = context.getContentResolver();
 
-        selection = address+" = ?";
+        selection = this.threadId+" LIKE ?";
         projection = new String[]{"*"};
-        selectionArgs = new String[]{contactNo};
+        selectionArgs = new String[]{threadId};
         String mSortOrder = null;
         switch (sortingOrder) {
             case SORT_DESC: mSortOrder = date+" DESC"; break;
@@ -603,11 +628,9 @@ public class InboxUtil {
             default: mSortOrder="";
         }
 
-        ContentResolver mContentResolver = context.getContentResolver();
         Cursor c = dbService
                 .query(mContentResolver, uriSmsURI, projection, selection, selectionArgs, mSortOrder);
 
-        IndexedHashMap<String, SMS> smses = new IndexedHashMap<>();
         log.info(methodName, "Reading SMSes... ");
 
         try {
@@ -649,8 +672,33 @@ public class InboxUtil {
         }
         return smses;
     }
+
     public interface Callback{
         void onAllSMSFromToResult(IndexedHashMap<String, SMS> updateList);
+    }
+
+    private String getThreadId(String address){
+        final String methodName =  "getThreadId(String)";
+        log.justEntered(methodName);
+
+        //Getting thread Id
+        ContentResolver mContentResolver = context.getContentResolver();
+        Uri uriSmsURI1 = Uri.withAppendedPath(Telephony.MmsSms.CONTENT_FILTER_BYPHONE_URI, address);
+        String[] projection1 = {this.threadId};
+        Cursor c1 = dbService.query(mContentResolver, uriSmsURI1, projection1, null, null, null);
+        if(c1.getCount()==0) {
+            log.error(methodName, "Got count: "+c1.getCount()+" While looking for ThreadID");
+        }
+
+        String threadId = null;
+        while(c1.moveToNext()){
+            threadId = c1.getString(c1.getColumnIndexOrThrow(this.threadId));
+        }
+        c1.close();
+
+        log.debug(methodName, "Found Thread ID: "+threadId+" For Address: "+address);
+        log.returning(methodName);
+        return threadId;
     }
 
 }
