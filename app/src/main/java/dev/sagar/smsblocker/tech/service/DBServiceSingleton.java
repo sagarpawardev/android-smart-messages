@@ -217,15 +217,30 @@ public class DBServiceSingleton {
         int count = contentResolver.delete(uri, selection, selectionArgs);
 
         //TODO need to delete from conversation Database as well and update from SMS database in case only latest SMS is deleted
-        Uri deleteThreadUri = Telephony.Sms.CONTENT_URI;
-        String colThreadId = Telephony.Sms.THREAD_ID;
-        if(uri.equals(deleteThreadUri) && selection!=null && selection.contains(colThreadId)){ //FIXME selection may contain value thread_id like " thread_id = 'thread_id'"
-            String convColThreadId = Converesation.COLUMN_NAME_THREAD_ID;
-            DBHelper dbHelper = new DBHelper(context);
-            SQLiteDatabase writableDB = dbHelper.getWritableDatabase();
-            String convSelection = selection.replaceFirst(colThreadId, convColThreadId);
-            int rowCount = writableDB.delete(DBConstants.TABLE_CONVERSATION, convSelection, selectionArgs);
-            log.info(methodName, "Deleted Thread from Conversation count: "+rowCount);
+
+
+        //if deleting thread then Delete Thread from Conversation DB
+        try {
+            Uri deleteThreadUri = Telephony.Sms.CONTENT_URI;
+            String colThreadId = Telephony.Sms.THREAD_ID;
+            String threadLikeDeleteQuery = colThreadId + "LIKE?"; // Removed all spaces just for comparision
+            String threadEqualDeleteQuery = colThreadId + "=?";
+            String formattedSelection = selection.replace(" ", "");
+
+            if (count > 0 && uri.equals(deleteThreadUri) &&
+                    (formattedSelection.equalsIgnoreCase(threadLikeDeleteQuery) ||
+                            formattedSelection.equalsIgnoreCase(threadEqualDeleteQuery)
+                    )) {
+                String convColThreadId = Converesation.COLUMN_NAME_THREAD_ID;
+                DBHelper dbHelper = new DBHelper(context);
+                SQLiteDatabase writableDB = dbHelper.getWritableDatabase();
+                String convSelection = selection.replaceFirst(colThreadId, convColThreadId);
+                int rowCount = writableDB.delete(DBConstants.TABLE_CONVERSATION, convSelection, selectionArgs);
+                log.info(methodName, "Deleted Thread from Conversation count: " + rowCount);
+            }
+        }catch (Exception ex){
+            //This is added in case Some null pointer is occurred
+            log.error(methodName, "Some Exception Occurred while playing with delete_thread_id from conversation: "+ex.getMessage());
         }
 
         log.returning(methodName);
