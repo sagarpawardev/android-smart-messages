@@ -35,11 +35,14 @@
                 android:value=".test.activities.SearchResultsActivity" />
             -->
 
-            <!--<intent-filter>
+
+            <!--
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
+            </intent-filter>
+            -->
         </activity>
 
         <!--
@@ -173,7 +176,8 @@
                 android:resource="@xml/home_searchable" />
             -->
         </activity>
-        <activity android:name=".ux.activities.IntroActivity"
+        <activity
+            android:name=".ux.activities.IntroActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -181,6 +185,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ux.activities.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".ux.activities.HomeActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="dev.sagar.smsblocker.ux.activities.HomeActivity" />
         </activity>
     </application>
 

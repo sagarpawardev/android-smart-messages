@@ -241,10 +241,20 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void startStarredActivity(){
-        final String methodName =  "statrtStarredActivity()";
+        final String methodName =  "startStarredActivity()";
         log.justEntered(methodName);
 
         Intent intent = new Intent(this, StarredSMSActivity.class);
+        startActivity(intent);
+
+        log.returning(methodName);
+    }
+
+    private void startSettingsActivity(){
+        final String methodName =  "startSettingsActivity()";
+        log.justEntered(methodName);
+
+        Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
 
         log.returning(methodName);
@@ -330,6 +340,7 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id){
             case R.id.menu_starred_sms: startStarredActivity(); break;
+            case R.id.menu_settings: startSettingsActivity(); break;
         }
         return super.onOptionsItemSelected(item);
     }

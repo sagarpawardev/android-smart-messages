@@ -117,6 +117,6 @@ public class SMS implements Serializable{
             return super.equals(obj);
         }
 
-        return sms.getId().equals(id) && sms.getThreadId().equals(threadId);
+        return sms.getId().equals(id);
     }
 }

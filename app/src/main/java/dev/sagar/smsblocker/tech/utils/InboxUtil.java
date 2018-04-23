@@ -300,13 +300,56 @@ public class InboxUtil {
         log.info(methodName, "Trying to insert in DataProvider");
 
         createdDataUri =  dbService.insert(context, INBOX_URI, values);
-
         log.info(methodName, "URI After insertion: "+createdDataUri);
+
+        SMS insertedSMS = getSMS(createdDataUri);
+        sms.setThreadId(insertedSMS.getThreadId());
+        sms.setSaved(insertedSMS.isSaved());
+        sms.setRead(insertedSMS.isRead());
+        sms.setType(insertedSMS.getType());
+        sms.setSubscription(insertedSMS.getSubscription());
+        sms.setReplySupported(insertedSMS.isReplySupported());
 
         String result = null;
         if (createdDataUri != null)
             result = createdDataUri.toString().replace(SMS_URI.toString()+"/", "");
         log.info(methodName, "Result: "+result);
+
+        log.returning(methodName);
+        return result;
+    }
+
+    public SMS getSMS(Uri uri){
+        final String methodName = "insertSMS()";
+        log.justEntered(methodName);
+
+        SMS result = null;
+        String projection[] = {"*"};
+        Cursor c = dbService.query(context.getContentResolver(), uri, projection, null, null, null);
+        boolean hasData = c.moveToFirst();
+        if(hasData){
+            String from = c.getString(c.getColumnIndexOrThrow(this.address));
+            String id = c.getString(c.getColumnIndexOrThrow(this._id));
+            String body = c.getString(c.getColumnIndexOrThrow(this.body));
+            int subscriptionId = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
+            boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
+            long time = c.getLong(c.getColumnIndexOrThrow(this.date));
+            long type = c.getLong(c.getColumnIndexOrThrow(this.type));
+            boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
+
+            result = new SMS();
+            result.setId(id);
+            result.setAddress(from);
+            result.setBody(body);
+            result.setRead(readState);
+            result.setDateTime(time);
+            result.setType(type);
+            result.setSubscription(subscriptionId);
+            result.setReplySupported(replySupported);
+
+            //FIXME need to look into saved data
+            result.setSaved(false);
+        }
 
         log.returning(methodName);
         return result;

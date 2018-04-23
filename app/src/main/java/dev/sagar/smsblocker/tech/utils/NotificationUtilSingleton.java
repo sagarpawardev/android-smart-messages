@@ -114,6 +114,7 @@ public class NotificationUtilSingleton {
         setSummaryNotification(context, sms);*/
 
         int notifId = getNotificationId();
+        String threadId = sms.getThreadId();
         String address = sms.getAddress();
         Contact contact = ContactUtilSingleton.getInstance().getContactOrDefault(context, address);;
 
@@ -121,7 +122,8 @@ public class NotificationUtilSingleton {
         //-- Open Activity onClick Ends
         Intent resultIntent = new Intent(context, InboxActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(InboxActivity.KEY_THREAD_ID, address);
+        bundle.putString(InboxActivity.KEY_THREAD_ID, threadId);
+        bundle.putString(InboxActivity.KEY_ADDRESS, address);
         resultIntent.putExtras(bundle);
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
