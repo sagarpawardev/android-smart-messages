@@ -433,12 +433,9 @@ public class DBServiceSingleton {
 
 
                 if(doneSet.contains(threadId)) continue; //If value is already in Map then go to next value
-                if(address.equals("VK-iPaytm")){
-                    log.info(methodName, "Test Debug");
-                }
 
                 SMS oldSMS = oldMap.get(threadId);
-                if(oldSMS!=null && oldSMS.getThreadId().equals(threadId)){ //If New message the oldSMS will be null
+                if(oldSMS!=null && oldSMS.getId().equals(id)){ //If New message the oldSMS will be null
                     oldMap.remove(threadId);
                     doneSet.add(threadId);
                     String formattedAddress = phoneUtils.formatNumber(context, address);
