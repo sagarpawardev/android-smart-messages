@@ -36,6 +36,7 @@ import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSDeliveredReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceivedReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSSentReceiver;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
+import dev.sagar.smsblocker.tech.exceptions.NoSuchContactException;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
@@ -236,7 +237,7 @@ public class ChatActivity extends AppCompatActivity implements
         try {
             Contact contact = ContactUtilSingleton.getInstance().getContact(this, this.address);
             contactID = contact.getId();
-        } catch (ReadContactPermissionException e) {
+        } catch (ReadContactPermissionException | NoSuchContactException e) {
             e.printStackTrace();
         }
 

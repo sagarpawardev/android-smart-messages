@@ -112,8 +112,12 @@ public class PhoneUtilsSingleton {
             try {
                 Phonenumber.PhoneNumber phoneNumber = phoneNumberUtil.parse(address, Locale.getDefault().getCountry());
                 PhoneNumberUtil.PhoneNumberType phoneNumberType = phoneNumberUtil.getNumberType(phoneNumber);
-                result = (phoneNumberType == PhoneNumberUtil.PhoneNumberType.MOBILE);
-                log.info(methodName, "Got result: "+result);
+
+                result = (phoneNumberType == PhoneNumberUtil.PhoneNumberType.FIXED_LINE_OR_MOBILE) ||
+                        (phoneNumberType == PhoneNumberUtil.PhoneNumberType.MOBILE);
+
+
+                log.info(methodName, "Got result: "+result+" For address: "+address+" Type: "+phoneNumberType);
             } catch (final Exception e) {
                 e.printStackTrace();
                 Crashlytics.logException(e);

@@ -23,6 +23,7 @@ import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.beans.Conversation;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
+import dev.sagar.smsblocker.tech.exceptions.NoSuchContactException;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
@@ -348,7 +349,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
                         String threadId = tvThreadId.getText().toString();
                         Contact contact = ContactUtilSingleton.getInstance().getContact(context, threadId);
                         contactID = contact.getId();
-                    } catch (ReadContactPermissionException e) {
+                    } catch (ReadContactPermissionException | NoSuchContactException e) {
                         e.printStackTrace();
                     }
 

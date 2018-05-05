@@ -23,6 +23,7 @@ import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.beans.SIM;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.exceptions.NoSuchContactException;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
@@ -53,6 +54,7 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
     private InboxUtil inboxUtil;
     private ThemeUtil themeUtil;
     private TelephonyUtilSingleton telephonyUtil;
+    private ContactUtilSingleton contactUtils = ContactUtilSingleton.getInstance();
 
     //Constants
     private final long TIMEOUT_TIME = 3500; //3.5 Seconds equal to Snackbar.LENGTH_LONG
@@ -133,11 +135,7 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
         String address = sms.getAddress();
 
         Contact contact = null;
-        try {
-            contact = ContactUtilSingleton.getInstance().getContact(context, sms.getAddress());
-        } catch (ReadContactPermissionException e) {
-            e.printStackTrace();
-        }
+        contact = contactUtils.getContactOrDefault(context, sms.getAddress());
         String displayName = contact.getDisplayName();
 
         /*if(position == 0){
@@ -219,18 +217,21 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
 
                     int position = getAdapterPosition();
                     SMS sms = smses.get(position);
-                    String threadId = sms.getAddress();
+                    String address = sms.getAddress();
 
-                    log.info(methodName, "Clicked Position: "+position+" Address: "+threadId);
+                    log.debug(methodName, "Clicked Position: "+position+" Address: "+address);
 
                     String contactID = null;
                     try {
-                        Contact contact = ContactUtilSingleton.getInstance().getContact(context, threadId);
+                        Contact contact = ContactUtilSingleton.getInstance().getContact(context, address);
                         contactID = contact.getId();
                         log.info(methodName, "Got Contact ID: "+contactID);
                     } catch (ReadContactPermissionException e) {
                         e.printStackTrace();
                         log.error(methodName, "Fall into Exception: "+e.getMessage());
+                    } catch (NoSuchContactException e) {
+                        e.printStackTrace();
+                        log.info(methodName, "Contact id not found for address: "+address);
                     }
 
                     if(contactID!=null) {

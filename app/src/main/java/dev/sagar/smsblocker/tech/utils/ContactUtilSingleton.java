@@ -16,6 +16,7 @@ import java.util.HashMap;
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
+import dev.sagar.smsblocker.tech.exceptions.NoSuchContactException;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
 
 /**
@@ -66,7 +67,13 @@ public class ContactUtilSingleton {
         final String methodName = "getContactName()";
         log.justEntered(methodName);
 
-        Contact contact =  getContact(context, phoneNumber);
+        Contact contact = null;
+        try {
+            contact = getContact(context, phoneNumber);
+        } catch (NoSuchContactException e) {
+            e.printStackTrace();
+        }
+
         String name;
         if(contact == null){
             name = phoneNumber;
@@ -429,7 +436,14 @@ public class ContactUtilSingleton {
         Contact contact = null;
         try{
             //TODO Default more data here like Uri, Thumbnail Uri
-            contact = getContact(context, phoneNumber);
+
+            try {
+                contact = getContact(context, phoneNumber);
+            } catch (NoSuchContactException e) {
+                log.info(methodName, "No Contact found for address : "+phoneNumber);
+                e.printStackTrace();
+            }
+
             if(contact != null) {
                 String name = contact.getDisplayName() == null ? contact.getNumber() : contact.getDisplayName();
 
@@ -456,7 +470,7 @@ public class ContactUtilSingleton {
         return contact;
     }
 
-    public Contact getContact(Context context, String phoneNumber) throws ReadContactPermissionException {
+    public Contact getContact(Context context, String phoneNumber) throws ReadContactPermissionException, NoSuchContactException {
         final String methodName = "getContact(Context, String)";
         log.justEntered(methodName);
 
@@ -494,6 +508,7 @@ public class ContactUtilSingleton {
             if (cursor == null || cursor.getCount() == 0) {
                 log.error(methodName, "Nothing in Cursor for " + phoneNumber);
                 result = null;
+                throw new NoSuchContactException(phoneNumber);
             } else {
                 log.info(methodName, "Cursor Size: " + cursor.getCount());
                 if (cursor.moveToFirst()) {
