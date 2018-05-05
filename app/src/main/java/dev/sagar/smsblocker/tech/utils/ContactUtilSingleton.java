@@ -494,7 +494,7 @@ public class ContactUtilSingleton {
             }
 
             //Actual Procedure
-            log.info(methodName, "Reading Content provider for contact");
+            log.info(methodName, "Reading Content provider for contact: "+phoneNumber);
             ContentResolver contentResolver = context.getContentResolver();
             Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
             String[] projection = {

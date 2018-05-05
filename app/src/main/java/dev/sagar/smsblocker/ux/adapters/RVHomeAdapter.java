@@ -239,7 +239,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         holder.tvTime.setText(socialDate);
         holder.tvFrom.setText(fromName);
         holder.tvBody.setText(conversation.getBody());
-        holder.tvThreadId.setText(conversation.getThreadId());
+        holder.tvAddress.setText(conversation.getAddress());
 
         //Setting User Image
         Uri dpUri = conversation.getPhotoThumbnailUri();
@@ -270,7 +270,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         final String methodName =  "onClick()";
         log.justEntered(methodName);
 
-        TextView tvThreadID = view.findViewById(R.id.tv_thread_id);
+        TextView tvThreadID = view.findViewById(R.id.tv_address);
         String threadId = tvThreadID.getText().toString();
 
         if(!isSelectionModeOn) {
@@ -321,7 +321,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
 
 
     protected class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener{
-        TextView tvFrom, tvBody, tvTime, tvThreadId;
+        TextView tvFrom, tvBody, tvTime, tvAddress;
         DisplayPictureView dpView;
         View parent;
         TextView tvBadge;
@@ -332,7 +332,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             tvBody = view.findViewById(R.id.tv_body);
             tvTime = view.findViewById(R.id.tv_time);
             dpView = view.findViewById(R.id.dpv_picture);
-            tvThreadId = view.findViewById(R.id.tv_thread_id);
+            tvAddress = view.findViewById(R.id.tv_address);
             tvBadge = view.findViewById(R.id.tv_badge);
             parent = view;
 
@@ -346,8 +346,8 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
                 public void onClick(View view) {
                     String contactID = null;
                     try {
-                        String threadId = tvThreadId.getText().toString();
-                        Contact contact = ContactUtilSingleton.getInstance().getContact(context, threadId);
+                        String address = tvAddress.getText().toString();
+                        Contact contact = ContactUtilSingleton.getInstance().getContact(context, address);
                         contactID = contact.getId();
                     } catch (ReadContactPermissionException | NoSuchContactException e) {
                         e.printStackTrace();
