@@ -4,9 +4,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
+import io.fabric.sdk.android.Fabric;
 
 public class SilentSMSSenderActivity extends AppCompatActivity {
 
@@ -28,6 +32,7 @@ public class SilentSMSSenderActivity extends AppCompatActivity {
         log.justEntered(methodName);
 
         super.onCreate(savedInstanceState);
+        AnalyticsUtil.start(this);
         init();
         getData();
         process();

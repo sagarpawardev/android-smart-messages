@@ -8,15 +8,18 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.BroadcastUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.NotificationUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.PhoneUtilsSingleton;
+import io.fabric.sdk.android.Fabric;
 
 public class SMSReceivedReceiver extends BroadcastReceiver {
 
@@ -56,6 +59,8 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
         final String methodName = "onReceive()";
         log.justEntered(methodName);
         log.info(methodName, "Action Name: "+intent.getAction());
+        AnalyticsUtil.start(context);
+
 
         String event = intent.getAction();
         switch (event) {
@@ -76,6 +81,7 @@ public class SMSReceivedReceiver extends BroadcastReceiver {
         //Start Log
         final String methodName = "smsReceived()";
         log.justEntered(methodName);
+
 
         Bundle bundle = intent.getExtras();
         if (bundle != null) {

@@ -23,9 +23,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.analytics.GoogleAnalytics;
+/*import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
+import com.google.android.gms.analytics.Tracker;*/
 
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
@@ -37,8 +37,10 @@ import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceivedReceiver;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSSentReceiver;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
+import dev.sagar.smsblocker.tech.utils.PhoneUtilsSingleton;
 import dev.sagar.smsblocker.tech.utils.PictureUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.TelephonyUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
@@ -48,7 +50,7 @@ import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThread;
 
-public class InboxActivity extends AppCompatActivity implements
+public class ChatActivity extends AppCompatActivity implements
         RVThreadAdapter.Callback,
         LocalSMSReceivedReceiver.Callback,
         LocalSMSSentReceiver.Callback,
@@ -82,8 +84,8 @@ public class InboxActivity extends AppCompatActivity implements
     private AMCallbackThread amCallback;
     private Toolbar toolbar;
     //TODO Analytics test
-    private GoogleAnalytics sAnalytics;
-    private Tracker sTracker;
+    /*private GoogleAnalytics sAnalytics;
+    private Tracker sTracker;*/
 
 
     //Java Core
@@ -227,6 +229,9 @@ public class InboxActivity extends AppCompatActivity implements
     }
 
     public void showContact(){
+        final String methodName =  "showDialer()";
+        log.justEntered(methodName);
+
         String contactID = null;
         try {
             Contact contact = ContactUtilSingleton.getInstance().getContact(this, this.address);
@@ -241,6 +246,19 @@ public class InboxActivity extends AppCompatActivity implements
             intent.setData(uri);
             startActivity(intent);
         }
+
+        log.returning(methodName);
+    }
+
+    public void showDialer(){
+        final String methodName =  "showDialer()";
+        log.justEntered(methodName);
+
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:"+this.address));
+        startActivity(intent);
+
+        log.returning(methodName);
     }
 
     public void highlightSMS(){
@@ -273,18 +291,6 @@ public class InboxActivity extends AppCompatActivity implements
     private void init(){
         final String methodName =  "init()";
         log.justEntered(methodName);
-
-        try {
-            //TODO Analytics App
-            sAnalytics = GoogleAnalytics.getInstance(this);
-            sTracker = getDefaultTracker();
-            sTracker.setScreenName("Image~HomeActivity");
-            sTracker.send(new HitBuilders.ScreenViewBuilder().build());
-        }
-        catch (Exception e){
-            log.info(methodName, "Logging Error..");
-            log.error(methodName, e);
-        }
 
 
         recyclerView = (RecyclerView) findViewById(R.id.lv_sms);
@@ -347,6 +353,7 @@ public class InboxActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         final String methodName =  "onCreate()";
         log.justEntered(methodName);
+        AnalyticsUtil.start(this);
 
         setContentView(R.layout.activity_thread);
 
@@ -384,7 +391,7 @@ public class InboxActivity extends AppCompatActivity implements
                 }
                 else{
                     hideMsgs();
-                    Toast.makeText(InboxActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ChatActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -452,7 +459,7 @@ public class InboxActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_thread, menu);
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
 
 
         //Hide Show contact option if contact not in contact
@@ -461,8 +468,12 @@ public class InboxActivity extends AppCompatActivity implements
         String id = contact.getId();
 
         if(id == null) {
-            MenuItem item = menu.findItem(R.id.showContact);
-            item.setVisible(false);
+            menu.findItem(R.id.show_contact).setVisible(false);
+        }
+
+        boolean isPersonalContact = PhoneUtilsSingleton.getInstance().isReplySupported(this.address);
+        if(!isPersonalContact){
+            menu.findItem(R.id.show_dialer).setVisible(false);
         }
 
         return true;
@@ -473,7 +484,8 @@ public class InboxActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.showContact: showContact(); break;
+            case R.id.show_contact: showContact(); break;
+            case R.id.show_dialer: showDialer(); break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -596,14 +608,14 @@ public class InboxActivity extends AppCompatActivity implements
 
 
     //TODO Remove Ananlytics
-    synchronized public Tracker getDefaultTracker() {
+    /*synchronized public Tracker getDefaultTracker() {
         // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
         if (sTracker == null) {
             sTracker = sAnalytics.newTracker(R.xml.global_tracker);
         }
 
         return sTracker;
-    }
+    }*/
 
     //---- InboxUtil.Callback Overrides Starts ----
     @Override

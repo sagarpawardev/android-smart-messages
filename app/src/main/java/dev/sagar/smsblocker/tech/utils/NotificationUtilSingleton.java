@@ -18,7 +18,7 @@ import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.broadcastreceivers.NotificationBroadcastReceiver;
-import dev.sagar.smsblocker.ux.activities.InboxActivity;
+import dev.sagar.smsblocker.ux.activities.ChatActivity;
 
 /**
  * Created by sagarpawar on 05/11/17.
@@ -91,9 +91,9 @@ public class NotificationUtilSingleton {
                 .setWhen(sms.getDateTime())
                 .setShowWhen(true);
 
-        Intent resultIntent = new Intent(context, InboxActivity.class);
+        Intent resultIntent = new Intent(context, ChatActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(InboxActivity.KEY_THREAD_ID, fromNo);
+        bundle.putString(ChatActivity.KEY_THREAD_ID, fromNo);
         resultIntent.putExtras(bundle);
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -120,10 +120,10 @@ public class NotificationUtilSingleton {
 
 
         //-- Open Activity onClick Ends
-        Intent resultIntent = new Intent(context, InboxActivity.class);
+        Intent resultIntent = new Intent(context, ChatActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(InboxActivity.KEY_THREAD_ID, threadId);
-        bundle.putString(InboxActivity.KEY_ADDRESS, address);
+        bundle.putString(ChatActivity.KEY_THREAD_ID, threadId);
+        bundle.putString(ChatActivity.KEY_ADDRESS, address);
         resultIntent.putExtras(bundle);
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
@@ -277,9 +277,9 @@ public class NotificationUtilSingleton {
                         //.setBigContentTitle("How to create bundle notification? Tip: " + BIG_TEXT_NOTIFICATION_KEY)
                         .setSummaryText(fromName));
 
-        Intent activityIndent = new Intent(context, InboxActivity.class);
+        Intent activityIndent = new Intent(context, ChatActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putString(InboxActivity.KEY_THREAD_ID, fromNo);
+        bundle.putString(ChatActivity.KEY_THREAD_ID, fromNo);
         activityIndent.putExtras(bundle);
         PendingIntent activityPIndent =
                 PendingIntent.getActivity(
@@ -387,11 +387,11 @@ public class NotificationUtilSingleton {
                         PendingIntent.FLAG_UPDATE_CURRENT);
             } else {
                 // start your activity for Android M and below
-                intent = new Intent(context, InboxActivity.class);
+                intent = new Intent(context, ChatActivity.class);
 
                 intent.setAction(NotificationBroadcastReceiver.REPLY_ACTION);
                 Bundle basket = new Bundle();
-                basket.putString(InboxActivity.KEY_THREAD_ID, address);
+                basket.putString(ChatActivity.KEY_THREAD_ID, address);
                 intent.putExtras(basket);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 pIntent = PendingIntent.getActivity(context, 100, intent,

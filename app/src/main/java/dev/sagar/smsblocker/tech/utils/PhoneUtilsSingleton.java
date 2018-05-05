@@ -4,6 +4,13 @@ import android.content.Context;
 import android.os.Build;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+
+import com.crashlytics.android.Crashlytics;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
+
+import java.util.Locale;
 
 /**
  * Created by sagarpawar on 22/02/18.
@@ -89,11 +96,32 @@ public class PhoneUtilsSingleton {
         log.justEntered(methodName);
 
         //TODO Change Logic Here
-        address = address.toUpperCase();
+        /*address = address.toUpperCase();
         log.info(methodName, "Checking for address: "+address);
         boolean result = !( (address.charAt(0)<='Z' && address.charAt(0)>='A') && address.length()<10 ); //If Address is VK-Mumbai or 56065
         log.error(methodName, "This Logic is valid only in India");
         log.debug(methodName, "I will return : "+result);
+        log.returning(methodName);*/
+
+        boolean result;
+        if (TextUtils.isEmpty(address)) {
+            log.error(methodName, "Address in Empty...");
+            result = false;
+        }else {
+            final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
+            try {
+                Phonenumber.PhoneNumber phoneNumber = phoneNumberUtil.parse(address, Locale.getDefault().getCountry());
+                PhoneNumberUtil.PhoneNumberType phoneNumberType = phoneNumberUtil.getNumberType(phoneNumber);
+                result = (phoneNumberType == PhoneNumberUtil.PhoneNumberType.MOBILE);
+                log.info(methodName, "Got result: "+result);
+            } catch (final Exception e) {
+                e.printStackTrace();
+                Crashlytics.logException(e);
+                result = false;
+                log.info(methodName, "Fall in exception...");
+            }
+        }
+
         log.returning(methodName);
         return result;
     }

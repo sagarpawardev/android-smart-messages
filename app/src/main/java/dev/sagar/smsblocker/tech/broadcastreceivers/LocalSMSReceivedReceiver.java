@@ -8,6 +8,7 @@ import android.os.Bundle;
 import com.google.gson.Gson;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
@@ -46,6 +47,7 @@ public class LocalSMSReceivedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String methodName = "onReceive()";
         log.justEntered(methodName);
+        AnalyticsUtil.start(context);
 
         //Receive SMS
         if (intent.getAction().equals(EVENT_RECEIVED)) {
@@ -58,6 +60,7 @@ public class LocalSMSReceivedReceiver extends BroadcastReceiver {
         }
 
         log.returning(methodName);
+        throw new RuntimeException("Hey! Man my name is Bruno");
     }
 
 

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
@@ -114,8 +115,8 @@ public class NewThreadActivity extends AppCompatActivity
         log.justEntered(methodName);
 
         Bundle bundle = new Bundle();
-        bundle.putString(InboxActivity.KEY_ADDRESS, phoneNo);
-        Intent intent = new Intent(this, InboxActivity.class);
+        bundle.putString(ChatActivity.KEY_ADDRESS, phoneNo);
+        Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
 
@@ -229,6 +230,8 @@ public class NewThreadActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_thread);
+        AnalyticsUtil.start(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

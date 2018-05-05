@@ -19,13 +19,17 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.util.List;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.ux.adapters.RVStarredSMSAdapter;
+import io.fabric.sdk.android.Fabric;
 
 public class StarredSMSActivity extends AppCompatActivity implements RVStarredSMSAdapter.Callback{
 
@@ -169,6 +173,7 @@ public class StarredSMSActivity extends AppCompatActivity implements RVStarredSM
         log.justEntered(methodName);
 
         setContentView(R.layout.activity_starred_sms);
+        AnalyticsUtil.start(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

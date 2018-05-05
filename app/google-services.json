@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "797261958657",
+    "firebase_url": "https://smart-messages.firebaseio.com",
+    "project_id": "smart-messages",
+    "storage_bucket": "smart-messages.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797261958657:android:1399e99fc69f503e",
+        "android_client_info": {
+          "package_name": "dev.sagar.smsblocker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "797261958657-tcl812quj1ri16oreh11t39sr84r2dgc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.sagar.smsblocker",
+            "certificate_hash": "f09fe3908d06d80713b52ca817e072b35292e339"
+          }
+        },
+        {
+          "client_id": "797261958657-83orvltn6v2ftm3o4l419b0qfr0gkifu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbXvjAjqBzZgNGXy60R8CcdmUURFNn1Bo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "797261958657-83orvltn6v2ftm3o4l419b0qfr0gkifu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

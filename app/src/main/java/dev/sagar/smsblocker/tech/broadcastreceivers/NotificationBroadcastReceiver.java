@@ -7,9 +7,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
+
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.NotificationUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
+import io.fabric.sdk.android.Fabric;
 
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
@@ -21,6 +25,8 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        AnalyticsUtil.start(context);
+
         if (REPLY_ACTION.equals(intent.getAction())) {
             // do whatever you want with the message. Send to the server or add to the db.
             // for this tutorial, we'll just show it in a toast;

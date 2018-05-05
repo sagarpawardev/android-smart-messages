@@ -14,13 +14,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Conversation;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.ConversationUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.VPIntroAdapter;
+import io.fabric.sdk.android.Fabric;
 
 public class IntroActivity extends AppCompatActivity implements ConversationUtil.Callback{
 
@@ -37,6 +40,8 @@ public class IntroActivity extends AppCompatActivity implements ConversationUtil
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        AnalyticsUtil.start(this);
+
         setContentView(R.layout.activity_intro);
 
         loadingViewHolder = findViewById(R.id.loading_view_holder);

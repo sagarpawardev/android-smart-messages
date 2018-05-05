@@ -19,7 +19,11 @@ import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import com.crashlytics.android.Crashlytics;
+
 import dev.sagar.smsblocker.R;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
+import io.fabric.sdk.android.Fabric;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +39,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        AnalyticsUtil.start(this);
 
         // load settings fragment
         getFragmentManager().beginTransaction().replace(android.R.id.content, new MainPreferenceFragment()).commit();

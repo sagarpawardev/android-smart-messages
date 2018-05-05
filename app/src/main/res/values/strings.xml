@@ -194,6 +194,7 @@
     <string name="key_notifications_new_message_ringtone">key_notifications_new_message_ringtone</string>
     <string name="key_vibrate">key_vibrate</string>
     <string name="key_send_feedback">key_send_feedback</string>
+    <string name="label_call">Call</string>
 
     <!-- Preference Test Ends-->
 

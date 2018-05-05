@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context="dev.sagar.smsblocker.ux.activities.InboxActivity">
+    tools:context="dev.sagar.smsblocker.ux.activities.ChatActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"

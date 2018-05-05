@@ -50,7 +50,7 @@
         starts and edditext is focused in activity
         -->
         <activity
-            android:name=".ux.activities.InboxActivity"
+            android:name=".ux.activities.ChatActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:parentActivityName=".ux.activities.HomeActivity"
@@ -194,6 +194,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="dev.sagar.smsblocker.ux.activities.HomeActivity" />
         </activity>
+
+       <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="2def30f1ad972fafd1ee8fba1d3bd1cdbea48296" />
+
     </application>
 
 </manifest>

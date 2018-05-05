@@ -159,7 +159,7 @@ public class AMCallbackThread implements ActionMode.Callback{
         adapter.setSelectionModeOn(true);
 
         MenuInflater inflater = actionMode.getMenuInflater();
-        inflater.inflate( R.menu.contextual_thread, menu );
+        inflater.inflate( R.menu.contextual_chat, menu );
         this.actionMode = actionMode;
 
         log.returning(methodName);

@@ -35,6 +35,7 @@ import dev.sagar.smsblocker.tech.beans.Conversation;
 import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSReceivedReceiver;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.datastructures.PositionLog;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.ConversationUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.PhoneUtilsSingleton;
@@ -311,6 +312,7 @@ public class HomeActivity extends AppCompatActivity
 
         final String methodName =  "onCreate(Bundle)";
         log.justEntered(methodName);
+        AnalyticsUtil.start(this);
 
         setContentView(R.layout.activity_home);
 
@@ -451,11 +453,11 @@ public class HomeActivity extends AppCompatActivity
 
         String threadId = conversation.getThreadId();
         String address = conversation.getAddress();
-        Intent intent = new Intent(this, InboxActivity.class);
+        Intent intent = new Intent(this, ChatActivity.class);
         Bundle basket = new Bundle();
 
-        basket.putString(InboxActivity.KEY_THREAD_ID, threadId);
-        basket.putString(InboxActivity.KEY_ADDRESS, address);
+        basket.putString(ChatActivity.KEY_THREAD_ID, threadId);
+        basket.putString(ChatActivity.KEY_ADDRESS, address);
         intent.putExtras(basket);
         startActivity(intent);
         overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out);

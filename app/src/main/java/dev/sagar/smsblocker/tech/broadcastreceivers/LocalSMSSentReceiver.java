@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.EventCode;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
@@ -52,7 +53,7 @@ public class LocalSMSSentReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String methodName = "onReceive()";
         log.justEntered(methodName);
-
+        AnalyticsUtil.start(context);
 
         String action = intent.getAction();
         log.debug(methodName, "Received Action: "+action);

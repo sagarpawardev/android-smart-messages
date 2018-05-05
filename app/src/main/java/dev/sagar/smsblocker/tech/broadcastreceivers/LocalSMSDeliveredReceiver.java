@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
 /**
@@ -48,6 +49,7 @@ public class LocalSMSDeliveredReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String methodName = "onReceive()";
         log.justEntered(methodName);
+        AnalyticsUtil.start(context);
 
         Bundle basket = intent.getExtras();
         String jsonSMS = basket.getString(KEY_SMS);

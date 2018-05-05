@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background_primary"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="dev.sagar.smsblocker.ux.activities.InboxActivity"
+    tools:context="dev.sagar.smsblocker.ux.activities.ChatActivity"
     tools:showIn="@layout/activity_thread">
 
     <RelativeLayout

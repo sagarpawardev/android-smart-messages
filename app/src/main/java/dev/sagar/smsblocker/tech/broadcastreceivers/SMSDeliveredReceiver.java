@@ -10,6 +10,7 @@ import android.provider.Telephony;
 import android.widget.Toast;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.BroadcastUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 
@@ -36,6 +37,7 @@ public class SMSDeliveredReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String methodName = "onReceive()";
         log.justEntered(methodName);
+        AnalyticsUtil.start(context);
 
         switch (getResultCode()) {
             case Activity.RESULT_OK:
