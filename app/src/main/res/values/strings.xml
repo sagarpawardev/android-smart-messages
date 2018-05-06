@@ -80,6 +80,7 @@
     <string name="txt_work_fax">Work Fax</string>
     <string name="txt_main">Main</string>
     <string name="deleted">Deleted</string>
+    <string name="txt_ok">OK</string>
     <string name="title_activity_settings">Settings</string>
 
 
@@ -195,6 +196,7 @@
     <string name="key_vibrate">key_vibrate</string>
     <string name="key_send_feedback">key_send_feedback</string>
     <string name="label_call">Call</string>
+    <string name="lbl_translate">Translate</string>
 
     <!-- Preference Test Ends-->
 

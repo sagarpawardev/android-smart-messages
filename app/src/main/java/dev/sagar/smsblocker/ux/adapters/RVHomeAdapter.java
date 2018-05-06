@@ -240,6 +240,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         holder.tvFrom.setText(fromName);
         holder.tvBody.setText(conversation.getBody());
         holder.tvAddress.setText(conversation.getAddress());
+        holder.tvThreadId.setText(conversation.getThreadId());
 
         //Setting User Image
         Uri dpUri = conversation.getPhotoThumbnailUri();
@@ -270,8 +271,8 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         final String methodName =  "onClick()";
         log.justEntered(methodName);
 
-        TextView tvThreadID = view.findViewById(R.id.tv_address);
-        String threadId = tvThreadID.getText().toString();
+        TextView tvThreadId = view.findViewById(R.id.tv_thread_id);
+        String threadId = tvThreadId.getText().toString();
 
         if(!isSelectionModeOn) {
             log.debug(methodName, "sending Callback..");
@@ -325,6 +326,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
         DisplayPictureView dpView;
         View parent;
         TextView tvBadge;
+        TextView tvThreadId;
 
         SMSViewHolder(View view) {
             super(view);
@@ -334,6 +336,7 @@ public class RVHomeAdapter extends RecyclerView.Adapter<RVHomeAdapter.SMSViewHol
             dpView = view.findViewById(R.id.dpv_picture);
             tvAddress = view.findViewById(R.id.tv_address);
             tvBadge = view.findViewById(R.id.tv_badge);
+            tvThreadId = view.findViewById(R.id.tv_thread_id);
             parent = view;
 
             //Set Font for TextViews

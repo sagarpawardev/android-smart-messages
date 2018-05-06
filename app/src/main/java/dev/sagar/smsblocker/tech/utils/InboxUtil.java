@@ -9,19 +9,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.Telephony;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.service.DBConstants;
 import dev.sagar.smsblocker.tech.service.DBServiceSingleton;
-import dev.sagar.smsblocker.tech.handlers.MarkSMSReadHandler;
+import dev.sagar.smsblocker.tech.handlers.dbrequest.MarkSMSReadHandler;
 import dev.sagar.smsblocker.tech.service.helper.DBHelper;
 import dev.sagar.smsblocker.tech.service.helper.savedsms.SavedSMSDBAttributes;
 

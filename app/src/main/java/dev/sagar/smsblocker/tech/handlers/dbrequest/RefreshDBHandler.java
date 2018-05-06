@@ -1,4 +1,4 @@
-package dev.sagar.smsblocker.tech.handlers;
+package dev.sagar.smsblocker.tech.handlers.dbrequest;
 
 import android.content.Context;
 import android.os.AsyncTask;

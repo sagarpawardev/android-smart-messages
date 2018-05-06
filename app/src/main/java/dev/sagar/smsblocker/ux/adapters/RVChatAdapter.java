@@ -11,7 +11,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,17 +32,19 @@ import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SIM;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
+import dev.sagar.smsblocker.tech.handlers.httprequest.translate.TranslateService;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.SystemUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.TelephonyUtilSingleton;
+import dev.sagar.smsblocker.ux.dialog.TranslateDialog;
 
 /**
  * Created by sagarpawar on 15/10/17.
  */
 
-public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSViewHolder>{
+public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHolder> {
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -66,8 +70,8 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     //Flag
     private int highlightPosition = -1;
 
-    public RVThreadAdapter(Context context, Callback callback, IndexedHashMap<String, SMS> smses) {
-        final String methodName =  "RVThreadAdapter()";
+    public RVChatAdapter(Context context, Callback callback, IndexedHashMap<String, SMS> smses) {
+        final String methodName =  "RVChatAdapter()";
         log.justEntered(methodName);
 
         this.context = context;
@@ -398,8 +402,11 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
     }
 
 
-    class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener, OnLikeListener{
-        TextView tvBody, tvTime;
+    class SMSViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener,
+            View.OnClickListener,
+            OnLikeListener,
+            TranslateService.Callback{
+        TextView tvBody, tvTime, tvTranslate;
         View llParent;
         LikeButton btnStar;
         //Log Initiate
@@ -407,6 +414,7 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
         String format = context.getResources().getString(R.string.format_thread__datetime);
         DateFormat dateFormat = new SimpleDateFormat(format);
         ImageView ivState;
+        ProgressBar pbTranslate;
 
         SMSViewHolder(View view) {
             super(view);
@@ -418,10 +426,29 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             tvTime = view.findViewById(R.id.tv_time);
             ivState = view.findViewById(R.id.iv_state);
             btnStar = view.findViewById(R.id.btn_star);
+            tvTranslate = view.findViewById(R.id.tv_translate);
+            pbTranslate = view.findViewById(R.id.pb_translate);
 
             view.setOnLongClickListener(this);
             view.setOnClickListener(this);
             btnStar.setOnLikeListener(this);
+
+            if(tvTranslate!=null) {
+                tvTranslate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int pos = getAdapterPosition();
+                        SMS sms = smses.get(pos);
+                        String id = sms.getId();
+                        String body = sms.getBody();
+                        TranslateService service = new TranslateService(RVChatAdapter.this.context, SMSViewHolder.this);
+                        service.execute(id, body);
+
+                        tvTranslate.setVisibility(View.INVISIBLE);
+                        pbTranslate.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
 
             log.returning(methodName);
         }
@@ -536,9 +563,24 @@ public class RVThreadAdapter extends RecyclerView.Adapter<RVThreadAdapter.SMSVie
             markedForUnstar.add(position);
 
             SMS sms = smses.get(position);
-            log.debug(methodName, "marked Unstarred for sms id: "+sms.getId()+"Position: "+position);
+            log.debug(methodName, "marked Unstarred for sms id: "+sms.getId()+" Position: "+position);
 
             log.returning(methodName);
         }
+
+        //---- TranslateService.Callback Overrides Starts ----
+        @Override
+        public void onTranslationSuccess(String smsId, String translatedText) {
+            //Toast.makeText(context, translatedText, Toast.LENGTH_SHORT).show();
+            pbTranslate.setVisibility(View.GONE);
+            tvTranslate.setVisibility(View.VISIBLE);
+            new TranslateDialog(RVChatAdapter.this.context).show(translatedText);
+        }
+
+        @Override
+        public void onTranslationFailure(Exception e) {
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        //---- TranslateService.Callback Overrides Ends ----
     }
 }

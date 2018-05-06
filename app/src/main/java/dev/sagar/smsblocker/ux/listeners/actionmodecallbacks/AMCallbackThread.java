@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
-import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
+import dev.sagar.smsblocker.ux.adapters.RVChatAdapter;
 
 /**
  * Created by sagarpawar on 24/11/17.
@@ -22,10 +22,10 @@ public class AMCallbackThread implements ActionMode.Callback{
     private ActionMode actionMode = null;
 
     //Java Android
-    private RVThreadAdapter adapter;
+    private RVChatAdapter adapter;
     private Context context;
 
-    public AMCallbackThread(Context context, RVThreadAdapter adapter){
+    public AMCallbackThread(Context context, RVChatAdapter adapter){
         this.adapter = adapter;
         this.context = context;
     }

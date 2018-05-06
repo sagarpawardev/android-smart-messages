@@ -60,7 +60,6 @@ public class LocalSMSReceivedReceiver extends BroadcastReceiver {
         }
 
         log.returning(methodName);
-        throw new RuntimeException("Hey! Man my name is Bruno");
     }
 
 

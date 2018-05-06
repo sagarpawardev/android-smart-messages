@@ -43,7 +43,6 @@
             android:paddingTop="@dimen/msg_body_paddingtop"
             android:paddingBottom="@dimen/msg_body_paddingbottom">
 
-
             <TextView
                 android:id="@+id/tv_body"
                 android:layout_width="wrap_content"
@@ -97,6 +96,52 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.99"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_body"
+                app:layout_constraintVertical_bias="0.62" />
+
+            <TextView
+                android:id="@+id/tv_translate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@id/tv_body"
+                android:layout_gravity="end"
+                android:layout_marginEnd="2dp"
+                android:layout_marginStart="2dp"
+                android:elevation="1dp"
+                android:paddingBottom="2dp"
+                android:text="@string/lbl_translate"
+                android:textColor="#1E88E5"
+                android:textSize="10sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_time"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_body"
+                app:layout_constraintVertical_bias="0.62" />
+
+            <!--<ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="#F00"
+                android:indeterminateTintMode="src_in" />-->
+
+            <ProgressBar
+                android:id="@+id/pb_translate"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_below="@id/tv_body"
+                android:layout_gravity="end"
+                android:layout_marginEnd="2dp"
+                android:layout_marginStart="2dp"
+                android:elevation="1dp"
+                android:paddingBottom="2dp"
+                android:visibility="gone"
+                android:indeterminate="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/tv_time"
+                app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_body"
                 app:layout_constraintVertical_bias="0.62" />

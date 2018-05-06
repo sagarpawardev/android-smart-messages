@@ -38,13 +38,14 @@ import dev.sagar.smsblocker.tech.broadcastreceivers.LocalSMSSentReceiver;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.exceptions.NoSuchContactException;
 import dev.sagar.smsblocker.tech.exceptions.ReadContactPermissionException;
+import dev.sagar.smsblocker.tech.handlers.httprequest.translate.TranslateService;
 import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.ContactUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.PhoneUtilsSingleton;
 import dev.sagar.smsblocker.tech.utils.PictureUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.TelephonyUtilSingleton;
-import dev.sagar.smsblocker.ux.adapters.RVThreadAdapter;
+import dev.sagar.smsblocker.ux.adapters.RVChatAdapter;
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.InboxUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
@@ -52,7 +53,7 @@ import dev.sagar.smsblocker.tech.utils.SMSUtil;
 import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackThread;
 
 public class ChatActivity extends AppCompatActivity implements
-        RVThreadAdapter.Callback,
+        RVChatAdapter.Callback,
         LocalSMSReceivedReceiver.Callback,
         LocalSMSSentReceiver.Callback,
         LocalSMSDeliveredReceiver.Callback,
@@ -81,7 +82,7 @@ public class ChatActivity extends AppCompatActivity implements
     private TextView tvSim;
 
     //Java Android
-    private RVThreadAdapter adapter;
+    private RVChatAdapter adapter;
     private AMCallbackThread amCallback;
     private Toolbar toolbar;
     //TODO Analytics test
@@ -313,7 +314,7 @@ public class ChatActivity extends AppCompatActivity implements
         Bundle basket = getIntent().getExtras();
         this.threadId = basket.getString(KEY_THREAD_ID);
         this.address = basket.getString(KEY_ADDRESS);
-        adapter = new RVThreadAdapter(this, this, smses);
+        adapter = new RVChatAdapter(this, this, smses);
         amCallback = new AMCallbackThread(this, adapter);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mLayoutManager.setReverseLayout(true);
@@ -554,7 +555,7 @@ public class ChatActivity extends AppCompatActivity implements
     //--- LocalSMSDeliveredReceiver.Callback Overriders Ends ---
 
 
-    //--- RVThreadAdapter.Callback Starts ---
+    //--- RVChatAdapter.Callback Starts ---
     @Override
     public void onItemLongClicked() {
         final String methodName =  "onItemLongClicked()";
@@ -605,7 +606,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         log.returning(methodName);
     }
-    //--- RVThreadAdapter.Callback Ends ---
+    //--- RVChatAdapter.Callback Ends ---
 
 
     //TODO Remove Ananlytics
@@ -639,5 +640,7 @@ public class ChatActivity extends AppCompatActivity implements
 
         log.returning(methodName);
     }
+
     //---- InboxUtil.Callback Overrides Ends ----
+
 }

@@ -1,14 +1,11 @@
 package dev.sagar.smsblocker.tech.utils;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 
 import dev.sagar.smsblocker.tech.beans.Conversation;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
-import dev.sagar.smsblocker.tech.handlers.LatestMsgHandler;
-import dev.sagar.smsblocker.tech.handlers.RefreshDBHandler;
+import dev.sagar.smsblocker.tech.handlers.dbrequest.LatestMsgHandler;
+import dev.sagar.smsblocker.tech.handlers.dbrequest.RefreshDBHandler;
 import dev.sagar.smsblocker.tech.service.DBServiceSingleton;
 
 /**
