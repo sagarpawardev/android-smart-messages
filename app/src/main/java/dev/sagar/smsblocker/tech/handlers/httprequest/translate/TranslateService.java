@@ -3,13 +3,14 @@ package dev.sagar.smsblocker.tech.handlers.httprequest.translate;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import dev.sagar.smsblocker.tech.beans.TranslateResponse;
 import dev.sagar.smsblocker.tech.utils.TranslateUtil;
 
 /**
  * Created by sagarpawar on 06/05/18.
  */
 
-public class TranslateService extends AsyncTask<String, Void, Object[]>{
+public class TranslateService extends AsyncTask<String, Void, TranslateResponse>{
     private Context context;
     private Callback callback;
 
@@ -19,37 +20,45 @@ public class TranslateService extends AsyncTask<String, Void, Object[]>{
     }
 
     @Override
-    protected Object[] doInBackground(String... strings) {
-        String textId = strings[0];
+    protected TranslateResponse doInBackground(String... strings) {
+        String requestCode = strings[0];
         String textToTranslate = null;
+
+        String fromLang = TranslateUtil.ENGLISH;
+        String toLang = TranslateUtil.HINDI;
+
+        TranslateResponse response = new TranslateResponse();
+        response.setRequestCode(requestCode);
         try {
             textToTranslate = strings[1];
-            TranslateUtil util = new TranslateUtil(context, TranslateUtil.ENGLISH, TranslateUtil.HINDI);
+            TranslateUtil util = new TranslateUtil(context, fromLang, toLang);
             String translatedText = util.translate(textToTranslate);
-            String[] result = {textId, translatedText};
-            return result;
+            response.setFromLang(fromLang);
+            response.setToLang(toLang);
+            response.setOrgText(textToTranslate);
+            response.setTransText(translatedText);
         }
         catch (Exception e){
             e.printStackTrace();
-            Object[] result = {e};
-            return result;
+            response.setErr(e);
         }
+        return response;
     }
 
     @Override
-    protected void onPostExecute(Object[] obj) {
-        if(obj[0] instanceof Exception){
-            callback.onTranslationFailure((Exception) obj[0]);
+    protected void onPostExecute(TranslateResponse response) {
+        if(response.getErr() != null){
+            Exception e = response.getErr();
+            callback.onTranslationFailure(e);
         }
         else {
-            String[] s = (String[]) obj;
-            callback.onTranslationSuccess(s[0], s[1]);
+            callback.onTranslationSuccess(response);
         }
-        super.onPostExecute(obj);
+        super.onPostExecute(response);
     }
 
     public interface Callback{
-        void onTranslationSuccess(String textId, String translatedText);
+        void onTranslationSuccess(TranslateResponse response);
         void onTranslationFailure(Exception e);
     }
 

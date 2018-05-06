@@ -31,6 +31,7 @@ import java.util.Set;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.SIM;
 import dev.sagar.smsblocker.tech.beans.SMS;
+import dev.sagar.smsblocker.tech.beans.TranslateResponse;
 import dev.sagar.smsblocker.tech.datastructures.IndexedHashMap;
 import dev.sagar.smsblocker.tech.handlers.httprequest.translate.TranslateService;
 import dev.sagar.smsblocker.tech.utils.DateUtilSingleton;
@@ -570,11 +571,13 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
 
         //---- TranslateService.Callback Overrides Starts ----
         @Override
-        public void onTranslationSuccess(String smsId, String translatedText) {
+        public void onTranslationSuccess(TranslateResponse response) {
             //Toast.makeText(context, translatedText, Toast.LENGTH_SHORT).show();
+            String translatedText = response.getTransText();
+
             pbTranslate.setVisibility(View.GONE);
             tvTranslate.setVisibility(View.VISIBLE);
-            new TranslateDialog(RVChatAdapter.this.context).show(translatedText);
+            new TranslateDialog(RVChatAdapter.this.context).show(response);
         }
 
         @Override
