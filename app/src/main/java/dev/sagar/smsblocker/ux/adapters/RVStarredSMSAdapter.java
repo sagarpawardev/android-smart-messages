@@ -280,13 +280,15 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
             SMS sms = smses.get(position);
             String address = sms.getAddress();
             String id = sms.getId();
+            String threadId = sms.getThreadId();
 
             //Start Thread Activity
             log.info(methodName, "Start Thread Activity");
             Intent intent = new Intent(context, ChatActivity.class);
             Bundle basket = new Bundle();
-            basket.putString(ChatActivity.KEY_THREAD_ID, address);
+            basket.putString(ChatActivity.KEY_ADDRESS, address);
             basket.putString(ChatActivity.KEY_SMS_ID, id);
+            basket.putString(ChatActivity.KEY_THREAD_ID, threadId);
             intent.putExtras(basket);
             context.startActivity(intent);
 

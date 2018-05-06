@@ -26,6 +26,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -52,7 +54,6 @@ android {
 
 dependencies {
     implementation 'com.android.support:support-v4:26.1.0'
-    implementation 'com.google.firebase:firebase-crash:15.0.2'
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -65,6 +66,7 @@ dependencies {
     compile 'com.miguelcatalan:materialsearchview:1.4.0'
 
     //Analytics
+    implementation 'com.google.firebase:firebase-crash:15.0.2'
     compile 'com.google.firebase:firebase-core:15.0.2'
     implementation 'com.google.firebase:firebase-perf:15.1.0'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.1'
@@ -80,10 +82,19 @@ dependencies {
     //compile 'com.squareup.retrofit2:converter-gson:2.4.0'
     compile 'com.squareup.retrofit2:converter-scalars:2.4.0'
 
+    //Esspresso
+    compile 'com.android.support:multidex:1.0.3'
+
     testCompile 'junit:junit:4.12'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     implementation project(':libs:likebutton')
     implementation project(':libs:shapeloading')
+    androidTestCompile 'com.android.support.test.espresso:espresso-contrib:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'design'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
 }
 
 apply plugin: 'com.google.gms.google-services'

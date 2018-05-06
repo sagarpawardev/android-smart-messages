@@ -576,6 +576,7 @@ public class InboxUtil {
                     String from = c.getString(c.getColumnIndexOrThrow(this.address));
                     String id = c.getString(c.getColumnIndexOrThrow(this._id));
                     String body = c.getString(c.getColumnIndexOrThrow(this.body));
+                    String threadId = c.getString(c.getColumnIndexOrThrow(this.threadId));
                     int subscriptionId = c.getInt(c.getColumnIndexOrThrow(this.subscriptionId));
                     boolean readState = c.getInt(c.getColumnIndex(this.read)) == 1;
                     long time = c.getLong(c.getColumnIndexOrThrow(this.date));
@@ -586,6 +587,7 @@ public class InboxUtil {
                     sms.setId(id);
                     sms.setAddress(from);
                     sms.setBody(body);
+                    sms.setThreadId(threadId);
                     sms.setRead(readState);
                     sms.setDateTime(time);
                     sms.setType(type);

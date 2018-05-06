@@ -268,20 +268,13 @@ public class ChatActivity extends AppCompatActivity implements
         log.justEntered(methodName);
 
         Bundle basket = getIntent().getExtras();
-        String id = basket.getString(KEY_SMS_ID);
-        if(id!=null){
+        String smsId = basket.getString(KEY_SMS_ID);
+        if(smsId!=null){
             //Find Position
-            log.info(methodName, "Looking for position for SMS id: "+id);
-            for(int i=0; i<smses.size(); i++){
-                SMS sms = smses.get(i);
-                if(sms.getId().equals(id)){
-                    //Scroll to position
-                    log.info(methodName, "Found Position: "+i);
-                    recyclerView.smoothScrollToPosition(i);
-                    adapter.highlightItem(i);
-                    break;
-                }
-            }
+            log.info(methodName, "Looking for position for SMS id: "+smsId);
+            int pos = smses.indexOf(smsId);
+            recyclerView.scrollToPosition(pos);
+            adapter.highlightItem(pos);
         }
         else{
             log.info(methodName, "No special SMS to show");
