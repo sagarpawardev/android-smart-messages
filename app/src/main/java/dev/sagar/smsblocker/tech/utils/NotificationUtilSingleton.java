@@ -14,6 +14,9 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
 import android.widget.Toast;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Contact;
 import dev.sagar.smsblocker.tech.beans.SMS;
@@ -39,6 +42,9 @@ public class NotificationUtilSingleton {
     public static final String KEY_REPLY = "reply";
     private static final int SUMMARY_ID = 0;
     private static final String NOTIFICATION_GROUP = "NOTIFICATION_GROUP";
+
+    //Notification Delay Problem
+    private static boolean notifGroupCreated = false;
 
     /**
      * This is part of Singleton Design pattern
@@ -113,6 +119,10 @@ public class NotificationUtilSingleton {
         /*generateSingleNotification(context, sms);
         setSummaryNotification(context, sms);*/
 
+
+
+        long startTime = System.currentTimeMillis();
+
         int notifId = getNotificationId();
         String threadId = sms.getThreadId();
         String address = sms.getAddress();
@@ -133,6 +143,7 @@ public class NotificationUtilSingleton {
                         PendingIntent.FLAG_UPDATE_CURRENT
                 );
         //-- Open Activity onClick Ends
+
 
         //Get Notification Builder
         NotificationCompat.Builder mBuilder = getNotifBuilder(context, contact, sms);
@@ -157,20 +168,62 @@ public class NotificationUtilSingleton {
         mGroupBuilder.setContentIntent(resultPendingIntent)
                 .setAutoCancel(true);
 
+
         log.info(methodName, "Creating Notification..");
         NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
         Notification notification = mBuilder.build();
         Notification notifGroupSummary = mGroupBuilder.build();
 
-        mNotificationManager.notify(notifId, notification);
+
+
+        if(notifGroupCreated)
+            mNotificationManager.notify(notifId, notification);
+
         mNotificationManager.notify(SUMMARY_ID, notifGroupSummary);
+
+        if(!notifGroupCreated) {
+            mNotificationManager.notify(getNotificationId(), notification);
+            notifGroupCreated = true;
+        }
+
+
+        /*String CHANNEL_ID = "12345";
+        NotificationCompat.MessagingStyle.Message message1 =
+                new NotificationCompat.MessagingStyle.Message(sms.getBody(),
+                        sms.getDateTime(),
+                        sms.getAddress());
+        NotificationCompat.MessagingStyle.Message message2 =
+                new NotificationCompat.MessagingStyle.Message("Hello Billo: "+sms.getBody(),
+                        sms.getDateTime(),
+                        "Sagar Pawar");
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notif_24dp)
+                .setStyle(new NotificationCompat.MessagingStyle(context.getString(R.string.text_conversation))
+                        .addMessage(message1)
+                        .addMessage(message2));
+
+        Notification notification = mBuilder.build();
+        NotificationManagerCompat mNotificationManager = NotificationManagerCompat.from(context);
+
+
+        Contact contact = ContactUtilSingleton.getInstance().getContactOrDefault(context, sms.getAddress());;
+        NotificationCompat.Builder mGroupBuilder = getNotifBuilder(context, contact, sms).setGroupSummary(true);
+        setGroup(context,  mGroupBuilder, contact);
+        Notification notifGroupSummary = mGroupBuilder.build();
+
+        setPriority(context, mGroupBuilder);
+        setPriority(context, mBuilder);
+
+        mNotificationManager.notify(getNotificationId(), notification);
+        mNotificationManager.notify(SUMMARY_ID, notifGroupSummary);*/
 
         log.returning(methodName);
     }
 
     private NotificationCompat.Builder getNotifBuilder(Context context, Contact contact, SMS sms){
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, "12345");
         String text = sms.getBody();
         String fromName = contact.getDisplayName();
         int notifColor = context.getResources().getColor(R.color.colorPrimaryDark, null);
@@ -185,15 +238,19 @@ public class NotificationUtilSingleton {
                 .setShowWhen(true);*/
 
 
-        mBuilder.setSmallIcon(R.drawable.ic_notif_24dp)
+        /*mBuilder.setSmallIcon(R.drawable.ic_notif_24dp)
                 //build summary info into InboxStyle template
                 .setStyle(new NotificationCompat.BigTextStyle()
-                        /*.addLine("Alex Faarborg  Check this out")
-                        .addLine("Jeff Chang    Launch Party")*/
+                        *//*.addLine("Alex Faarborg  Check this out")
+                        .addLine("Jeff Chang    Launch Party")*//*
                         //.setBigContentTitle(text)
                         //.setSummaryText(fromName)
                         .bigText(text)
-                );
+                );*/
+
+        NotificationCompat.MessagingStyle.Message message1 = new NotificationCompat.MessagingStyle.Message(sms.getBody(), sms.getDateTime(), contact.getDisplayName());
+
+        mBuilder.setStyle(new NotificationCompat.MessagingStyle(context.getString(R.string.text_conversation)).addMessage(message1));
 
         mBuilder.setSmallIcon(R.drawable.ic_notif_24dp)
                 .setContentTitle(fromName)
@@ -216,95 +273,6 @@ public class NotificationUtilSingleton {
     private int getNotificationId(){
         return sNotificationId++;
     }
-
-    /*private void setSummaryNotification(Context context, SMS sms, String groupKey) {
-        Contact contact = ContactUtilSingleton.getInstance().getContactOrDefault(context, sms.getAddress());
-        String fromName = contact.getDisplayName();
-
-        String text = sms.getBody();
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        NotificationCompat.Builder summaryNotification = new NotificationCompat.Builder(context)
-                .setContentText(text)
-                .setAutoCancel(false)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
-                        R.drawable.ic_notif))
-                .setSmallIcon(R.drawable.ic_notif)
-                .setStyle(new NotificationCompat.InboxStyle()
-                        //.setBigContentTitle("From "+fromName)
-                        //.addLine("Tip 1")
-                        //.addLine("Tip 2")
-                        //.addLine("Tip 3")
-                        //.addLine("Tip 4")
-                        .setSummaryText(fromName))
-                .setGroup(groupKey)
-                .setGroupSummary(true);
-
-        notificationManager.notify(100, summaryNotification.build());
-    }*/
-
-    /*private void generateSingleNotification(Context context, SMS sms) {
-        String fromNo = sms.getAddress();
-        String fromName = fromNo;
-        try {
-            fromName = ContactUtilSingleton.getInstance().getContactName(context, fromNo);
-        } catch (ReadContactPermissionException e) {
-            e.printStackTrace();
-        }
-        String text = sms.getBody();
-
-        String groupKey = fromNo;
-        int notificationId = getNotificationId();
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        *//*PendingIntent pIntent = PendingIntent.getActivity(context,
-                (int) System.currentTimeMillis(),
-                new Intent(context, NotificationOpenActivity.class), 0);
-
-        // Add to your action, enabling Direct Reply for it
-        NotificationCompat.Action replayAction =
-                new NotificationCompat.Action.Builder(R.drawable.ic_replay, "Replay", pIntent)
-                        .build();*//*
-
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setContentText(text)
-                .setAutoCancel(false)
-                //.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_notif))
-                .setSmallIcon(R.drawable.ic_notif)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(text)
-                        //.setBigContentTitle("How to create bundle notification? Tip: " + BIG_TEXT_NOTIFICATION_KEY)
-                        .setSummaryText(fromName));
-
-        Intent activityIndent = new Intent(context, ChatActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(ChatActivity.KEY_THREAD_ID, fromNo);
-        activityIndent.putExtras(bundle);
-        PendingIntent activityPIndent =
-                PendingIntent.getActivity(
-                        context,
-                        0,
-                        activityIndent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
-                );
-
-
-        PendingIntent replyPIntent = getReplyPendingIntent(context, sms);
-        mBuilder.setContentIntent(activityPIndent)
-                .setAutoCancel(true);
-
-        NotificationCompat.Action replyAction =
-                new NotificationCompat.Action.Builder(R.drawable.ic_notif,
-                        context.getString(R.string.label_reply), replyPIntent)
-                        .build();
-
-        mBuilder.setContentIntent(activityPIndent)
-                .addAction(replyAction)
-                .setGroup(groupKey);
-
-        notificationManager.notify(notificationId, mBuilder.build());
-    }*/
 
 
     private void setGroup(Context context, NotificationCompat.Builder builder, Contact contact){
