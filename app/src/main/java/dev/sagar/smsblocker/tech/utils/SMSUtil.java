@@ -92,7 +92,7 @@ public class SMSUtil {
 
                     String strSms = gson.toJson(sms);
                     sendBasket.putString(SMSSentReceiver.KEY_SMS, strSms);
-                    deliverBasket.putSerializable(SMSDeliveredReceiver.KEY_SMS, sms);
+                    deliverBasket.putString(SMSDeliveredReceiver.KEY_SMS, strSms);
 
                     sentIntent.putExtras(sendBasket);
                     deliverIntent.putExtras(deliverBasket);

@@ -362,6 +362,8 @@ public class ChatActivity extends AppCompatActivity implements
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         init();
         updateActionBar();
         hideMsgs();
@@ -543,7 +545,12 @@ public class ChatActivity extends AppCompatActivity implements
     //--- LocalSMSDeliveredReceiver.Callback Overriders Start ---
     @Override
     public void onSMSDelivered(SMS sms) {
-        Toast.makeText(this, "SMS Delivered", Toast.LENGTH_SHORT).show();
+        String id = sms.getId();
+        SMS orgSMS = smses.get(id);
+        orgSMS.setSeen(true);
+        int position = smses.indexOf(id);
+
+        adapter.notifyItemChanged(position);
     }
     //--- LocalSMSDeliveredReceiver.Callback Overriders Ends ---
 

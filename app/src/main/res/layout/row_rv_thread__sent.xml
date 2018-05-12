@@ -42,6 +42,7 @@
         android:paddingEnd="@dimen/msg_body_paddingend"
         android:paddingStart="@dimen/msg_body_paddingstart"
         android:paddingTop="@dimen/msg_body_paddingtop"
+        app:layout_constraintBottom_toTopOf="@+id/tv_failure"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -54,9 +55,9 @@
             android:autoLink="all"
             android:maxWidth="250dp"
             android:paddingBottom="5dp"
-            android:textColor="@color/white"
             android:paddingEnd="10dp"
             android:text="shlslhs;s;s/sn/slsnl/san;sn/lslsnvlsnvl"
+            android:textColor="@color/white"
             android:textColorLink="@color/white" />
 
         <LinearLayout
@@ -74,20 +75,33 @@
                 android:paddingBottom="2dp"
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
-                android:textColor="@color/white"
                 android:text="1646646463466"
+                android:textColor="@color/white"
                 android:textSize="10sp" />
 
             <ImageView
+                android:id="@+id/iv_state"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
-                android:id="@+id/iv_state"
-                android:src="@drawable/ic_check_all_white_24dp"/>
+                android:src="@drawable/ic_check_all_white_24dp" />
 
         </LinearLayout>
     </LinearLayout>
-            
-        <!--</android.support.v7.widget.CardView>
+
+    <TextView
+        android:id="@+id/tv_failure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/lbl_failed"
+        android:textColor="@color/red800"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="8dp"
+        android:paddingBottom="@dimen/msg_body_paddingbottom"
+        android:paddingEnd="@dimen/msg_body_paddingend"
+        android:paddingStart="@dimen/msg_body_paddingstart" />
+    <!--</android.support.v7.widget.CardView>
 
 
     </RelativeLayout>-->

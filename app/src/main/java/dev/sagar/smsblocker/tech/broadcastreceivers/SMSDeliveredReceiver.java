@@ -2,12 +2,15 @@ package dev.sagar.smsblocker.tech.broadcastreceivers;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
@@ -19,16 +22,21 @@ public class SMSDeliveredReceiver extends BroadcastReceiver {
     //Log Initiate
     LogUtil log = new LogUtil( this.getClass().getName() );
 
+    //Java Android
+    private final Gson gson = new Gson();
+
     public final static String EVENT_CODE = "sms_event_delivered";
     public final static String KEY_PART_INDEX = "part_index";
     public final static String KEY_TOTAL_PARTS = "total_parts";
     public final static String KEY_SMS = "sms";
+    public final static String KEY_ACTION = "delivered_action";
 
     public final static String KEY_SMS_DELIVERED = "sms_delivered";
     public final static String KEY_DELIVERY_CANCELLED = "sms_delivery_cancelled";
 
     private final static String type = Telephony.Sms.TYPE;
     private final static String _id = Telephony.Sms._ID;
+    private final static String seen = Telephony.Sms.SEEN;
 
     private static final Uri SMS_URI = Telephony.Sms.Inbox.CONTENT_URI;
     private BroadcastUtilSingleton broadcastUtil = BroadcastUtilSingleton.getInstance();
@@ -41,8 +49,8 @@ public class SMSDeliveredReceiver extends BroadcastReceiver {
 
         switch (getResultCode()) {
             case Activity.RESULT_OK:
-                Toast.makeText(context, "SMS Delivered",
-                        Toast.LENGTH_SHORT).show();
+                /*Toast.makeText(context, "SMS Delivered",
+                        Toast.LENGTH_SHORT).show();*/
                 resultOk(context, intent);
                 break;
 
@@ -61,7 +69,21 @@ public class SMSDeliveredReceiver extends BroadcastReceiver {
         log.justEntered(methodName);
 
         Bundle basket = intent.getExtras();
-        SMS sms = (SMS) basket.getSerializable(KEY_SMS);
+        String strSMS = basket.getString(KEY_SMS);
+        SMS sms = gson.fromJson(strSMS, SMS.class);
+        String id = sms.getId();
+
+        String selection = _id + " = ?";
+        String[] selectionArgs = {id};
+        ContentValues values = new ContentValues();
+        values.put(seen, SMS.SEEN);
+
+        int updateCount = context
+                .getContentResolver()
+                .update(SMS_URI, values, selection, selectionArgs);
+        log.info(methodName, "Update Count: " + updateCount);
+
+
 
         log.info(methodName, "Broadcasting Locally");
         broadcastLocalSMS(context, sms, KEY_SMS_DELIVERED);
@@ -82,13 +104,14 @@ public class SMSDeliveredReceiver extends BroadcastReceiver {
      * This method broadcast SMS SENT Locally
      * @param context Context
      */
-    private void broadcastLocalSMS(Context context, SMS sms, String key){
+    private void broadcastLocalSMS(Context context, SMS sms, String resultCode){
         final String methodName = "broadcastLocalSMS(Context, SMS)";
         log.justEntered(methodName);
 
         Bundle basket = new Bundle();
-        basket.putSerializable(LocalSMSDeliveredReceiver.KEY_SMS, sms);
-        broadcastUtil.broadcast(context, key, basket);
+        basket.putSerializable(KEY_SMS, sms);
+        basket.putString(KEY_ACTION, resultCode);
+        broadcastUtil.broadcast(context, EVENT_CODE, basket);
 
         log.returning(methodName);
     }

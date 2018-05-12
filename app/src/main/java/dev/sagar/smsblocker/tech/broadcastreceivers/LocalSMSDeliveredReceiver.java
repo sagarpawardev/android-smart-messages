@@ -25,6 +25,7 @@ public class LocalSMSDeliveredReceiver extends BroadcastReceiver {
     //Constant
     public static final String EVENT_DELIVERED = SMSDeliveredReceiver.EVENT_CODE;
     public static final String KEY_SMS = SMSDeliveredReceiver.KEY_SMS;
+    public static final String KEY_ACTION = SMSDeliveredReceiver.KEY_ACTION;
 
     //Java Android
     private Gson gson = new Gson();
@@ -52,10 +53,10 @@ public class LocalSMSDeliveredReceiver extends BroadcastReceiver {
         AnalyticsUtil.start(context);
 
         Bundle basket = intent.getExtras();
-        String jsonSMS = basket.getString(KEY_SMS);
-        SMS sms = gson.fromJson(jsonSMS, SMS.class);
+        //String jsonSMS = basket.getSerializable(KEY_SMS);
+        SMS sms = (SMS) basket.getSerializable(KEY_SMS);;
 
-        String action = intent.getAction();
+        String action = basket.getString(KEY_ACTION);
         String msg = null;
         switch (action){
             case SMSDeliveredReceiver.KEY_SMS_DELIVERED:

@@ -28,6 +28,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.EventCode;
@@ -82,6 +84,7 @@ public class HomeActivity extends AppCompatActivity
     final String RECEIVE_SMS = Permission.RECEIVE_SMS;
     final String SEND_SMS = Permission.SEND_SMS;
     final String READ_CONTACTS = Permission.READ_CONTACTS;
+    final String KEY_CONV_MAP = "conv_map";
 
     private void init(){
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -284,6 +287,26 @@ public class HomeActivity extends AppCompatActivity
     }
 
     //--- AppCompatActivity Overrides Start ---
+
+
+    /*@Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Gson gson = new Gson();
+        String strConvMap = gson.toJson(conversationMap);
+        outState.putString(KEY_CONV_MAP, strConvMap);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        String strConvMap = savedInstanceState.getString(KEY_CONV_MAP);
+
+        Gson gson = new Gson();
+        conversationMap = gson.fromJson(strConvMap, IndexedHashMap.class);
+    }*/
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 
@@ -322,6 +345,7 @@ public class HomeActivity extends AppCompatActivity
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+
 
         init();
         addListeners();
@@ -539,6 +563,7 @@ public class HomeActivity extends AppCompatActivity
         log.info(methodName, "DB Refreshed :D...");
         log.info(methodName, "Now retrieving latest list");
         conversationUtil.getLatestMsgs();
+        progressBar.setVisibility(View.GONE);
 
         log.returning(methodName);
     }
@@ -565,7 +590,6 @@ public class HomeActivity extends AppCompatActivity
         tvTotalCount.setText(strTotalCount);
 
         swipeRefreshLayout.setRefreshing(false);
-        progressBar.setVisibility(View.GONE);
 
         log.returning(methodName);
     }

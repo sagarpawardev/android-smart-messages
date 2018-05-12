@@ -20,6 +20,7 @@ public class SMS implements Serializable{
     private boolean replySupported;
     private boolean saved = false;
     private String threadId;
+    private boolean seen = false;
 
     private int subscription;
 
@@ -29,6 +30,9 @@ public class SMS implements Serializable{
     public static final long TYPE_DRAFT = Telephony.Sms.MESSAGE_TYPE_DRAFT;
     public static final long TYPE_FAILED = Telephony.Sms.MESSAGE_TYPE_FAILED;
     public static final long TYPE_OUTBOX = Telephony.Sms.MESSAGE_TYPE_OUTBOX;
+
+
+    public static final int SEEN = 1;
 
     public String getId() {
         return id;
@@ -108,6 +112,14 @@ public class SMS implements Serializable{
 
     public void setThreadId(String threadId) {
         this.threadId = threadId;
+    }
+
+    public boolean getSeen() {
+        return seen;
+    }
+
+    public void setSeen(boolean seen) {
+        this.seen = seen;
     }
 
     @Override

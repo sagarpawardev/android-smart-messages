@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -40,6 +39,7 @@ import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.SystemUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.TelephonyUtilSingleton;
 import dev.sagar.smsblocker.ux.dialog.TranslateDialog;
+import dev.sagar.smsblocker.ux.utils.ThemeUtil;
 
 /**
  * Created by sagarpawar on 15/10/17.
@@ -62,6 +62,7 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
     private TelephonyUtilSingleton telephonyUtil;
     private boolean replyNotSupportedTold = false;
     private Set<Integer> markedForUnstar;
+    private ThemeUtil themeUtil;
 
     //Constants
     private static final int TYPE_RECEIVED = 0;
@@ -81,6 +82,7 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
         inboxUtil = new InboxUtil(context);
         telephonyUtil = TelephonyUtilSingleton.getInstance();
         markedForUnstar = new HashSet<>();
+        themeUtil = new ThemeUtil(context);
 
         log.returning(methodName);
     }
@@ -234,10 +236,10 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
         Resources res = context.getResources();
 
         if(type == SMS.TYPE_SENT){
-            drawable = res.getDrawable(R.drawable.ic_check_all_white_24dp, null);
+            drawable = res.getDrawable(R.drawable.ic_check_white_24dp, null);
         }
         else if(type == SMS.TYPE_FAILED){
-            drawable = res.getDrawable(R.drawable.ic_highlight_off_white_24dp, null);
+            drawable = res.getDrawable(R.drawable.baseline_error_outline_24, null);
         }
         else if(type == SMS.TYPE_QUEUED){
             drawable = res.getDrawable(R.drawable.ic_schedule_white_24dp, null);
@@ -284,7 +286,7 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
         log.justEntered(methodName);
 
         //Adi changes Start
-        Typeface myFont = Typeface.createFromAsset(context.getAssets(),"fonts/VarelaRound-Regular.ttf");
+        Typeface myFont = themeUtil.getTypeface();
         holder.tvBody.setTypeface(myFont);
         holder.tvTime.setTypeface(myFont);
         //Adi changes End
@@ -299,6 +301,21 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
 
         //SetImage View
         setStateImage(type, holder.ivState);
+
+        //Set Delivered Image
+        boolean isSeen = sms.getSeen();
+        if(isSeen){
+            Drawable drawable = context.getResources().getDrawable(R.drawable.ic_check_all_white_24dp, null);
+            holder.ivState.setImageDrawable(drawable);
+        }
+
+        //Set Error Image
+        if(type == SMS.TYPE_FAILED){
+            holder.tvFailure.setVisibility(View.VISIBLE);
+        }
+        else if(type == SMS.TYPE_SENT){
+            holder.tvFailure.setVisibility(View.GONE);
+        }
 
         //If SMS is among saved SMS
         log.debug(methodName, "Checking Saved SMS: "+sms.isSaved()+" id: "+sms.getId());
@@ -416,6 +433,7 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
         DateFormat dateFormat = new SimpleDateFormat(format);
         ImageView ivState;
         ProgressBar pbTranslate;
+        TextView tvFailure;
 
         SMSViewHolder(View view) {
             super(view);
@@ -429,6 +447,7 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
             btnStar = view.findViewById(R.id.btn_star);
             tvTranslate = view.findViewById(R.id.tv_translate);
             pbTranslate = view.findViewById(R.id.pb_translate);
+            tvFailure = view.findViewById(R.id.tv_failure);
 
             view.setOnLongClickListener(this);
             view.setOnClickListener(this);
@@ -449,6 +468,10 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
                         pbTranslate.setVisibility(View.VISIBLE);
                     }
                 });
+            }
+
+            if(tvFailure!=null){
+                tvFailure.setTypeface(themeUtil.getTypeface());
             }
 
             log.returning(methodName);

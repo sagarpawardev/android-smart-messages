@@ -51,6 +51,7 @@ public class InboxUtil {
     private final String date = Telephony.Sms.DATE;
     private final String type = Telephony.Sms.TYPE;
     private final String replySupported = Telephony.Sms.REPLY_PATH_PRESENT;
+    private final String seen = Telephony.Sms.SEEN;
     private final Uri INBOX_URI = Telephony.Sms.Inbox.CONTENT_URI;
     private final Uri SENT_URI = Telephony.Sms.Sent.CONTENT_URI;
     private final Uri SMS_URI = Telephony.Sms.CONTENT_URI;
@@ -334,6 +335,7 @@ public class InboxUtil {
             long time = c.getLong(c.getColumnIndexOrThrow(this.date));
             long type = c.getLong(c.getColumnIndexOrThrow(this.type));
             boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
+            boolean isSeen = c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1;
 
             result = new SMS();
             result.setId(id);
@@ -344,6 +346,7 @@ public class InboxUtil {
             result.setType(type);
             result.setSubscription(subscriptionId);
             result.setReplySupported(replySupported);
+            result.setSeen(isSeen);
 
             //FIXME need to look into saved data
             result.setSaved(false);
@@ -582,6 +585,7 @@ public class InboxUtil {
                     long time = c.getLong(c.getColumnIndexOrThrow(this.date));
                     long type = c.getLong(c.getColumnIndexOrThrow(this.type));
                     boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
+                    boolean isSeen = c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1;
 
                     SMS sms = new SMS();
                     sms.setId(id);
@@ -594,6 +598,7 @@ public class InboxUtil {
                     sms.setSubscription(subscriptionId);
                     sms.setReplySupported(replySupported);
                     sms.setSaved(true);
+                    sms.setSeen(isSeen);
 
                     smses.add(sms);
 
@@ -686,6 +691,7 @@ public class InboxUtil {
                 long time = c.getLong(c.getColumnIndexOrThrow(this.date));
                 long type = c.getLong(c.getColumnIndexOrThrow(this.type));
                 boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
+                boolean isSeen = c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1;
 
                 SMS sms = new SMS();
                 sms.setId(id);
@@ -696,6 +702,7 @@ public class InboxUtil {
                 sms.setType(type);
                 sms.setSubscription(subscriptionId);
                 sms.setReplySupported(replySupported);
+                sms.setSeen(isSeen);
 
                 if(set.contains(id))
                     sms.setSaved(true);
