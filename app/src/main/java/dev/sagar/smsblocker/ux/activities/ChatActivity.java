@@ -16,10 +16,12 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -601,7 +603,18 @@ public class ChatActivity extends AppCompatActivity implements
         final String methodName =  "onReplyNotSupported()";
         log.justEntered(methodName);
 
+        //Show Message
         tvReplyNotSupported.setVisibility(View.VISIBLE);
+
+        //Attach RelativeLayout to message
+        RelativeLayout.LayoutParams params= (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
+        params.addRule(RelativeLayout.ABOVE, tvReplyNotSupported.getId());
+        recyclerView.setLayoutParams(params);
+
+        //Hide EditText
+        ViewGroup.LayoutParams lp =  (ViewGroup.MarginLayoutParams) holderBodyET.getLayoutParams();
+        lp.height = 1;
+        holderBodyET.setLayoutParams(lp);
         holderBodyET.setVisibility(View.INVISIBLE);
 
         log.returning(methodName);

@@ -52,9 +52,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_settings);
 
             // gallery EditText change listener
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_notif_alert)));
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_notif_sound)));
-            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_notif_vibrate)));
+            //bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_notif_alert)));
+            //bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_notif_sound)));
+            //bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_notif_vibrate)));
 
             // notification preference change listener
             //bindPreferenceSummaryToValue(findPreference(getString(R.string.key_notifications_new_message_ringtone)));

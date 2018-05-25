@@ -52,8 +52,8 @@ public class StarredSMSActivity extends AppCompatActivity implements RVStarredSM
         final String methodName =  "init()";
         log.justEntered(methodName);
 
-        parentHolder = findViewById(R.id.view_holder);
-        rvStarredSMS = (RecyclerView) findViewById(R.id.rv_starred_sms);
+        parentHolder = findViewById(android.R.id.content);
+        rvStarredSMS = findViewById(R.id.rv_starred_sms);
         inboxUtil = new InboxUtil(this);
 
         log.returning(methodName);

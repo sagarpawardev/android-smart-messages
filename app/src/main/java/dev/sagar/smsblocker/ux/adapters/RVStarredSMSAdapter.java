@@ -114,6 +114,7 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.row_rv_starred_sms, parent, false);
         //itemView.setOnClickListener(this);
+
         SMSViewHolder holder = new SMSViewHolder(itemView);
 
         log.returning(methodName);
@@ -130,6 +131,17 @@ public class RVStarredSMSAdapter extends RecyclerView.Adapter<RVStarredSMSAdapte
         holder.tvFrom.setTypeface(myFont);
         holder.tvTime.setTypeface(myFont);
         //Adi changes End
+
+
+        //Space for first element
+        if(position == 0){
+            log.debug(methodName, "Changing padding of first element");
+            View parent = holder.parent;
+            ViewGroup.MarginLayoutParams lp =  (ViewGroup.MarginLayoutParams) parent.getLayoutParams();
+            lp.topMargin = 3*lp.topMargin;
+
+            parent.setLayoutParams(lp);
+        }
 
         SMS sms = smses.get(position);
         String address = sms.getAddress();
