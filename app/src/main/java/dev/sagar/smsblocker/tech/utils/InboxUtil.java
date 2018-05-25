@@ -335,7 +335,7 @@ public class InboxUtil {
             long time = c.getLong(c.getColumnIndexOrThrow(this.date));
             long type = c.getLong(c.getColumnIndexOrThrow(this.type));
             boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
-            boolean isSeen = c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1;
+            boolean isSeen = type==SMS.TYPE_SENT && (c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1);
 
             result = new SMS();
             result.setId(id);
@@ -585,7 +585,7 @@ public class InboxUtil {
                     long time = c.getLong(c.getColumnIndexOrThrow(this.date));
                     long type = c.getLong(c.getColumnIndexOrThrow(this.type));
                     boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
-                    boolean isSeen = c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1;
+                    boolean isSeen = type==SMS.TYPE_SENT && (c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1);
 
                     SMS sms = new SMS();
                     sms.setId(id);
@@ -691,7 +691,7 @@ public class InboxUtil {
                 long time = c.getLong(c.getColumnIndexOrThrow(this.date));
                 long type = c.getLong(c.getColumnIndexOrThrow(this.type));
                 boolean replySupported = PhoneUtilsSingleton.getInstance().isReplySupported(from);
-                boolean isSeen = c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1;
+                boolean isSeen = type==SMS.TYPE_SENT && (c.getLong(c.getColumnIndexOrThrow(this.seen)) == 1);
 
                 SMS sms = new SMS();
                 sms.setId(id);
