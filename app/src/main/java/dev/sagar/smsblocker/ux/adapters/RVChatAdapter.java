@@ -304,11 +304,8 @@ public class RVChatAdapter extends RecyclerView.Adapter<RVChatAdapter.SMSViewHol
 
         //Set Delivered Image
         boolean isSeen = sms.getSeen();
-        if(holder.ivState==null && isSeen){
-            log.debug(methodName, "Somethings weird...");
-        }
 
-        if(isSeen){
+        if(isSeen && sms.getType()==SMS.TYPE_SENT){
             Drawable drawable = context.getResources().getDrawable(R.drawable.ic_check_all_white_24dp, null);
             holder.ivState.setImageDrawable(drawable);
         }
