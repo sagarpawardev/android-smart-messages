@@ -40,11 +40,11 @@
             android:title="Enable Blocker"
             android:key="@string/pref_key_enable_blocker"/>
 
-        <MultiSelectListPreference
+        <ListPreference
             android:title="Blocked Contacts"
             android:key="@string/pref_key_blocked_contacts" />
 
-        <MultiSelectListPreference
+        <ListPreference
             android:title="Muted Contacts"
             android:key="@string/pref_key_muted_contacts" />
 

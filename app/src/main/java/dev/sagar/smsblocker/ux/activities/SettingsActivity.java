@@ -18,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -50,6 +51,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_settings);
+
+
+            ListPreference blockedPref = (ListPreference) findPreference(getString(R.string.pref_key_blocked_contacts));
+            blockedPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Toast.makeText(getContext(), "Hello Sagar", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
 
             // gallery EditText change listener
             //bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_key_notif_alert)));
