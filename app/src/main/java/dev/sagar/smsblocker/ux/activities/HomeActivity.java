@@ -49,8 +49,9 @@ import dev.sagar.smsblocker.ux.listeners.actionmodecallbacks.AMCallbackHome;
 
 public class HomeActivity extends AppCompatActivity
         implements RVHomeAdapter.Callback, LocalSMSReceivedReceiver.Callback,
-        ConversationUtil.Callback, View.OnClickListener, CompoundButton.OnCheckedChangeListener,
-        SwipeRefreshLayout.OnRefreshListener{
+        ConversationUtil.Callback, View.OnClickListener, CompoundButton.OnCheckedChangeListener
+        //,SwipeRefreshLayout.OnRefreshListener
+        {
 
     //Log Initiate
     private LogUtil log = new LogUtil(this.getClass().getName());
@@ -63,7 +64,7 @@ public class HomeActivity extends AppCompatActivity
     private ProgressBar progressBar;
     private SwitchCompat switchUnread;
     private TextView tvTotalCount;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    //private SwipeRefreshLayout swipeRefreshLayout;
 
     //Java Core
     ConversationUtil conversationUtil = null;
@@ -87,14 +88,14 @@ public class HomeActivity extends AppCompatActivity
     final String KEY_CONV_MAP = "conv_map";
 
     private void init(){
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        notificationView = (NotificationView) findViewById(R.id.notificationView);
-        recyclerView = (RecyclerView) findViewById(R.id.lv_threads);
+        fab =  findViewById(R.id.fab);
+        notificationView = findViewById(R.id.notificationView);
+        recyclerView =  findViewById(R.id.lv_threads);
         viewPlaceHolder = findViewById(R.id.holder_placeholder);
-        switchUnread = (SwitchCompat) findViewById(R.id.switch_unread);
-        tvTotalCount = (TextView) findViewById(R.id.tv_total_count);
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        switchUnread =  findViewById(R.id.switch_unread);
+        tvTotalCount =  findViewById(R.id.tv_total_count);
+        //swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        progressBar =  findViewById(R.id.progress_bar);
 
         holderLoader = findViewById(R.id.holder_loader);
         holderMain = findViewById(R.id.holder_main);
@@ -163,7 +164,7 @@ public class HomeActivity extends AppCompatActivity
                 permUtil.askToMakeAppDefault(HomeActivity.this);
             }
         });
-        swipeRefreshLayout.setOnRefreshListener(this);
+        //swipeRefreshLayout.setOnRefreshListener(this);
     }
 
 
@@ -350,9 +351,9 @@ public class HomeActivity extends AppCompatActivity
         init();
         addListeners();
 
-        swipeRefreshLayout.setColorSchemeResources(
+        /*swipeRefreshLayout.setColorSchemeResources(
                 R.color.grad_start,
-                R.color.grad_end);
+                R.color.grad_end);*/
 
         //By default assume permission is Not given
         hideInboxView();
@@ -367,6 +368,7 @@ public class HomeActivity extends AppCompatActivity
         switch (id){
             case R.id.menu_starred_sms: startStarredActivity(); break;
             case R.id.menu_settings: startSettingsActivity(); break;
+            case R.id.menu_referesh: refreshConversations(); break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -589,7 +591,7 @@ public class HomeActivity extends AppCompatActivity
         String strTotalCount = getCountText(adapter.getItemCount());
         tvTotalCount.setText(strTotalCount);
 
-        swipeRefreshLayout.setRefreshing(false);
+        //swipeRefreshLayout.setRefreshing(false);
 
         log.returning(methodName);
     }
@@ -616,7 +618,7 @@ public class HomeActivity extends AppCompatActivity
 
 
     //--- SwipeRefreshLayout.OnRefreshListener Overrides Starts
-    @Override
+    /*@Override
     public void onRefresh() {
         final String methodName =  "onRefresh()";
         log.justEntered(methodName);
@@ -624,6 +626,6 @@ public class HomeActivity extends AppCompatActivity
         refreshConversations();
 
         log.returning(methodName);
-    }
+    }*/
     //--- SwipeRefreshLayout.OnRefreshListener Overrides Ends
 }

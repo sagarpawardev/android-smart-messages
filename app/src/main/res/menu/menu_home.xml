@@ -13,8 +13,13 @@
         android:title="@string/hint_strred_sms"
         app:showAsAction="never" />
 
+    <item android:id="@+id/menu_referesh"
+        android:title="@string/label_refresh"
+        app:showAsAction="never" />
+
     <item android:id="@+id/menu_settings"
         android:title="@string/label_settings"
         app:showAsAction="never" />
+
 
 </menu>
