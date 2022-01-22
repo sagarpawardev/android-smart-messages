@@ -20,11 +20,8 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
-import io.fabric.sdk.android.Fabric;
 
 import java.util.HashMap;
 import java.util.HashSet;

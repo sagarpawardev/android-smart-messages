@@ -6,7 +6,6 @@ import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 
@@ -120,7 +119,7 @@ public class PhoneUtilsSingleton {
                 log.info(methodName, "Got result: "+result+" For address: "+address+" Type: "+phoneNumberType);
             } catch (final Exception e) {
                 e.printStackTrace();
-                Crashlytics.logException(e);
+                //Crashlytics.logException(e);
                 result = false;
                 log.info(methodName, "Fall in exception...");
             }

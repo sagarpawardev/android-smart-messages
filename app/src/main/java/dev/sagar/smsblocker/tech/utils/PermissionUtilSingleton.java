@@ -6,9 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Telephony;
-import android.support.v4.app.ActivityCompat;
-import android.view.View;
-import android.widget.Button;
+
+import androidx.core.app.ActivityCompat;
 
 import java.util.Arrays;
 
@@ -109,7 +108,7 @@ public class PermissionUtilSingleton {
         log.info(methodName, "Just Entered...");
 
         final String myPackageName = context.getPackageName();
-        boolean result = Telephony.Sms.getDefaultSmsPackage(context).equals(myPackageName);
+        boolean result = myPackageName.equals(Telephony.Sms.getDefaultSmsPackage(context));
 
         log.info(methodName, "Returing...");
         return result;

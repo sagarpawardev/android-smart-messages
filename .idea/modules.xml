@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Smart-Messages.iml" filepath="$PROJECT_DIR$/Smart-Messages.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libs/libs.iml" filepath="$PROJECT_DIR$/libs/libs.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libs/likebutton/likebutton.iml" filepath="$PROJECT_DIR$/libs/likebutton/likebutton.iml" />
-      <module fileurl="file://$PROJECT_DIR$/libs/shapeloading/shapeloading.iml" filepath="$PROJECT_DIR$/libs/shapeloading/shapeloading.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android-smart-messages.iml" filepath="$PROJECT_DIR$/.idea/modules/android-smart-messages.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android-smart-messages.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android-smart-messages.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libs/android-smart-messages.libs.iml" filepath="$PROJECT_DIR$/.idea/modules/libs/android-smart-messages.libs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libs/likebutton/android-smart-messages.libs.likebutton.iml" filepath="$PROJECT_DIR$/.idea/modules/libs/likebutton/android-smart-messages.libs.likebutton.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libs/shapeloading/android-smart-messages.libs.shapeloading.iml" filepath="$PROJECT_DIR$/.idea/modules/libs/shapeloading/android-smart-messages.libs.shapeloading.iml" />
     </modules>
   </component>
 </project>

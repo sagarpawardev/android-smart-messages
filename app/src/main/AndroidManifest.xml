@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
-        android:name="android.support.multidex.MultiDexApplication"
+        android:name=".SmartMessagesApplication"
         android:allowBackup="true"
         android:icon="@drawable/logo"
         android:label="@string/app_name"
@@ -88,6 +88,7 @@
         <!-- BroadcastReceiver that listens to incoming MMS messages -->
         <receiver
             android:name=".tech.broadcastreceivers.MMSReceiver"
+            android:exported="true"
             android:permission="android.permission.BROADCAST_WAP_PUSH">
             <intent-filter>
                 <action android:name="android.provider.Telephony.WAP_PUSH_DELIVER" />
@@ -129,6 +130,7 @@
         <activity
             android:name=".test.activities.TestMainActivity"
             android:label="@string/title_activity_test_main"
+            android:exported="false"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -163,7 +165,8 @@
             -->
         </activity>
         <activity android:name=".ux.activities.SilentSMSSenderActivity" />
-        <activity android:name=".test.activities.SearchResultsActivity">
+        <activity android:name=".test.activities.SearchResultsActivity"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
 
@@ -180,7 +183,8 @@
         <activity
             android:name=".ux.activities.IntroActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -190,6 +194,7 @@
         <activity
             android:name=".ux.activities.SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:exported="false"
             android:parentActivityName=".ux.activities.HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

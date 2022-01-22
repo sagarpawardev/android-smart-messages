@@ -4,10 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.crashlytics.android.Crashlytics;
-
 import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
-import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by sagarpawar on 18/11/17.

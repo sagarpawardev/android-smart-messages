@@ -3,9 +3,6 @@ package dev.sagar.smsblocker.tech.utils;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.crashlytics.android.Crashlytics;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -75,21 +72,21 @@ public class TranslateUtil {
                 translation = sbTranslation.toString();
             }
             else{
-                Crashlytics.log(Log.ERROR,
+                /*Crashlytics.log(Log.ERROR,
                         "Translate_API_Error",
-                        "Google Translate API Error: "+response.errorBody()+" \nURL: "+response.raw().request().url());
+                        "Google Translate API Error: "+response.errorBody()+" \nURL: "+response.raw().request().url());*/
                 throw new TranslateAPIException("Problem in Calling API");
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-            Crashlytics.logException(e);
+            //Crashlytics.logException(e);
             throw new TranslateAPIException("Cannot read property file: "+e.getMessage());
         } catch (JSONException e) {
-            Crashlytics.log(Log.ERROR,
+            /*Crashlytics.log(Log.ERROR,
                     "Translate_API_Error",
                     "Error in Response Structure..\n"+
-                    result);
+                    result);*/
             throw new TranslateAPIException("Cannot read property file: "+e.getMessage());
         }
 

@@ -8,9 +8,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Build;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
+
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import com.like.view.R;
 

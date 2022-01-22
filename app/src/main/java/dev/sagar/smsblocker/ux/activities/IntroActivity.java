@@ -4,17 +4,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;
 import dev.sagar.smsblocker.tech.beans.Conversation;
@@ -23,7 +23,6 @@ import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.ConversationUtil;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.ux.adapters.VPIntroAdapter;
-import io.fabric.sdk.android.Fabric;
 
 public class IntroActivity extends AppCompatActivity implements ConversationUtil.Callback{
 
@@ -168,7 +167,8 @@ public class IntroActivity extends AppCompatActivity implements ConversationUtil
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if(requestCode == PermissionUtilSingleton.RESULT_CODE_APP_DEFAULT) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PermissionUtilSingleton.RESULT_CODE_APP_DEFAULT) {
             boolean appIsDefault = permUtil.isAppDefault(getApplicationContext());
             if (appIsDefault) {
                 prepareInbox();

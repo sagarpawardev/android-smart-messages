@@ -8,7 +8,6 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 
 import dev.sagar.smsblocker.tech.beans.SMS;
@@ -19,7 +18,6 @@ import dev.sagar.smsblocker.tech.utils.LogUtil;
 import dev.sagar.smsblocker.tech.utils.NotificationUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.PermissionUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.PhoneUtilsSingleton;
-import io.fabric.sdk.android.Fabric;
 
 public class SMSReceivedReceiver extends BroadcastReceiver {
 

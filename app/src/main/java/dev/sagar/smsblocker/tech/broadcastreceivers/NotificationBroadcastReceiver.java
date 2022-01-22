@@ -7,13 +7,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
-
 import dev.sagar.smsblocker.tech.beans.SMS;
 import dev.sagar.smsblocker.tech.utils.AnalyticsUtil;
 import dev.sagar.smsblocker.tech.utils.NotificationUtilSingleton;
 import dev.sagar.smsblocker.tech.utils.SMSUtil;
-import io.fabric.sdk.android.Fabric;
 
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
 

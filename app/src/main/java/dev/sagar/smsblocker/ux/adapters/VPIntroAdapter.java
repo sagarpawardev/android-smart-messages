@@ -5,12 +5,13 @@ package dev.sagar.smsblocker.ux.adapters;
  */
 
 import android.app.Activity;
-import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.viewpager.widget.PagerAdapter;
 
 import dev.sagar.smsblocker.Permission;
 import dev.sagar.smsblocker.R;

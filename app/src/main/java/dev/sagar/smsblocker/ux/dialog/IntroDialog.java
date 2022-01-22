@@ -2,8 +2,8 @@ package dev.sagar.smsblocker.ux.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by sagarpawar on 02/04/18.
